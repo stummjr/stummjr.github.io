@@ -6,10 +6,20 @@
     <description>Recent content in python on Dunder Doc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 01 May 2020 15:42:35 -0300</lastBuildDate>
+    <lastBuildDate>Sun, 03 May 2020 15:55:13 -0300</lastBuildDate>
     
 	<atom:link href="http://stummjr.github.io/tags/python/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Writing Scrapy Spiders in 2020</title>
+      <link>http://stummjr.github.io/post/scrapy-in-2020/</link>
+      <pubDate>Sun, 03 May 2020 15:55:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/scrapy-in-2020/</guid>
+      <description>I am a huge fan of Scrapy and I&amp;rsquo;ve used it extensively for 3+ wonderful years working at Scrapinghub, the company behind this framework.
+It&amp;rsquo;s been one and a half year since I used it for the last time, but last week I had to build a spider for a personal project. To my surprise, I am not just rusty but pretty outdated in terms of the new shiny features of Scrapy.</description>
+    </item>
     
     <item>
       <title>Debugging Python with pudb</title>
