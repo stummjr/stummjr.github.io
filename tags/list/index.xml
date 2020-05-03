@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>list on Dunder Doc</title>
+    <link>http://stummjr.github.io/tags/list/</link>
+    <description>Recent content in list on Dunder Doc</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 27 Aug 2018 15:42:35 -0300</lastBuildDate>
+    
+	<atom:link href="http://stummjr.github.io/tags/list/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Drop Duplicates from a List in Order</title>
+      <link>http://stummjr.github.io/post/drop-duplicates-in-order/</link>
+      <pubDate>Mon, 27 Aug 2018 15:42:35 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/drop-duplicates-in-order/</guid>
+      <description>Let’s say you have a list containing all the URLs extracted from a web page and you want to get rid of duplicate URLs.
+The most common way of achieving that might be building a set from that list, given that such operation automatically drops the duplicates. Something like:
+&amp;gt;&amp;gt;&amp;gt; urls = [ &amp;#39;http://api.example.com/b&amp;#39;, &amp;#39;http://api.example.com/a&amp;#39;, &amp;#39;http://api.example.com/c&amp;#39;, &amp;#39;http://api.example.com/b&amp;#39; ] &amp;gt;&amp;gt;&amp;gt; set(urls) {&amp;#39;http://api.example.com/a&amp;#39;, &amp;#39;http://api.example.com/b&amp;#39;, &amp;#39;http://api.example.com/c&amp;#39;} The problem is that we just lost the original order of the list.</description>
+    </item>
+    
+  </channel>
+</rss>

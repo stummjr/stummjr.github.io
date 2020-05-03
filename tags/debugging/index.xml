@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>debugging on Dunder Doc</title>
+    <link>http://stummjr.github.io/tags/debugging/</link>
+    <description>Recent content in debugging on Dunder Doc</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 01 May 2020 15:42:35 -0300</lastBuildDate>
+    
+	<atom:link href="http://stummjr.github.io/tags/debugging/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Debugging Python with pudb</title>
+      <link>http://stummjr.github.io/post/debugging-python-with-pudb/</link>
+      <pubDate>Fri, 01 May 2020 15:42:35 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/debugging-python-with-pudb/</guid>
+      <description>Pudb is, in my opinion, the most underrated Python package out there. I know this is a bold statement, but that’s how I feel about it. It helped me so much in a daily basis for so many years and I still feel like not too many people know about it.
+Debugging in Python There are several good debuggers for Python. I know a ton of people that use pdb, ipdb, VSCode/PyCharm embedded debuggers, among others.</description>
+    </item>
+    
+  </channel>
+</rss>

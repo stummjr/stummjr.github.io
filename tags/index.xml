@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Dunder Doc</title>
+    <link>http://stummjr.github.io/tags/</link>
+    <description>Recent content in Tags on Dunder Doc</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 01 May 2020 15:42:35 -0300</lastBuildDate>
+    
+	<atom:link href="http://stummjr.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>debugging</title>
+      <link>http://stummjr.github.io/tags/debugging/</link>
+      <pubDate>Fri, 01 May 2020 15:42:35 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/debugging/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>python</title>
+      <link>http://stummjr.github.io/tags/python/</link>
+      <pubDate>Fri, 01 May 2020 15:42:35 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/python/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ast</title>
+      <link>http://stummjr.github.io/tags/ast/</link>
+      <pubDate>Mon, 31 Dec 2018 15:42:35 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/ast/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>flake8</title>
+      <link>http://stummjr.github.io/tags/flake8/</link>
+      <pubDate>Mon, 31 Dec 2018 15:42:35 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/flake8/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>linter</title>
+      <link>http://stummjr.github.io/tags/linter/</link>
+      <pubDate>Mon, 31 Dec 2018 15:42:35 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/linter/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>loops</title>
+      <link>http://stummjr.github.io/tags/loops/</link>
+      <pubDate>Wed, 05 Sep 2018 15:42:35 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/loops/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>programming</title>
+      <link>http://stummjr.github.io/tags/programming/</link>
+      <pubDate>Wed, 05 Sep 2018 15:42:35 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/programming/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ipython</title>
+      <link>http://stummjr.github.io/tags/ipython/</link>
+      <pubDate>Sun, 02 Sep 2018 15:55:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/ipython/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>shell</title>
+      <link>http://stummjr.github.io/tags/shell/</link>
+      <pubDate>Sun, 02 Sep 2018 15:55:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/shell/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rounding</title>
+      <link>http://stummjr.github.io/tags/rounding/</link>
+      <pubDate>Tue, 28 Aug 2018 15:55:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/rounding/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>list</title>
+      <link>http://stummjr.github.io/tags/list/</link>
+      <pubDate>Mon, 27 Aug 2018 15:42:35 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/list/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

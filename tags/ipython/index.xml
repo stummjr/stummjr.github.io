@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ipython on Dunder Doc</title>
+    <link>http://stummjr.github.io/tags/ipython/</link>
+    <description>Recent content in ipython on Dunder Doc</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 02 Sep 2018 15:55:13 -0300</lastBuildDate>
+    
+	<atom:link href="http://stummjr.github.io/tags/ipython/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>How to customize your IPython 5&#43; prompt</title>
+      <link>http://stummjr.github.io/post/customize-ipython5-prompt/</link>
+      <pubDate>Sun, 02 Sep 2018 15:55:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/customize-ipython5-prompt/</guid>
+      <description>IPython is wonderful and I ❤️ it. I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:
+Some of the things that I dislike:
+ the banner displayed when we start it; the In[x] and Out[x] displayed for inputs and outputs; the newline in between commands; and last, but far from least, the uber-annoying “do you really want to exit?</description>
+    </item>
+    
+  </channel>
+</rss>

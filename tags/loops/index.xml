@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>loops on Dunder Doc</title>
+    <link>http://stummjr.github.io/tags/loops/</link>
+    <description>Recent content in loops on Dunder Doc</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 05 Sep 2018 15:42:35 -0300</lastBuildDate>
+    
+	<atom:link href="http://stummjr.github.io/tags/loops/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The curious case of the else in Python loops</title>
+      <link>http://stummjr.github.io/post/else-in-python-loops/</link>
+      <pubDate>Wed, 05 Sep 2018 15:42:35 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/else-in-python-loops/</guid>
+      <description>One of the first things to stand out when I was starting with Python was the else clause. I guess everyone knows the normal usage of such clauses in any programming language, which is to define an alternate path for the if condition. Oddly enough, in Python we can add else clauses in loop constructions, such as for and while.
+For example, this is valid Python:
+for number in some_sequence: if is_the_magic_number(number): print(&amp;#39;found the magic number&amp;#39;) break else: print(&amp;#39;magic number not found&amp;#39;) Notice how the else is aligned with the for and not with the if.</description>
+    </item>
+    
+  </channel>
+</rss>

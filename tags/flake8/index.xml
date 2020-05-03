@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>flake8 on Dunder Doc</title>
+    <link>http://stummjr.github.io/tags/flake8/</link>
+    <description>Recent content in flake8 on Dunder Doc</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 31 Dec 2018 15:42:35 -0300</lastBuildDate>
+    
+	<atom:link href="http://stummjr.github.io/tags/flake8/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Building a custom Flake8 plugin</title>
+      <link>http://stummjr.github.io/post/building-a-custom-flake8-plugin/</link>
+      <pubDate>Mon, 31 Dec 2018 15:42:35 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/building-a-custom-flake8-plugin/</guid>
+      <description>Linters are everywhere. Be it in a fancy IDE, a CI pipeline or in the command line, linters help us to spot potential issues in our codebases. My favorite linter is flake8 and I use it in my VSCode setup, in my git pre-commit hooks and CI pipelines.
+But the thing is that flake8 doesn’t catch all the stuff I wanted it to catch. For example, I’d like my linter to catch the usage of the map and filter functions.</description>
+    </item>
+    
+  </channel>
+</rss>
