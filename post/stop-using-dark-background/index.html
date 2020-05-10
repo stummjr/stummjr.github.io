@@ -11,7 +11,7 @@
     
 
     
-    <title>How to customize your IPython 5&#43; prompt</title>
+    <title>Why I stopped using dark backgrounds</title>
 
     
     
@@ -21,18 +21,14 @@
   
   
   <meta name="author" content="Valdir Stumm Jr" />
-  <meta name="description" content="IPython is wonderful and I ❤️ it. I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:
-Some of the things that I dislike:
- the banner displayed when we start it; the In[x] and Out[x] displayed for inputs and outputs; the newline in between commands; and last, but far from least, the uber-annoying “do you really want to exit?">
+  <meta name="description" content="15 years ago, my whole desktop environment was dark. Dark terminal, dark vim, dark graphic environment, and dark mp3 player. It was pretty cool. I felt like a hacker in those unrealistic 90s movies. Whoever stepped into my room would think that I was doing some rocket science. In fact, I was probaby just listening to mp3, learning some bash scripting and taking screenshots to share my cool desktop in online forums.">
 
   
   
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@stummjr" />
-    <meta name="twitter:title" content="How to customize your IPython 5&#43; prompt" />
-    <meta name="twitter:description" content="IPython is wonderful and I ❤️ it. I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:
-Some of the things that I dislike:
- the banner displayed when we start it; the In[x] and Out[x] displayed for inputs and outputs; the newline in between commands; and last, but far from least, the uber-annoying “do you really want to exit?" />
+    <meta name="twitter:title" content="Why I stopped using dark backgrounds" />
+    <meta name="twitter:description" content="15 years ago, my whole desktop environment was dark. Dark terminal, dark vim, dark graphic environment, and dark mp3 player. It was pretty cool. I felt like a hacker in those unrealistic 90s movies. Whoever stepped into my room would think that I was doing some rocket science. In fact, I was probaby just listening to mp3, learning some bash scripting and taking screenshots to share my cool desktop in online forums." />
     <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
   
 
@@ -42,7 +38,7 @@ Some of the things that I dislike:
 <meta name="generator" content="Hugo 0.69.2" />
 
 
-<link rel="canonical" href="http://stummjr.github.io/post/customize-ipython5-prompt/">
+<link rel="canonical" href="http://stummjr.github.io/post/stop-using-dark-background/">
 <link rel="alternative" href="/index.xml" title="Dunder Doc" type="application/atom+xml">
 
 
@@ -227,87 +223,83 @@ Some of the things that I dislike:
     
   <section class="main post-detail">
     <header class="post-header">
-      <h1 class="post-title">How to customize your IPython 5&#43; prompt</h1>
+      <h1 class="post-title">Why I stopped using dark backgrounds</h1>
       <p class="entry-meta">
-        <span class="entry-time">Sep 2, 2018</span>
+        <span class="entry-time">May 7, 2020</span>
         <span class="entry-author">Valdir Stumm Jr</span>
-        2 min read
+        4 min read
       </p>
     </header>
     
 
-    <article class="post-content"><p><strong><a href="https://ipython.org/">IPython</a> is wonderful and I ❤️ it.</strong> I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:</p>
-<p><img src="/img/posts/ipython1.png" alt=""></p>
-<p><strong>Some of the things that I dislike:</strong></p>
-<ul>
-<li>the banner displayed when we start it;</li>
-<li>the <code>In[x]</code> and <code>Out[x]</code> displayed for inputs and outputs;</li>
-<li>the newline in between commands;</li>
-<li>and last, but far from least, the uber-annoying <em>“do you really want to exit?”</em> message.</li>
-</ul>
-<p>As you can see, it doesn’t take much to get on my nerves. 😆</p>
-<p>The bright side is that it’s easy to change that and have a more pleasant experience with IPython. This is my ideal shell, more compact and less bureaucratic:</p>
-<p><img src="/img/posts/ipython2.png" alt=""></p>
-<p>If you like it, follow me through the next steps to make your IPython shell look and behave like that.</p>
-<h1 id="customizing-the-prompt">Customizing the prompt</h1>
-<p><strong>First</strong> you have to create a default profile for your shell with this command:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ipython profile create
-</code></pre></div><p>As a result, a <code>.ipython</code> folder will be created in your home folder, with the following contents:</p>
-<pre><code>.ipython
-├── extensions
-├── nbextensions
-└── profile_default
-    ├── ipython_config.py
-    ├── log
-    ├── pid
-    ├── security
-    └── startup
-        └── README
-</code></pre><p><strong>Next</strong>, create  <code>.ipython/custom_prompt.py</code> file with the following content:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> IPython.terminal.prompts <span style="color:#f92672">import</span> Prompts, Token
- 
-<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CustomPrompt</span>(Prompts):
- 
-    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">in_prompt_tokens</span>(self, cli<span style="color:#f92672">=</span>None):
-        <span style="color:#66d9ef">return</span> [(Token<span style="color:#f92672">.</span>Prompt, <span style="color:#e6db74">&#39;&gt;&gt;&gt; &#39;</span>), ]
- 
-    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">out_prompt_tokens</span>(self, cli<span style="color:#f92672">=</span>None):
-        <span style="color:#66d9ef">return</span> [(Token<span style="color:#f92672">.</span>Prompt, <span style="color:#e6db74">&#39;&#39;</span>), ]
- 
-    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">continuation_prompt_tokens</span>(self, cli<span style="color:#f92672">=</span>None, width<span style="color:#f92672">=</span>None):
-        <span style="color:#66d9ef">return</span> [(Token<span style="color:#f92672">.</span>Prompt, <span style="color:#e6db74">&#39;&#39;</span>), ]
-</code></pre></div><p><strong>And last</strong>, you have to tell IPython to use this new class as your prompt and in addition to custom settings.</p>
-<p>You can do so by adding this code to <code>.ipython/profile_default/ipython_config.py</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> custom_prompt <span style="color:#f92672">import</span> CustomPrompt
- 
- 
-c <span style="color:#f92672">=</span> get_config()
- 
-c<span style="color:#f92672">.</span>TerminalInteractiveShell<span style="color:#f92672">.</span>prompts_class <span style="color:#f92672">=</span> CustomPrompt
-c<span style="color:#f92672">.</span>TerminalInteractiveShell<span style="color:#f92672">.</span>separate_in <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>
-c<span style="color:#f92672">.</span>TerminalInteractiveShell<span style="color:#f92672">.</span>confirm_exit <span style="color:#f92672">=</span> False
-c<span style="color:#f92672">.</span>TerminalIPythonApp<span style="color:#f92672">.</span>display_banner <span style="color:#f92672">=</span> False
-</code></pre></div><p><strong>That’s it</strong>, now you have a prompt like the one I’ve shown earlier. I hope it improves your experience with IPython as it did for me.</p>
-<p>If you want to learn how to do further customizations, check <a href="https://ipython.readthedocs.io/en/stable/config/details.html#custom-prompts">the official documentation</a>.</p>
-<p>Ah, did I mention that <strong>I love IPython</strong>? Huge kudos and thanks for the team behind it! 👏</p>
+    <article class="post-content"><p>15 years ago, my whole desktop environment was dark. Dark terminal, dark vim, dark graphic environment, and dark mp3 player.
+It was pretty cool. I felt like a hacker in those unrealistic 90s movies. Whoever stepped into my room would think that I was
+doing some rocket science. In fact, I was probaby just listening to mp3, learning some bash scripting and taking screenshots
+to share my cool desktop in online forums. I can&rsquo;t say it wasn&rsquo;t fun, though.</p>
+<p>10 years later I started noticing how hard it had become to read/write code in my dark environment. My eyes would feel sore
+and it was hard to focus on the code. Fonts were blurrier in my shiny retina display than they were in the 640x480 CRT monitors
+I used back in the days.</p>
+<p>After a bit of research, I found out that it probably happened because of my <a href="https://en.wikipedia.org/wiki/Astigmatism">astigmatism</a>.
+There are several scientific studies that show that people with astigmatism have trouble reading on <em>light-on-dark</em> schemes.
+I found out about them in this <a href="https://ux.stackexchange.com/a/53268">SE answer</a>. People with astigmatism experience the so-called
+<a href="https://www.lexico.com/en/definition/halation">halation effect</a>:</p>
+<blockquote>
+<p>The spreading of light beyond its proper boundaries to form a fog around the edges of a bright image in a
+photograph or on a television screen.</p>
+</blockquote>
+<p>Check out <a href="https://jessicaotis.com/academia/never-use-white-text-on-a-black-background-astygmatism-and-conference-slides/">this blog post</a>
+to see how it feels.</p>
+<h1 id="how-i-fixed-this">How I fixed this</h1>
+<p>All I did was changing my whole desktop to use a light background for everything. <a href="https://ethanschoonover.com/solarized/">Solarized Light</a> is my favorite color scheme for my editor, terminal, and many other apps. This is how my development environment looks
+like these days:</p>
+<figure>
+    <img src="/img/light-env.png" width="500"/> 
+</figure>
+
+<p>Not as cool as my screen two decades ago, but fully functional. 😉</p>
+<h1 id="dark-backgrounds-are-everywhere">Dark backgrounds are everywhere</h1>
+<p>Every week I see someone celebrating the fact that yet another app now supports dark backgrounds. The products announce it
+as if they had found the cure for cancer. It&rsquo;s kind of weird to see how far they go to announce a (<em>wait for it&hellip;</em>) new color
+scheme. Apple focused a MacOS release on something that most Linux graphical environments allowed me to do 20 years ago.</p>
+<p>I am not preaching against dark backgrounds and in favor of light ones. In fact, most people that I know can&rsquo;t code in a light
+environment for too much time as they suffer from eye strain after a few hours.</p>
+<p>From a reader perspective, though, there are multiple studies showing that it&rsquo;s harder to read in <em>light-on-dark</em> than in <em>dark-on-light</em>.</p>
+<h2 id="a-call-for-conference-speakers">A call for conference speakers</h2>
+<p>I&rsquo;ve been in countless conferences where the speaker used a dark background to present snippets of code. Me during their talks:</p>
+<figure>
+    <img src="/img/michael-scott-i-understand-nothing.png" width="500"/> 
+</figure>
+
+<p>And it wasn&rsquo;t just me. You could see people squeezing their eyes all around the room. Sometimes even the speaker notices and
+apologizes (or blames the video projector).</p>
+<p>Even in a world where everyone can read well in dark backgrounds, there are still crappy devices and bad lighting
+to ruin your talk. It&rsquo;s not really common to find a conference with the right combination of light and good
+projection devices. It&rsquo;s probably hard and expensive to do so (I have no idea, to be honest).</p>
+<p><strong>But what can you, as a speaker, do?</strong> Use light backgrounds for your slide decks and specially for the code snippets.
+That will give you and your audience a better experience. As a bonus you also reduce the chances of having your talk
+negatively impacted by an external factor like this.</p>
+<h1 id="this-is-all-about-me-though">This is all about me, though</h1>
+<p>This blog post talks about <strong>my personal experience</strong> using dark vs light backgrounds. I am no doctor and I know nothing
+about the human eye to give any sort of advice.</p>
+<p>Anyway, I feel it&rsquo;s worth sharing what worked for me as there may be other people having similar issues and a light
+background could be worth a quick try. In any case, a doctor is probably the right call. 😀</p>
+<p><em><strong>Disclaimer:</strong> the snippets on this website will continue to use a dark background, just because it looks cooler. 😂</em></p>
 </article>
     <footer class="post-footer">
       
       <ul class="post-tags">
         
-          <li class="post-tag"><a href="/tags/python"><span class="tag">Python</span></a></li>
+          <li class="post-tag"><a href="/tags/coding"><span class="tag">Coding</span></a></li>
         
-          <li class="post-tag"><a href="/tags/ipython"><span class="tag">Ipython</span></a></li>
-        
-          <li class="post-tag"><a href="/tags/shell"><span class="tag">Shell</span></a></li>
+          <li class="post-tag"><a href="/tags/life"><span class="tag">Life</span></a></li>
         
       </ul>
       
       <div class="sharing">
-        <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=How%20to%20customize%20your%20IPython%205%2b%20prompt&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Twitter">
+        <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Why%20I%20stopped%20using%20dark%20backgrounds&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fstop-using-dark-background%2f" title="Share on Twitter">
           <svg class="icon icon-twitter" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
         </a>
-        <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Facebook">
+        <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fstop-using-dark-background%2f" title="Share on Facebook">
           <svg class="icon icon-facebook" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
         </a>
       </div>

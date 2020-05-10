@@ -11,30 +11,28 @@
     
 
     
-    <title>How to customize your IPython 5&#43; prompt</title>
-
-    
-    
-
-
-
+    <title>
+  Tag → life
   
+   | Dunder Doc
+</title>
+
+    
+    
+
+
+
+
   
   <meta name="author" content="Valdir Stumm Jr" />
-  <meta name="description" content="IPython is wonderful and I ❤️ it. I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:
-Some of the things that I dislike:
- the banner displayed when we start it; the In[x] and Out[x] displayed for inputs and outputs; the newline in between commands; and last, but far from least, the uber-annoying “do you really want to exit?">
+  <meta name="description" content="Random thoughts and tips on programming." />
 
   
-  
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@stummjr" />
-    <meta name="twitter:title" content="How to customize your IPython 5&#43; prompt" />
-    <meta name="twitter:description" content="IPython is wonderful and I ❤️ it. I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:
-Some of the things that I dislike:
- the banner displayed when we start it; the In[x] and Out[x] displayed for inputs and outputs; the newline in between commands; and last, but far from least, the uber-annoying “do you really want to exit?" />
-    <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
-  
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@stummjr" />
+  <meta name="twitter:title" content="Dunder Doc" />
+  <meta name="twitter:description" content="Random thoughts and tips on programming." />
+  <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
 
 
 
@@ -42,7 +40,7 @@ Some of the things that I dislike:
 <meta name="generator" content="Hugo 0.69.2" />
 
 
-<link rel="canonical" href="http://stummjr.github.io/post/customize-ipython5-prompt/">
+<link rel="canonical" href="http://stummjr.github.io/tags/life/">
 <link rel="alternative" href="/index.xml" title="Dunder Doc" type="application/atom+xml">
 
 
@@ -225,108 +223,41 @@ Some of the things that I dislike:
 </amp-sidebar>
 
     
-  <section class="main post-detail">
-    <header class="post-header">
-      <h1 class="post-title">How to customize your IPython 5&#43; prompt</h1>
-      <p class="entry-meta">
-        <span class="entry-time">Sep 2, 2018</span>
-        <span class="entry-author">Valdir Stumm Jr</span>
-        2 min read
-      </p>
+  <section class="main entry-list">
+    <header class="list-header">
+      
+      
+        
+      
+        
+      
     </header>
     
+    
+      
+        <article class="entry-single">
+  
+  <header class="entry-header">
+    <h3 class="entry-title"><a href="http://stummjr.github.io/post/stop-using-dark-background/" title="Why I stopped using dark backgrounds" class="entry-link">Why I stopped using dark backgrounds</a></h3>
+  </header>
 
-    <article class="post-content"><p><strong><a href="https://ipython.org/">IPython</a> is wonderful and I ❤️ it.</strong> I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:</p>
-<p><img src="/img/posts/ipython1.png" alt=""></p>
-<p><strong>Some of the things that I dislike:</strong></p>
-<ul>
-<li>the banner displayed when we start it;</li>
-<li>the <code>In[x]</code> and <code>Out[x]</code> displayed for inputs and outputs;</li>
-<li>the newline in between commands;</li>
-<li>and last, but far from least, the uber-annoying <em>“do you really want to exit?”</em> message.</li>
-</ul>
-<p>As you can see, it doesn’t take much to get on my nerves. 😆</p>
-<p>The bright side is that it’s easy to change that and have a more pleasant experience with IPython. This is my ideal shell, more compact and less bureaucratic:</p>
-<p><img src="/img/posts/ipython2.png" alt=""></p>
-<p>If you like it, follow me through the next steps to make your IPython shell look and behave like that.</p>
-<h1 id="customizing-the-prompt">Customizing the prompt</h1>
-<p><strong>First</strong> you have to create a default profile for your shell with this command:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ipython profile create
-</code></pre></div><p>As a result, a <code>.ipython</code> folder will be created in your home folder, with the following contents:</p>
-<pre><code>.ipython
-├── extensions
-├── nbextensions
-└── profile_default
-    ├── ipython_config.py
-    ├── log
-    ├── pid
-    ├── security
-    └── startup
-        └── README
-</code></pre><p><strong>Next</strong>, create  <code>.ipython/custom_prompt.py</code> file with the following content:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> IPython.terminal.prompts <span style="color:#f92672">import</span> Prompts, Token
- 
-<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CustomPrompt</span>(Prompts):
- 
-    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">in_prompt_tokens</span>(self, cli<span style="color:#f92672">=</span>None):
-        <span style="color:#66d9ef">return</span> [(Token<span style="color:#f92672">.</span>Prompt, <span style="color:#e6db74">&#39;&gt;&gt;&gt; &#39;</span>), ]
- 
-    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">out_prompt_tokens</span>(self, cli<span style="color:#f92672">=</span>None):
-        <span style="color:#66d9ef">return</span> [(Token<span style="color:#f92672">.</span>Prompt, <span style="color:#e6db74">&#39;&#39;</span>), ]
- 
-    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">continuation_prompt_tokens</span>(self, cli<span style="color:#f92672">=</span>None, width<span style="color:#f92672">=</span>None):
-        <span style="color:#66d9ef">return</span> [(Token<span style="color:#f92672">.</span>Prompt, <span style="color:#e6db74">&#39;&#39;</span>), ]
-</code></pre></div><p><strong>And last</strong>, you have to tell IPython to use this new class as your prompt and in addition to custom settings.</p>
-<p>You can do so by adding this code to <code>.ipython/profile_default/ipython_config.py</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> custom_prompt <span style="color:#f92672">import</span> CustomPrompt
- 
- 
-c <span style="color:#f92672">=</span> get_config()
- 
-c<span style="color:#f92672">.</span>TerminalInteractiveShell<span style="color:#f92672">.</span>prompts_class <span style="color:#f92672">=</span> CustomPrompt
-c<span style="color:#f92672">.</span>TerminalInteractiveShell<span style="color:#f92672">.</span>separate_in <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>
-c<span style="color:#f92672">.</span>TerminalInteractiveShell<span style="color:#f92672">.</span>confirm_exit <span style="color:#f92672">=</span> False
-c<span style="color:#f92672">.</span>TerminalIPythonApp<span style="color:#f92672">.</span>display_banner <span style="color:#f92672">=</span> False
-</code></pre></div><p><strong>That’s it</strong>, now you have a prompt like the one I’ve shown earlier. I hope it improves your experience with IPython as it did for me.</p>
-<p>If you want to learn how to do further customizations, check <a href="https://ipython.readthedocs.io/en/stable/config/details.html#custom-prompts">the official documentation</a>.</p>
-<p>Ah, did I mention that <strong>I love IPython</strong>? Huge kudos and thanks for the team behind it! 👏</p>
+  <p class="entry-summary">15 years ago, my whole desktop environment was dark. Dark terminal, dark vim, dark graphic environment, and dark mp3 player. It was pretty cool. I felt like a hacker in those unrealistic 90s movies. Whoever stepped into my room would think that I was doing some rocket science. In fact, I was probaby just listening to mp3, learning some bash scripting and taking screenshots to share my cool desktop in online forums.</p>
+  <footer class="entry-footer">
+    <p class="entry-meta"><span class="entry-time">May 7, 2020</span> 4 min read</p>
+    <div class="sharing">
+      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Why%20I%20stopped%20using%20dark%20backgrounds&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fstop-using-dark-background%2f" title="Share on Twitter">
+        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
+      </a>
+      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fstop-using-dark-background%2f" title="Share on Facebook">
+        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
+      </a>
+    </div>
+  </footer>
 </article>
-    <footer class="post-footer">
-      
-      <ul class="post-tags">
-        
-          <li class="post-tag"><a href="/tags/python"><span class="tag">Python</span></a></li>
-        
-          <li class="post-tag"><a href="/tags/ipython"><span class="tag">Ipython</span></a></li>
-        
-          <li class="post-tag"><a href="/tags/shell"><span class="tag">Shell</span></a></li>
-        
-      </ul>
-      
-      <div class="sharing">
-        <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=How%20to%20customize%20your%20IPython%205%2b%20prompt&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Twitter">
-          <svg class="icon icon-twitter" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-        </a>
-        <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Facebook">
-          <svg class="icon icon-facebook" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-        </a>
-      </div>
-
-      <div id="disqus_thread"></div>
-      <script>
-      
 
       
-
-      (function() { 
-      var d = document, s = d.createElement('script');
-      s.src = 'https://dunderdoc.disqus.com/embed.js';
-      s.setAttribute('data-timestamp', +new Date());
-      (d.head || d.body).appendChild(s);
-      })();
-      </script>
-      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                       
-    </footer>
+    
+    
   </section>
 
     <footer class="footer">

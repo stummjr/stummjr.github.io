@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>coding on Dunder Doc</title>
+    <link>http://stummjr.github.io/tags/coding/</link>
+    <description>Recent content in coding on Dunder Doc</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 07 May 2020 15:55:13 -0300</lastBuildDate>
+    
+	<atom:link href="http://stummjr.github.io/tags/coding/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Why I stopped using dark backgrounds</title>
+      <link>http://stummjr.github.io/post/stop-using-dark-background/</link>
+      <pubDate>Thu, 07 May 2020 15:55:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/stop-using-dark-background/</guid>
+      <description>15 years ago, my whole desktop environment was dark. Dark terminal, dark vim, dark graphic environment, and dark mp3 player. It was pretty cool. I felt like a hacker in those unrealistic 90s movies. Whoever stepped into my room would think that I was doing some rocket science. In fact, I was probaby just listening to mp3, learning some bash scripting and taking screenshots to share my cool desktop in online forums.</description>
+    </item>
+    
+  </channel>
+</rss>
