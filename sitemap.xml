@@ -3,11 +3,6 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://stummjr.github.io/post/progress-bars-with-tqdm/</loc>
-    <lastmod>2020-05-07T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
     <loc>http://stummjr.github.io/tags/coding/</loc>
     <lastmod>2020-05-07T15:55:13-03:00</lastmod>
   </url>
@@ -28,16 +23,6 @@
   </url>
   
   <url>
-    <loc>http://stummjr.github.io/tags/python/</loc>
-    <lastmod>2020-05-07T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://stummjr.github.io/tags/scripts/</loc>
-    <lastmod>2020-05-07T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
     <loc>http://stummjr.github.io/tags/</loc>
     <lastmod>2020-05-07T15:55:13-03:00</lastmod>
   </url>
@@ -45,6 +30,11 @@
   <url>
     <loc>http://stummjr.github.io/post/stop-using-dark-background/</loc>
     <lastmod>2020-05-07T15:55:13-03:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://stummjr.github.io/tags/python/</loc>
+    <lastmod>2020-05-03T15:55:13-03:00</lastmod>
   </url>
   
   <url>

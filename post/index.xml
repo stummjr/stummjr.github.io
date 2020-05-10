@@ -12,16 +12,6 @@
     
     
     <item>
-      <title>Building Quick and Dirty Scripts Like a Pro</title>
-      <link>http://stummjr.github.io/post/progress-bars-with-tqdm/</link>
-      <pubDate>Thu, 07 May 2020 15:55:13 -0300</pubDate>
-      
-      <guid>http://stummjr.github.io/post/progress-bars-with-tqdm/</guid>
-      <description>I have built countless scripts in my life to solve a myriad of problems. They usually start pretty ugly, but once I notice that I will be running them over and over again, I start adding some basic functionality to make my user experience a bit better.
- parsing command line arguments; showing a progress bar for expensive operations; formatting the output for better reading.  My ugly script Reading Command Line Arguments using click?</description>
-    </item>
-    
-    <item>
       <title>Why I stopped using dark backgrounds</title>
       <link>http://stummjr.github.io/post/stop-using-dark-background/</link>
       <pubDate>Thu, 07 May 2020 15:55:13 -0300</pubDate>
