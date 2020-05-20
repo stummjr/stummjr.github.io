@@ -6,15 +6,15 @@
     <description>Recent content in libraries on Dunder Doc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 15 May 2020 15:55:13 -0300</lastBuildDate>
+    <lastBuildDate>Tue, 19 May 2020 23:19:13 -0300</lastBuildDate>
     
 	<atom:link href="http://stummjr.github.io/tags/libraries/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Building command line scripts like a pro with Python</title>
+      <title>Tips for boosting your Python scripts</title>
       <link>http://stummjr.github.io/post/building-scripts-in-python/</link>
-      <pubDate>Fri, 15 May 2020 15:55:13 -0300</pubDate>
+      <pubDate>Tue, 19 May 2020 23:19:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/building-scripts-in-python/</guid>
       <description>I find myself writing quick command line scripts every so often. They usually automate a random task from my daily routine and end up saving me a bunch of time. These scripts usually start as quick and dirty snippets, but once I figure that they are not a one-off thing, then I iterate to make them more usable.
