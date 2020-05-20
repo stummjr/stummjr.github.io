@@ -11,28 +11,28 @@
     
 
     
-    <title>
-  Tag → python
+    <title>Building command line scripts like a pro with Python</title>
+
+    
+    
+
+
+
   
-   | Dunder Doc
-</title>
-
-    
-    
-
-
-
-
   
   <meta name="author" content="Valdir Stumm Jr" />
-  <meta name="description" content="Random thoughts and tips on programming." />
+  <meta name="description" content="I find myself writing quick command line scripts every so often. They usually automate a random task from my daily routine and end up saving me a bunch of time. These scripts usually start as quick and dirty snippets, but once I figure that they are not a one-off thing, then I iterate to make them more usable.
+There are several things that I find valuable in scripts like these:">
 
   
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="@stummjr" />
-  <meta name="twitter:title" content="Dunder Doc" />
-  <meta name="twitter:description" content="Random thoughts and tips on programming." />
-  <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
+  
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@stummjr" />
+    <meta name="twitter:title" content="Building command line scripts like a pro with Python" />
+    <meta name="twitter:description" content="I find myself writing quick command line scripts every so often. They usually automate a random task from my daily routine and end up saving me a bunch of time. These scripts usually start as quick and dirty snippets, but once I figure that they are not a one-off thing, then I iterate to make them more usable.
+There are several things that I find valuable in scripts like these:" />
+    <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
+  
 
 
 
@@ -40,7 +40,7 @@
 <meta name="generator" content="Hugo 0.69.2" />
 
 
-<link rel="canonical" href="http://stummjr.github.io/tags/python/">
+<link rel="canonical" href="http://stummjr.github.io/post/building-scripts-in-python/">
 <link rel="alternative" href="/index.xml" title="Dunder Doc" type="application/atom+xml">
 
 
@@ -223,200 +223,180 @@
 </amp-sidebar>
 
     
-  <section class="main entry-list">
-    <header class="list-header">
-      
-      
-        
-      
-        
-      
+  <section class="main post-detail">
+    <header class="post-header">
+      <h1 class="post-title">Building command line scripts like a pro with Python</h1>
+      <p class="entry-meta">
+        <span class="entry-time">May 15, 2020</span>
+        <span class="entry-author">Valdir Stumm Jr</span>
+        5 min read
+      </p>
     </header>
     
-    
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/building-scripts-in-python/" title="Building command line scripts like a pro with Python" class="entry-link">Building command line scripts like a pro with Python</a></h3>
-  </header>
 
-  <p class="entry-summary">I find myself writing quick command line scripts every so often. They usually automate a random task from my daily routine and end up saving me a bunch of time. These scripts usually start as quick and dirty snippets, but once I figure that they are not a one-off thing, then I iterate to make them more usable.
-There are several things that I find valuable in scripts like these:</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">May 15, 2020</span> 5 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Building%20command%20line%20scripts%20like%20a%20pro%20with%20Python&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fbuilding-scripts-in-python%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fbuilding-scripts-in-python%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
+    <article class="post-content"><p>I find myself writing quick command line scripts every so often. They usually automate a
+random task from my daily routine and end up saving me a bunch of time. These scripts
+usually start as quick and dirty snippets, but once I figure that they are not a one-off
+thing, then I iterate to make them more usable.</p>
+<p>There are several things that I find valuable in scripts like these:</p>
+<ol>
+<li>Their development cycle must be fast and iterative.</li>
+<li>They must support command line arguments.</li>
+<li>They must display progress bars during expensive operations.</li>
+<li>They must output the results in a human-digestable format.</li>
+</ol>
+<p>I am pretty sure I am not alone on this, so I am going to share some of the tools that I use
+on my scripts to support the features above.</p>
+<h2 id="caching-http-responses-during-development">Caching HTTP responses during development</h2>
+<p>Building scripts that fetch data from the network can be a bit of a pain. Every time you
+want to test changes to your code, you have to re-fetch the data. In addition to slowing
+down the development cycle, you may very quickly hit API rate limits which will force you to
+stop until you&rsquo;re clean again.</p>
+<p>To avoid such issues, I&rsquo;ve been using a library called
+<a href="https://github.com/reclosedev/requests-cache"><code>requests-cache</code></a> that is a great companion
+to <a href="https://github.com/psf/requests"><code>requests</code></a>. It basically creates a persistent cache so
+that your script does not reach out to the server every time you run it. Using it is as simple
+as importing it and installing a cache:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> requests
+<span style="color:#f92672">import</span> requests_cache
+
+requests_cache<span style="color:#f92672">.</span>install_cache(<span style="color:#e6db74">&#39;temp_cache&#39;</span>)
+response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;http://example.com&#34;</span>)
+</code></pre></div><p>When the script above is ran for the first time, <code>requests-cache</code> will create a <code>temp_cache.sqlite</code>
+file and store the responses there. The next time the script is ran, no requests are going to hit
+the server.</p>
+<p>In some cases, it may be useful to specify an expiration period. For example, we can force
+a cache invalidation after 1 hour by passing the <code>expire_after</code> parameter:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">requests_cache<span style="color:#f92672">.</span>install_cache(<span style="color:#e6db74">&#39;temp_cache&#39;</span>, expire_after<span style="color:#f92672">=</span><span style="color:#ae81ff">3600</span>)
+</code></pre></div><p>This library has boosted my development speed considerably. For more options, check out
+the <a href="https://requests-cache.readthedocs.io/en/latest/">requests-cache documentation</a>.</p>
+<h2 id="parsing-command-line-arguments">Parsing Command Line Arguments</h2>
+<p>I was a long time <code>argparse</code> user, until I met <a href="https://click.palletsprojects.com/"><code>click</code></a>.
+Click is so much simpler and yet very powerful. It allows me to define the arguments for my script
+by simply decorating a function. Check out how simple it is to parse a couple command line options
+with <code>click</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> click
+
+<span style="color:#a6e22e">@click.command</span>()
+<span style="color:#a6e22e">@click.option</span>(<span style="color:#e6db74">&#34;--user&#34;</span>, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;A GitHub username.&#34;</span>)
+<span style="color:#a6e22e">@click.option</span>(<span style="color:#e6db74">&#34;--days&#34;</span>, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;The number of days to look back.&#34;</span>, default<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">grab_stats</span>(user, days):
+    click<span style="color:#f92672">.</span>echo(click<span style="color:#f92672">.</span>style(f<span style="color:#e6db74">&#34;Hello, {user}!&#34;</span>, fg<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;green&#34;</span>))
+    click<span style="color:#f92672">.</span>echo(click<span style="color:#f92672">.</span>style(f<span style="color:#e6db74">&#34;Fetching the PRs/issues created in the past {days} days.&#34;</span>, fg<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;red&#34;</span>))
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+    grab_stats()
+</code></pre></div><p>Check out the output of the script above:</p>
+<figure>
+    <img src="/img/click-output.png" width="800"/> 
+</figure>
+
+<p>Click allowed me to easily format the output using <code>click.style()</code>, which is a great abstraction
+around the terminal&rsquo;s escape sequences.</p>
+<p>Click&rsquo;s <code>echo()</code> function is also quite helpful as it gracefully handles multiple types of
+terminals, so that the script&rsquo;s output looks the same no matter the terminal encoding.</p>
+<p>Click also auto-generates help pages:</p>
+<pre><code>$ python ghstats.py --help
+Usage: ghstats.py [OPTIONS]
+
+Options:
+  --user TEXT     The user's GitHub username.
+  --days INTEGER  List the PRs/issues opened in the last 'days' days.
+  --help          Show this message and exit.
+</code></pre><p>This is the simplest example ever. Click is a very robust and feature-rich tool.
+For more info, check out the <a href="https://click.palletsprojects.com/">click docs</a>.</p>
+<h2 id="showing-progress-bars-for-the-impatient">Showing progress bars for the impatient</h2>
+<p>Every now and then I build a script that is just slow. Sometimes it&rsquo;s because it&rsquo;s reading
+a ton of files, sometimes it&rsquo;s doing a bunch of HTTP requests and sometimes it&rsquo;s just CPU heavy.</p>
+<p>There&rsquo;s nothing worse than staring at the screen as the cursor blinks without telling us
+anything. Progress bars are excellent at giving the users a sense of (<em>uh &hellip;</em>) progress.
+A simple progress bar like this helps users to estimate how much time they&rsquo;ll have to wait:</p>
+<figure>
+    <img src="/img/progress-bar-tqdm.png" width="800"/> 
+</figure>
+
+<p>Adding progress bars to Python scripts is super easy with <a href="https://github.com/tqdm/tqdm"><code>tqdm</code></a>.
+Let&rsquo;s say that we have a script that goes through a bunch of URLs making requests to fetch their
+resources. This is all we have to do to show a nice progress bar to follow through the progress:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> tqdm <span style="color:#f92672">import</span> tqdm
+
+<span style="color:#f92672">...</span>
+<span style="color:#66d9ef">for</span> url <span style="color:#f92672">in</span> tqdm(urls):
+    resp <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(url)
+    <span style="color:#f92672">...</span>
+</code></pre></div><p>Pretty simple, huh? It&rsquo;s so simple that it&rsquo;s hard to notice where the progress bar is being
+introduced.</p>
+<p>Again, this is just the simplest thing we can do with <code>tqdm</code>. It is super configurable and even provides
+a command line tool so that you can add progress bars to your shell scripts. For more info, check out
+the <a href="https://github.com/tqdm/tqdm/blob/master/README.rst">tqdm docs</a>.</p>
+<h2 id="tabulating-the-output">Tabulating the output</h2>
+<p>Isn&rsquo;t it better when a script outputs a nice little table on the screen instead of a confusing
+JSON object? The <a href="https://github.com/astanin/python-tabulate"><code>tabulate</code></a> library is quite handy
+as it allows us to easily plot nice ASCII tables with the output of our scripts:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> tabulate <span style="color:#f92672">import</span> tabulate
+
+repo_pulls <span style="color:#f92672">=</span> [
+    (<span style="color:#e6db74">&#34;https://github.com/stummjr/flake8-scrapy/pull/13&#34;</span>, <span style="color:#e6db74">&#34;Drop usage of lambda as callback&#34;</span>, <span style="color:#e6db74">&#34;stummjr&#34;</span>, <span style="color:#e6db74">&#34;2018-10-20&#34;</span>),
+    (<span style="color:#e6db74">&#34;https://github.com/stummjr/flake8-scrapy/pull/12&#34;</span>, <span style="color:#e6db74">&#34;Forbid inline callbacks&#34;</span>, <span style="color:#e6db74">&#34;stummjr&#34;</span>, <span style="color:#e6db74">&#34;2018-09-20&#34;</span>),
+    (<span style="color:#e6db74">&#34;https://github.com/stummjr/flake8-scrapy/pull/11&#34;</span>, <span style="color:#e6db74">&#34;Document callbacks&#34;</span>, <span style="color:#e6db74">&#34;stummjr&#34;</span>, <span style="color:#e6db74">&#34;2018-08-20&#34;</span>),
+]
+headers <span style="color:#f92672">=</span> (<span style="color:#e6db74">&#34;URL&#34;</span>, <span style="color:#e6db74">&#34;Title&#34;</span>, <span style="color:#e6db74">&#34;Author&#34;</span>, <span style="color:#e6db74">&#34;When&#34;</span>)
+table <span style="color:#f92672">=</span> tabulate(repo_pulls, headers<span style="color:#f92672">=</span>headers, tablefmt<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;fancy_grid&#34;</span>)
+<span style="color:#66d9ef">print</span>(table)
+</code></pre></div><p>The script above will output a nice little table like this:</p>
+<pre><code>╒══════════════════════════════════════════════════╤══════════════════════════════════╤══════════╤════════════╕
+│ URL                                              │ Title                            │ Author   │ When       │
+╞══════════════════════════════════════════════════╪══════════════════════════════════╪══════════╪════════════╡
+│ https://github.com/stummjr/flake8-scrapy/pull/13 │ Drop usage of lambda as callback │ stummjr  │ 2018-10-20 │
+├──────────────────────────────────────────────────┼──────────────────────────────────┼──────────┼────────────┤
+│ https://github.com/stummjr/flake8-scrapy/pull/12 │ Forbid inline callbacks          │ stummjr  │ 2018-09-20 │
+├──────────────────────────────────────────────────┼──────────────────────────────────┼──────────┼────────────┤
+│ https://github.com/stummjr/flake8-scrapy/pull/11 │ Document callbacks               │ stummjr  │ 2018-08-20 │
+╘══════════════════════════════════════════════════╧══════════════════════════════════╧══════════╧════════════╛
+</code></pre><p>This makes your quick and dirty scripts look more professional and it makes their output way more digestable.
+For more options, check out the <a href="https://github.com/astanin/python-tabulate#python-tabulate">tabulate documentation</a>.</p>
+<h2 id="wrapping-up">Wrapping up</h2>
+<p>I love writing scripts and I feel super proud when I am able to make one that&rsquo;s useful <strong>and</strong> usable.
+I hope the tips I shared here can help you feel the same about your scripts.</p>
+<p>And if you know any other helpful tools, please share them here in the comments as I&rsquo;m always looking for
+ways to improve my own scripts.</p>
 </article>
+    <footer class="post-footer">
+      
+      <ul class="post-tags">
+        
+          <li class="post-tag"><a href="/tags/python"><span class="tag">Python</span></a></li>
+        
+          <li class="post-tag"><a href="/tags/tools"><span class="tag">Tools</span></a></li>
+        
+          <li class="post-tag"><a href="/tags/libraries"><span class="tag">Libraries</span></a></li>
+        
+      </ul>
+      
+      <div class="sharing">
+        <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Building%20command%20line%20scripts%20like%20a%20pro%20with%20Python&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fbuilding-scripts-in-python%2f" title="Share on Twitter">
+          <svg class="icon icon-twitter" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
+        </a>
+        <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fbuilding-scripts-in-python%2f" title="Share on Facebook">
+          <svg class="icon icon-facebook" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
+        </a>
+      </div>
+
+      <div id="disqus_thread"></div>
+      <script>
+      
 
       
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/scrapy-in-2020/" title="Writing Scrapy Spiders in 2020" class="entry-link">Writing Scrapy Spiders in 2020</a></h3>
-  </header>
 
-  <p class="entry-summary">I am a huge fan of Scrapy and I’ve used it extensively for 3&#43; wonderful years working at Scrapinghub, the company behind this framework.
-It’s been one and a half year since I used it for the last time, but last week I had to build a spider for a personal project. To my surprise, I am not just rusty but pretty outdated in terms of the new shiny features of Scrapy.</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">May 3, 2020</span> 4 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Writing%20Scrapy%20Spiders%20in%202020&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fscrapy-in-2020%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fscrapy-in-2020%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/debugging-python-with-pudb/" title="Debugging Python with pudb" class="entry-link">Debugging Python with pudb</a></h3>
-  </header>
-
-  <p class="entry-summary">Pudb is, in my opinion, the most underrated Python package out there. I know this is a bold statement, but that’s how I feel about it. It helped me so much in a daily basis for so many years and I still feel like not too many people know about it.
-Debugging in Python There are several good debuggers for Python. I know a ton of people that use pdb, ipdb, VSCode/PyCharm embedded debuggers, among others.</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">May 1, 2020</span> 3 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Debugging%20Python%20with%20pudb&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fdebugging-python-with-pudb%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fdebugging-python-with-pudb%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/building-a-custom-flake8-plugin/" title="Building a custom Flake8 plugin" class="entry-link">Building a custom Flake8 plugin</a></h3>
-  </header>
-
-  <p class="entry-summary">Linters are everywhere. Be it in a fancy IDE, a CI pipeline or in the command line, linters help us to spot potential issues in our codebases. My favorite linter is flake8 and I use it in my VSCode setup, in my git pre-commit hooks and CI pipelines.
-But the thing is that flake8 doesn’t catch all the stuff I wanted it to catch. For example, I’d like my linter to catch the usage of the map and filter functions.</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Dec 31, 2018</span> 6 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Building%20a%20custom%20Flake8%20plugin&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fbuilding-a-custom-flake8-plugin%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fbuilding-a-custom-flake8-plugin%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/else-in-python-loops/" title="The curious case of the else in Python loops" class="entry-link">The curious case of the else in Python loops</a></h3>
-  </header>
-
-  <p class="entry-summary">One of the first things to stand out when I was starting with Python was the else clause. I guess everyone knows the normal usage of such clauses in any programming language, which is to define an alternate path for the if condition. Oddly enough, in Python we can add else clauses in loop constructions, such as for and while.
-For example, this is valid Python:
-for number in some_sequence: if is_the_magic_number(number): print(&#39;found the magic number&#39;) break else: print(&#39;magic number not found&#39;) Notice how the else is aligned with the for and not with the if.</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Sep 5, 2018</span> 1 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=The%20curious%20case%20of%20the%20else%20in%20Python%20loops&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2felse-in-python-loops%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2felse-in-python-loops%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/customize-ipython5-prompt/" title="How to customize your IPython 5&#43; prompt" class="entry-link">How to customize your IPython 5&#43; prompt</a></h3>
-  </header>
-
-  <p class="entry-summary">IPython is wonderful and I ❤️ it. I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:
-Some of the things that I dislike:
- the banner displayed when we start it; the In[x] and Out[x] displayed for inputs and outputs; the newline in between commands; and last, but far from least, the uber-annoying “do you really want to exit?</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Sep 2, 2018</span> 2 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=How%20to%20customize%20your%20IPython%205%2b%20prompt&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/python3-round-oddities/" title="Python 3 rounding oddities" class="entry-link">Python 3 rounding oddities</a></h3>
-  </header>
-
-  <p class="entry-summary">Rounding a decimal number with Python 3 is as simple as invoking the round() builtin:
-&gt;&gt;&gt; round(1.2) 1 &gt;&gt;&gt; round(1.8) 2 We can also pass an extra parameter called ndigits, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:
-&gt;&gt;&gt; round(1.847, ndigits=2) 1.85 &gt;&gt;&gt; round(1.847, ndigits=1) 1.8 And what happens when we want to round a number like 1.5? Will it round it up or down?</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Aug 28, 2018</span> 2 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Python%203%20rounding%20oddities&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fpython3-round-oddities%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fpython3-round-oddities%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/drop-duplicates-in-order/" title="Drop Duplicates from a List in Order" class="entry-link">Drop Duplicates from a List in Order</a></h3>
-  </header>
-
-  <p class="entry-summary">Let’s say you have a list containing all the URLs extracted from a web page and you want to get rid of duplicate URLs.
-The most common way of achieving that might be building a set from that list, given that such operation automatically drops the duplicates. Something like:
-&gt;&gt;&gt; urls = [ &#39;http://api.example.com/b&#39;, &#39;http://api.example.com/a&#39;, &#39;http://api.example.com/c&#39;, &#39;http://api.example.com/b&#39; ] &gt;&gt;&gt; set(urls) {&#39;http://api.example.com/a&#39;, &#39;http://api.example.com/b&#39;, &#39;http://api.example.com/c&#39;} The problem is that we just lost the original order of the list.</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Aug 27, 2018</span> 2 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Drop%20Duplicates%20from%20a%20List%20in%20Order&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fdrop-duplicates-in-order%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fdrop-duplicates-in-order%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-    
-    
+      (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://dunderdoc.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+      })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                       
+    </footer>
   </section>
 
     <footer class="footer">
