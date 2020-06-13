@@ -6,10 +6,20 @@
     <description>Recent content on Dunder Doc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 19 May 2020 23:19:13 -0300</lastBuildDate>
+    <lastBuildDate>Sat, 06 Jun 2020 10:19:13 -0300</lastBuildDate>
     
 	<atom:link href="http://stummjr.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>My Favorite IPython Tricks</title>
+      <link>http://stummjr.github.io/post/ipython-tricks/</link>
+      <pubDate>Sat, 06 Jun 2020 10:19:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/ipython-tricks/</guid>
+      <description>It’s no secret that IPython is my favorite Python shell. I am the guy who is always asking everyone “did you try IPython already?” as soon as I see they opening the regular Python shell. Yes, I know, you’d probably hate me.
+The reason I like it so much is that IPython makes it very easy for me to incrementally experiment when coding. I consider experimentation to be a crucial step when writing software, as it helps to reduce the unkowns in a problem or technology.</description>
+    </item>
     
     <item>
       <title>Tips for boosting your Python scripts</title>
