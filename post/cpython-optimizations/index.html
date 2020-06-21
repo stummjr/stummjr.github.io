@@ -306,7 +306,7 @@ True
 <h2 id="constant-folding">Constant Folding</h2>
 <p><a href="https://en.wikipedia.org/wiki/Constant_folding">Constant folding</a> is another technique often employed by compilers and interpreters. It consists of precomputing in compile time the expressions that have no runtime dependencies. For example, it is quite common to find definitions like this in Python programs:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">kilobyte <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>
-</code></pre></div><p>People usually do that so that other people reading their code can get a better grasp on how an otherwise &ldquo;magic&rdquo; value (8096 in this case) was actually defined.</p>
+</code></pre></div><p>People usually do that so that other people reading their code can get a better grasp on how an otherwise &ldquo;magic&rdquo; value (8192 in this case) was actually defined.</p>
 <p>The CPython interpreter folds that expression into a constant while compiling the source code (<code>.py</code>) into bytecode (<code>.pyc</code>). In practical terms, it means that the resulting bytecode won&rsquo;t contain the <code>8 * 1024</code> expression, but the <code>8192</code> constant instead. We are basically trading run time for compile time. Imagine if <code>kilobyte</code> was defined in a function that is called thousands of times during a program execution. We&rsquo;d have thousands of multiplications, all happening in runtime.</p>
 <h3 id="digging-a-bit-more">Digging a Bit More</h3>
 <p>Before we start digging, let me show you how we can verify if a given expression is being folded into a constant or not. An easy way to do that is to use the <a href="https://docs.python.org/3/library/dis.html"><code>dis</code></a> module to disassemble a Python function into its bytecode representation.</p>
@@ -368,11 +368,11 @@ False
 </code></pre></div><h3 id="what-about-constant-propagation">What About Constant Propagation?</h3>
 <p>As far as I can tell, CPython <strong>does not do</strong> <a href="https://en.wikipedia.org/wiki/Constant_folding#Constant_propagation">Constant Propagation</a>. That is, it does not replace variables whose values are known in compile time by their actual values. Check this out:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
-        kilobyte <span style="color:#f92672">=</span> <span style="color:#ae81ff">8096</span>
+        kilobyte <span style="color:#f92672">=</span> <span style="color:#ae81ff">8192</span>
         megabyte <span style="color:#f92672">=</span> kilobyte <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>
 
 <span style="color:#f92672">&gt;&gt;&gt;</span> dis<span style="color:#f92672">.</span>dis(func)
-  <span style="color:#ae81ff">2</span>           <span style="color:#ae81ff">0</span> LOAD_CONST               <span style="color:#ae81ff">1</span> (<span style="color:#ae81ff">8096</span>)
+  <span style="color:#ae81ff">2</span>           <span style="color:#ae81ff">0</span> LOAD_CONST               <span style="color:#ae81ff">1</span> (<span style="color:#ae81ff">8192</span>)
               <span style="color:#ae81ff">2</span> STORE_FAST               <span style="color:#ae81ff">0</span> (kilobyte)
 
   <span style="color:#ae81ff">3</span>           <span style="color:#ae81ff">4</span> LOAD_FAST                <span style="color:#ae81ff">0</span> (kilobyte)
