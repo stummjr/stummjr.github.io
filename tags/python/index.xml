@@ -6,10 +6,20 @@
     <description>Recent content in python on Dunder Doc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 06 Jun 2020 10:19:13 -0300</lastBuildDate>
+    <lastBuildDate>Fri, 19 Jun 2020 23:19:13 -0300</lastBuildDate>
     
 	<atom:link href="http://stummjr.github.io/tags/python/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>CPython Optimizations</title>
+      <link>http://stummjr.github.io/post/cpython-optimizations/</link>
+      <pubDate>Fri, 19 Jun 2020 23:19:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/cpython-optimizations/</guid>
+      <description>CPython is the reference implementation of the Python language. While there are several other implementations, CPython is by far the most popular one. These days, it comes bundled in most of the operating systems.
+Even though CPython is not the most performatic Python interpreter out there, it does some very interesting optimizations to speed itself and Python programs up. I am pretty curious about things like these and the rationale behind them, even though I know very little about it.</description>
+    </item>
     
     <item>
       <title>My Favorite IPython Tricks</title>
