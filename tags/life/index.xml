@@ -8,7 +8,7 @@
     <language>en-us</language>
     <lastBuildDate>Thu, 07 May 2020 15:55:13 -0300</lastBuildDate>
     
-	<atom:link href="http://stummjr.github.io/tags/life/index.xml" rel="self" type="application/rss+xml" />
+      <atom:link href="http://stummjr.github.io/tags/life/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -17,7 +17,59 @@
       <pubDate>Thu, 07 May 2020 15:55:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/why-i-abandoned-dark-mode/</guid>
-      <description>15 years ago, my whole desktop environment was dark. Dark terminal, dark vim, dark graphic environment, and dark mp3 player. It was pretty cool. I felt like a hacker in those unrealistic 90s movies. Whoever stepped into my room would think that I was doing some rocket science. In fact, I was probaby just listening to mp3, learning some bash scripting and taking screenshots to share my cool desktop in online forums.</description>
+      <description>&lt;p&gt;15 years ago, my whole desktop environment was dark. Dark terminal, dark vim, dark graphic environment, and dark mp3 player.
+It was pretty cool. I felt like a hacker in those unrealistic 90s movies. Whoever stepped into my room would think that I was
+doing some rocket science. In fact, I was probaby just listening to mp3, learning some bash scripting and taking screenshots
+to share my cool desktop in online forums. I can&amp;rsquo;t say it wasn&amp;rsquo;t fun, though.&lt;/p&gt;
+&lt;p&gt;10 years later I started noticing how hard it had become to read/write code in my dark environment. My eyes would feel sore
+and it was hard to focus on the code. Fonts were blurrier in my shiny retina display than they were in the 640x480 CRT monitors
+I used back in the days.&lt;/p&gt;
+&lt;p&gt;After a bit of research, I found out that it probably happened because of my &lt;a href=&#34;https://en.wikipedia.org/wiki/Astigmatism&#34;&gt;astigmatism&lt;/a&gt;.
+There are several scientific studies that show that people with astigmatism have trouble reading on &lt;em&gt;light-on-dark&lt;/em&gt; schemes.
+I found out about them in this &lt;a href=&#34;https://ux.stackexchange.com/a/53268&#34;&gt;SE answer&lt;/a&gt;. People with astigmatism experience the so-called
+&lt;a href=&#34;https://www.lexico.com/en/definition/halation&#34;&gt;halation effect&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The spreading of light beyond its proper boundaries to form a fog around the edges of a bright image in a
+photograph or on a television screen.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Check out &lt;a href=&#34;https://jessicaotis.com/academia/never-use-white-text-on-a-black-background-astygmatism-and-conference-slides/&#34;&gt;this blog post&lt;/a&gt;
+to see how it feels.&lt;/p&gt;
+&lt;h1 id=&#34;how-i-fixed-the-issue&#34;&gt;How I fixed the issue&lt;/h1&gt;
+&lt;p&gt;To avoid this issue, all I did was changing my whole desktop to use a light background for everything. &lt;a href=&#34;https://ethanschoonover.com/solarized/&#34;&gt;Solarized Light&lt;/a&gt; is my favorite color scheme for my editor, terminal, and many other apps. This is how my development environment looks
+like these days:&lt;/p&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;http://stummjr.github.io/img/light-env.png&#34; width=&#34;500&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;Not as cool as my screen two decades ago, but fully functional. 😉&lt;/p&gt;
+&lt;h1 id=&#34;dark-backgrounds-are-everywhere&#34;&gt;Dark backgrounds are everywhere&lt;/h1&gt;
+&lt;p&gt;Every week I see someone celebrating the fact that yet another app now supports dark backgrounds. The products announce it
+as if they had found the cure for cancer. It&amp;rsquo;s kind of weird to see how far they go to announce a (&lt;em&gt;wait for it&amp;hellip;&lt;/em&gt;) new color
+scheme. Apple focused a MacOS release on something that most Linux graphical environments allowed me to do 20 years ago.&lt;/p&gt;
+&lt;p&gt;I am not preaching against dark backgrounds and in favor of light ones. In fact, most people that I know can&amp;rsquo;t code in a light
+environment for too much time as they suffer from eye strain after a few hours.&lt;/p&gt;
+&lt;p&gt;From a reader perspective, though, there are multiple studies showing that it&amp;rsquo;s harder to read in &lt;em&gt;light-on-dark&lt;/em&gt; than in &lt;em&gt;dark-on-light&lt;/em&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;it-gets-worse-at-conferences&#34;&gt;It gets worse at conferences&lt;/h2&gt;
+&lt;p&gt;I&amp;rsquo;ve been in countless conferences where the speaker used a dark background to present snippets of code. Me during their talks:&lt;/p&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;http://stummjr.github.io/img/michael-scott-i-understand-nothing.png&#34; width=&#34;500&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;And it wasn&amp;rsquo;t just me. You could see people squeezing their eyes all around the room. Sometimes even the speaker notices and
+apologizes (or blames the video projector).&lt;/p&gt;
+&lt;p&gt;Even in a world where everyone can read well in dark backgrounds, there are still crappy devices and bad lighting
+to ruin your talk. It&amp;rsquo;s not really common to find a conference with the right combination of light and good
+projection devices. It&amp;rsquo;s probably hard and expensive to do so (I have no idea, to be honest).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;But what can you, as a speaker, do?&lt;/strong&gt; Use light backgrounds for your slide decks and specially for the code snippets.
+That will give you and your audience a better experience. As a bonus you also reduce the chances of having your talk
+negatively impacted by an external factor like this.&lt;/p&gt;
+&lt;h1 id=&#34;this-is-all-about-me-though&#34;&gt;This is all about me, though&lt;/h1&gt;
+&lt;p&gt;This blog post talks about &lt;strong&gt;my personal experience&lt;/strong&gt; using dark vs light backgrounds. I am no doctor and I know nothing
+about the human eye to give any sort of advice.&lt;/p&gt;
+&lt;p&gt;Anyway, I feel it&amp;rsquo;s worth sharing what worked for me as there may be other people having similar issues and a light
+background could be worth a quick try. In any case, a doctor is probably the right call. 😀&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;Disclaimer:&lt;/strong&gt; the snippets on this website will continue to use a dark background, just because it looks cooler. 😂&lt;/em&gt;&lt;/p&gt;
+</description>
     </item>
     
   </channel>

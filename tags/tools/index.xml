@@ -8,7 +8,7 @@
     <language>en-us</language>
     <lastBuildDate>Sat, 06 Jun 2020 10:19:13 -0300</lastBuildDate>
     
-	<atom:link href="http://stummjr.github.io/tags/tools/index.xml" rel="self" type="application/rss+xml" />
+      <atom:link href="http://stummjr.github.io/tags/tools/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -17,8 +17,133 @@
       <pubDate>Sat, 06 Jun 2020 10:19:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/ipython-tricks/</guid>
-      <description>It’s no secret that IPython is my favorite Python shell. I am the guy who is always asking everyone “did you try IPython already?” as soon as I see they opening the regular Python shell. Yes, I know, you’d probably hate me.
-The reason I like it so much is that IPython makes it very easy for me to incrementally experiment when coding. I consider experimentation to be a crucial step when writing software, as it helps to reduce the unkowns in a problem or technology.</description>
+      <description>&lt;p&gt;It’s no secret that &lt;a href=&#34;https://ipython.org/&#34;&gt;IPython&lt;/a&gt; is my favorite Python shell. I am the guy who is always asking everyone “did you try IPython already?” as soon as I see they opening the regular Python shell. Yes, I know, you’d probably hate me.&lt;/p&gt;
+&lt;p&gt;The reason I like it so much is that IPython makes it very easy for me to incrementally experiment when coding. I consider experimentation to be a crucial step when writing software, as it helps to reduce the unkowns in a problem or technology.&lt;/p&gt;
+&lt;p&gt;Whenever I feel that there are gaps between what I know and what I have to accomplish, I use IPython to run experiments. After a bit of fiddling, I usually have a better understanding about what I have to do and then I feel more confident to go ahead and design a solution.&lt;/p&gt;
+&lt;p&gt;IPython provides me with the tools that I need for easier experimentation and I will share my favorite ones here.&lt;/p&gt;
+&lt;h2 id=&#34;docstrings-and-source-code-at-your-fingertips&#34;&gt;Docstrings and source code at your fingertips&lt;/h2&gt;
+&lt;p&gt;REPLs like IPython are the perfect environment for experimentation. One of the things that I need the most when trying stuff in IPython is to understand the functions/modules that I am willing to employ, and there&amp;rsquo;s nothing better than docstrings to help me with that.&lt;/p&gt;
+&lt;p&gt;IPython brings a handy shortcut to view the docstrings from any object. All I have to do is to append &lt;code&gt;?&lt;/code&gt; to the object&amp;rsquo;s name and hit enter. Check this out:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;getenv&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;?&lt;/span&gt;
+Signature: os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;getenv(key, default&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;None)
+Docstring:
+Get an environment variable, &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; None &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; it doesn&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;t exist.&lt;/span&gt;
+The optional second argument can specify an alternate default&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;
+key, default &lt;span style=&#34;color:#f92672&#34;&gt;and&lt;/span&gt; the result are str&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;
+File:      &lt;span style=&#34;color:#f92672&#34;&gt;~/.&lt;/span&gt;virtualenvs&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;python3&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;lib&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;python3&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;7&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;py
+Type:      function
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;However, sometimes I need to dig a bit further because the doctstrings are not clear enough or because I want to make sure that a corner-case is covered. Reading the source code is usually the best approach for that and IPython makes it pretty easy for pure-Python functions/classes/modules. It’s just a matter of appending &lt;code&gt;??&lt;/code&gt; and hitting enter:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;getenv&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;??&lt;/span&gt;
+Signature: os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;getenv(key, default&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;None)
+Source:
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;getenv&lt;/span&gt;(key, default&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;None):
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&amp;#34;Get an environment variable, return None if it doesn&amp;#39;t exist.
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;    The optional second argument can specify an alternate default.
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;    key, default and the result are str.&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; environ&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(key, default)
+File:      &lt;span style=&#34;color:#f92672&#34;&gt;~/.&lt;/span&gt;virtualenvs&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;python3&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;lib&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;python3&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;7&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;py
+Type:      function
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;saved-results-for-faster-experiments&#34;&gt;Saved results for faster experiments&lt;/h2&gt;
+&lt;p&gt;I find myself very often in a situation like this: I just executed a statement, saw the result and then I want to reuse that value in a follow-up statement. You&amp;rsquo;ve probably been there already too. The first instinct is to just re-execute that expression, now assigning a name to it so that you can reuse it in the next statement.&lt;/p&gt;
+&lt;p&gt;The good news is that we don&amp;rsquo;t need to do that. IPython saves the results of the 3 latest statements in these 3 names: &lt;code&gt;_&lt;/code&gt;, &lt;code&gt;__&lt;/code&gt; and &lt;code&gt;___&lt;/code&gt; (most to least recent).&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
+&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;
+&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; _ &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; __ &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; ___
+&lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; _ &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;span style=&#34;color:#ae81ff&#34;&gt;12&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;IPython also allows you to refer to the result of any statement previously executed in the current session via their numbers using the &lt;code&gt;_n&lt;/code&gt; syntax. Check this out:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;In [&lt;span style=&#34;color:#ae81ff&#34;&gt;18&lt;/span&gt;]: &lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;**&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+Out[&lt;span style=&#34;color:#ae81ff&#34;&gt;18&lt;/span&gt;]: &lt;span style=&#34;color:#ae81ff&#34;&gt;25&lt;/span&gt;
+
+In [&lt;span style=&#34;color:#ae81ff&#34;&gt;19&lt;/span&gt;]: _ &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;
+Out[&lt;span style=&#34;color:#ae81ff&#34;&gt;19&lt;/span&gt;]: &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;
+
+In [&lt;span style=&#34;color:#ae81ff&#34;&gt;20&lt;/span&gt;]: _19 &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+Out[&lt;span style=&#34;color:#ae81ff&#34;&gt;20&lt;/span&gt;]: &lt;span style=&#34;color:#ae81ff&#34;&gt;102&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;I actually customized my prompt to not show these numbers, so this is not useful for me. Also, a long session with large output objects may bloat your computer&amp;rsquo;s RAM. To avoid that, you can always disable caching by addding this to your IPython configuration:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;c&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;TerminalInteractiveShell&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;cache_size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This won&amp;rsquo;t disable the handy &lt;code&gt;_&lt;/code&gt;, &lt;code&gt;__&lt;/code&gt; and &lt;code&gt;___&lt;/code&gt; shortcuts, though.&lt;/p&gt;
+&lt;h2 id=&#34;magic-commands&#34;&gt;Magic commands&lt;/h2&gt;
+&lt;p&gt;IPython supports a variety of builtin commands that are so handy that they’re called &lt;strong&gt;magic commands&lt;/strong&gt;. They all start with the &lt;code&gt;%&lt;/code&gt; prefix and serve the most varied purposes. I am not a magic commands power user, but there are a few that I see myself using every now and then.&lt;/p&gt;
+&lt;h3 id=&#34;timeit-timing-your-python-code&#34;&gt;%timeit: timing your python code&lt;/h3&gt;
+&lt;p&gt;One of the goals of experimentation is figuring out what’d be the best solution to a particular problem, and often deciding what’s best involves performance evaluation. The &lt;a href=&#34;https://docs.python.org/3.8/library/timeit.html&#34;&gt;&lt;code&gt;timeit&lt;/code&gt;&lt;/a&gt; standard library module is great for that as it allows for measuring the time taken by a statement.&lt;/p&gt;
+&lt;p&gt;With IPython it&amp;rsquo;s even easier, as you can use the &lt;code&gt;%timeit&lt;/code&gt; magic function:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;%&lt;/span&gt;timeit [x &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; range(&lt;span style=&#34;color:#ae81ff&#34;&gt;1000&lt;/span&gt;)]
+&lt;span style=&#34;color:#ae81ff&#34;&gt;33.4&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;µ&lt;/span&gt;s &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;±&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;238&lt;/span&gt; ns per loop (mean &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;±&lt;/span&gt; std&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; dev&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; of &lt;span style=&#34;color:#ae81ff&#34;&gt;7&lt;/span&gt; runs, &lt;span style=&#34;color:#ae81ff&#34;&gt;10000&lt;/span&gt; loops each)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;prun-profiling-your-python-code&#34;&gt;%prun: profiling your python code&lt;/h3&gt;
+&lt;p&gt;When timing the execution of a given statement is not enough for the experiments, profiling it is the next step. IPython provides the &lt;code&gt;%prun&lt;/code&gt; magic command to allow for that. Check it out:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;%&lt;/span&gt;prun get_players_with_most_championships(players)
+         &lt;span style=&#34;color:#ae81ff&#34;&gt;11&lt;/span&gt; function calls &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; seconds
+
+   Ordered by: internal time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; {built&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; method builtins&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;exec&lt;/span&gt;}
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; ipython_edit_s94fadw6&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;py:&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;(players_with_most_rings)
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; {built&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; method builtins&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;max}
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;string&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;:&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;(&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;module&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;)
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; {method &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;append&amp;#39;&lt;/span&gt; of &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;list&amp;#39;&lt;/span&gt; objects}
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; {method &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;keys&amp;#39;&lt;/span&gt; of &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;dict&amp;#39;&lt;/span&gt; objects}
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; {method &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;disable&amp;#39;&lt;/span&gt; of &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;_lsprof.Profiler&amp;#39;&lt;/span&gt; objects}
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; ipython_edit_s94fadw6&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;py:&lt;span style=&#34;color:#ae81ff&#34;&gt;7&lt;/span&gt;(&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;listcomp&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This is great, as it helps identifying possible bottlenecks in the statements that I am experimenting with.&lt;/p&gt;
+&lt;h3 id=&#34;edit-editing-snippets-in-my-editor&#34;&gt;%edit: editing snippets in my editor&lt;/h3&gt;
+&lt;p&gt;It’s a pain to write an entire function directly in the shell input. Fortunately, the &lt;code&gt;%edit&lt;/code&gt; magic function allows me to do that in my favorite editor. Once I close the editor, IPython will execute whatever I have typed in there.&lt;/p&gt;
+&lt;p&gt;Check this out:&lt;/p&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;http://stummjr.github.io/img/edit-ipython.gif&#34; width=&#34;650&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;And if I want to reopen the same snippet for editing, I can just execute &lt;code&gt;%edit -p&lt;/code&gt; and that very same code snippet will be back in my editor.&lt;/p&gt;
+&lt;p&gt;This magic command is super handy when you want to input a big function and need a better place to write it in than the IPython shell itself.&lt;/p&gt;
+&lt;h3 id=&#34;hist-listing-the-commands-history&#34;&gt;%hist: listing the commands history&lt;/h3&gt;
+&lt;p&gt;When I am writing a function for an app and I am not really sure which operations are needed to transform the input from one format into another, I just open IPython and start experimenting. After a few experiments, I usually figure out what the function must implement. The next step is to copy the relevant lines to my editor and build the function from there.&lt;/p&gt;
+&lt;p&gt;Copying them one by one is cumbersome and copying them all at once will include the shell preffix and the outputs, so I&amp;rsquo;d need to clean that up after pasting into my editor. In cases like this, I use the magic &lt;code&gt;%hist&lt;/code&gt; command:&lt;/p&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;http://stummjr.github.io/img/hist-ipython.png&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;It ouputs only the expressions I typed in (no prefix and no outputs), so now I can just copy those into my editor, cut out the irrelevant parts of the experiments and finally polish the implementation.&lt;/p&gt;
+&lt;p&gt;This commmand also allows to save the history directly into a file by running:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;%&lt;/span&gt;hist &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;f myscript&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;py &lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;25&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The command above will save all the statements from the input lines 5 to 25 into the &lt;code&gt;myscript.py&lt;/code&gt; file.&lt;/p&gt;
+&lt;p&gt;Some people refer to this process as &lt;em&gt;REPL driven development&lt;/em&gt;. I find it particularly useful when I am writing a function to transform data from a known format to another.&lt;/p&gt;
+&lt;h3 id=&#34;what-else&#34;&gt;What else?&lt;/h3&gt;
+&lt;p&gt;There are also a couple other commands that I find pretty helpful, but that I don&amp;rsquo;t use very often:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;%pycat file.py&lt;/code&gt;: to view a python file inside IPython with syntax-highlighting and pagination.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;%run file.py&lt;/code&gt;: to run a python file inside the current IPython session.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;%quickref&lt;/code&gt;: to view a quick reference about magic commands.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;running-system-commands-from-inside-the-shell&#34;&gt;Running system commands from inside the shell&lt;/h2&gt;
+&lt;p&gt;It’s quite common to need to run an external command when you’re into an IPython session. Let’s say you want to quickly list the files from the current directory and you don’t want to leave your IPython session for that. All you have to do is this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;!&lt;/span&gt;ls
+main&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;py main&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;pyc output&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;What’s even cooler is that you can assign a name to the output of the system command:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; files &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;!&lt;/span&gt;ls
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; files
+[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;main.py&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;main.pyc&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;output.txt&amp;#39;&lt;/span&gt;]
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; files&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;s
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;main.py main.pyc output.txt&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; files&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;n
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;main.py&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;main.pyc&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;output.txt&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; files&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;p
+[PosixPath(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;main.py&amp;#39;&lt;/span&gt;), PosixPath(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;main.pyc&amp;#39;&lt;/span&gt;), PosixPath(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;output.txt&amp;#39;&lt;/span&gt;)]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Of course this is not valid Python code, so you can&amp;rsquo;t just use &lt;code&gt;!ls&lt;/code&gt; in your regular python scripts, but it can be pretty helpful during experiments.&lt;/p&gt;
+&lt;h2 id=&#34;inspecting-code-with-ipython&#34;&gt;Inspecting code with IPython&lt;/h2&gt;
+&lt;p&gt;Sometimes I need to stop the execution of my app at a certain point to inspect what’s going on. Even though debuggers serve this exact purpose very well, IPython also allows to drop the line below into any Python script and it will stop its execution for you to inspect the context and run experiments:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; IPython &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; embed; embed()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Does this replace a full-fledged debugger? Not at all, but it can be pretty handy. If you want a debugger, check out &lt;a href=&#34;http://stummjr.github.io/post/debugging-python-with-pudb/&#34;&gt;this blog post that I wrote on pudb&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;wrapping-up&#34;&gt;Wrapping up&lt;/h2&gt;
+&lt;p&gt;IPython is super powerful and I am sure that there are tons of goodies that I am not even aware of, specially when it comes to notebooks and scientific computing.&lt;/p&gt;
+&lt;p&gt;The tricks that I shared here are useful for me in my daily life as a software developer and I hope some of them can be helpful to you.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;P.S.:&lt;/strong&gt; this post was heavily inspired by a talk given by my good friend &lt;a href=&#34;https://eliasdorneles.com/&#34;&gt;Elias Dorneles&lt;/a&gt; and I back in 2016.&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -27,8 +152,133 @@ The reason I like it so much is that IPython makes it very easy for me to increm
       <pubDate>Tue, 19 May 2020 23:19:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/building-scripts-in-python/</guid>
-      <description>I find myself writing quick command line scripts every so often. They usually automate a random task from my daily routine and end up saving me a bunch of time. These scripts usually start as quick and dirty snippets, but once I figure that they are not a one-off thing, then I iterate to make them more usable.
-There are several things that I find valuable in scripts like these:</description>
+      <description>&lt;p&gt;I find myself writing quick command line scripts every so often. They usually automate a
+random task from my daily routine and end up saving me a bunch of time. These scripts
+usually start as quick and dirty snippets, but once I figure that they are not a one-off
+thing, then I iterate to make them more usable.&lt;/p&gt;
+&lt;p&gt;There are several things that I find valuable in scripts like these:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Their development cycle must be fast and iterative.&lt;/li&gt;
+&lt;li&gt;They must support command line arguments.&lt;/li&gt;
+&lt;li&gt;They must display progress bars during expensive operations.&lt;/li&gt;
+&lt;li&gt;They must output the results in a human-digestable format.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I am pretty sure I am not alone on this, so I am going to share some of the tools that I use
+on my scripts to support the features above.&lt;/p&gt;
+&lt;h2 id=&#34;caching-http-responses-during-development&#34;&gt;Caching HTTP responses during development&lt;/h2&gt;
+&lt;p&gt;Building scripts that fetch data from the network can be a bit of a pain. Every time you
+want to test changes to your code, you have to re-fetch the data. In addition to slowing
+down the development cycle, you may very quickly hit API rate limits which will force you to
+stop until you&amp;rsquo;re clean again.&lt;/p&gt;
+&lt;p&gt;To avoid such issues, I&amp;rsquo;ve been using a library called
+&lt;a href=&#34;https://github.com/reclosedev/requests-cache&#34;&gt;&lt;code&gt;requests-cache&lt;/code&gt;&lt;/a&gt; that is a great companion
+to &lt;a href=&#34;https://github.com/psf/requests&#34;&gt;&lt;code&gt;requests&lt;/code&gt;&lt;/a&gt;. It basically creates a persistent cache so
+that your script does not reach out to the server every time you run it. Using it is as simple
+as importing it and installing a cache:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; requests
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; requests_cache
+
+requests_cache&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;install_cache(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;temp_cache&amp;#39;&lt;/span&gt;)
+response &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; requests&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://example.com&amp;#34;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;When the script above is ran for the first time, &lt;code&gt;requests-cache&lt;/code&gt; will create a &lt;code&gt;temp_cache.sqlite&lt;/code&gt;
+file and store the responses there. The next time the script is ran, no requests are going to hit
+the server.&lt;/p&gt;
+&lt;p&gt;In some cases, it may be useful to specify an expiration period. For example, we can force
+a cache invalidation after 1 hour by passing the &lt;code&gt;expire_after&lt;/code&gt; parameter:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;requests_cache&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;install_cache(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;temp_cache&amp;#39;&lt;/span&gt;, expire_after&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;3600&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This library has boosted my development speed considerably. For more options, check out
+the &lt;a href=&#34;https://requests-cache.readthedocs.io/en/latest/&#34;&gt;requests-cache documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;parsing-command-line-arguments&#34;&gt;Parsing Command Line Arguments&lt;/h2&gt;
+&lt;p&gt;I was a long time &lt;code&gt;argparse&lt;/code&gt; user, until I met &lt;a href=&#34;https://click.palletsprojects.com/&#34;&gt;&lt;code&gt;click&lt;/code&gt;&lt;/a&gt;.
+Click is so much simpler and yet very powerful. It allows me to define the arguments for my script
+by simply decorating a function. Check out how simple it is to parse a couple command line options
+with &lt;code&gt;click&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; click
+
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@click.command&lt;/span&gt;()
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@click.option&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;--user&amp;#34;&lt;/span&gt;, help&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;A GitHub username.&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@click.option&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;--days&amp;#34;&lt;/span&gt;, help&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;The number of days to look back.&amp;#34;&lt;/span&gt;, default&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;grab_stats&lt;/span&gt;(user, days):
+    click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;echo(click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;style(f&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Hello, {user}!&amp;#34;&lt;/span&gt;, fg&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;green&amp;#34;&lt;/span&gt;))
+    click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;echo(click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;style(f&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Fetching the PRs/issues created in the past {days} days.&amp;#34;&lt;/span&gt;, fg&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;red&amp;#34;&lt;/span&gt;))
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; __name__ &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;__main__&amp;#34;&lt;/span&gt;:
+    grab_stats()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Check out the output of the script above:&lt;/p&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;http://stummjr.github.io/img/click-output.png&#34; width=&#34;800&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;Click allowed me to easily format the output using &lt;code&gt;click.style()&lt;/code&gt;, which is a great abstraction
+around the terminal&amp;rsquo;s escape sequences.&lt;/p&gt;
+&lt;p&gt;Click&amp;rsquo;s &lt;code&gt;echo()&lt;/code&gt; function is also quite helpful as it gracefully handles multiple types of
+terminals, so that the script&amp;rsquo;s output looks the same no matter the terminal encoding.&lt;/p&gt;
+&lt;p&gt;Click also auto-generates help pages:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ python ghstats.py --help
+Usage: ghstats.py [OPTIONS]
+
+Options:
+  --user TEXT     The user&#39;s GitHub username.
+  --days INTEGER  List the PRs/issues opened in the last &#39;days&#39; days.
+  --help          Show this message and exit.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This is the simplest example ever. Click is a very robust and feature-rich tool.
+For more info, check out the &lt;a href=&#34;https://click.palletsprojects.com/&#34;&gt;click docs&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;showing-progress-bars-for-the-impatient&#34;&gt;Showing progress bars for the impatient&lt;/h2&gt;
+&lt;p&gt;Every now and then I build a script that is just slow. Sometimes it&amp;rsquo;s because it&amp;rsquo;s reading
+a ton of files, sometimes it&amp;rsquo;s doing a bunch of HTTP requests and sometimes it&amp;rsquo;s just CPU heavy.&lt;/p&gt;
+&lt;p&gt;There&amp;rsquo;s nothing worse than staring at the screen as the cursor blinks without telling us
+anything. Progress bars are excellent at giving the users a sense of (&lt;em&gt;uh &amp;hellip;&lt;/em&gt;) progress.
+A simple progress bar like this helps users to estimate how much time they&amp;rsquo;ll have to wait:&lt;/p&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;http://stummjr.github.io/img/progress-bar-tqdm.png&#34; width=&#34;800&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;Adding progress bars to Python scripts is super easy with &lt;a href=&#34;https://github.com/tqdm/tqdm&#34;&gt;&lt;code&gt;tqdm&lt;/code&gt;&lt;/a&gt;.
+Let&amp;rsquo;s say that we have a script that goes through a bunch of URLs making requests to fetch their
+resources. This is all we have to do to show a nice progress bar to follow through the progress:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; tqdm &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; tqdm
+
+&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; url &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; tqdm(urls):
+    resp &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; requests&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(url)
+    &lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Pretty simple, huh? It&amp;rsquo;s so simple that it&amp;rsquo;s hard to notice where the progress bar is being
+introduced.&lt;/p&gt;
+&lt;p&gt;Again, this is just the simplest thing we can do with &lt;code&gt;tqdm&lt;/code&gt;. It is super configurable and even provides
+a command line tool so that you can add progress bars to your shell scripts. For more info, check out
+the &lt;a href=&#34;https://github.com/tqdm/tqdm/blob/master/README.rst&#34;&gt;tqdm docs&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;tabulating-the-output&#34;&gt;Tabulating the output&lt;/h2&gt;
+&lt;p&gt;Isn&amp;rsquo;t it better when a script outputs a nice little table on the screen instead of a confusing
+JSON object? The &lt;a href=&#34;https://github.com/astanin/python-tabulate&#34;&gt;&lt;code&gt;tabulate&lt;/code&gt;&lt;/a&gt; library is quite handy
+as it allows us to easily plot nice ASCII tables with the output of our scripts:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; tabulate &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; tabulate
+
+repo_pulls &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [
+    (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://github.com/stummjr/flake8-scrapy/pull/13&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Drop usage of lambda as callback&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;stummjr&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;2018-10-20&amp;#34;&lt;/span&gt;),
+    (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://github.com/stummjr/flake8-scrapy/pull/12&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Forbid inline callbacks&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;stummjr&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;2018-09-20&amp;#34;&lt;/span&gt;),
+    (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://github.com/stummjr/flake8-scrapy/pull/11&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Document callbacks&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;stummjr&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;2018-08-20&amp;#34;&lt;/span&gt;),
+]
+headers &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;URL&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Title&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Author&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;When&amp;#34;&lt;/span&gt;)
+table &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; tabulate(repo_pulls, headers&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;headers, tablefmt&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;fancy_grid&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#66d9ef&#34;&gt;print&lt;/span&gt;(table)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The script above will output a nice little table like this:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;╒══════════════════════════════════════════════════╤══════════════════════════════════╤══════════╤════════════╕
+│ URL                                              │ Title                            │ Author   │ When       │
+╞══════════════════════════════════════════════════╪══════════════════════════════════╪══════════╪════════════╡
+│ https://github.com/stummjr/flake8-scrapy/pull/13 │ Drop usage of lambda as callback │ stummjr  │ 2018-10-20 │
+├──────────────────────────────────────────────────┼──────────────────────────────────┼──────────┼────────────┤
+│ https://github.com/stummjr/flake8-scrapy/pull/12 │ Forbid inline callbacks          │ stummjr  │ 2018-09-20 │
+├──────────────────────────────────────────────────┼──────────────────────────────────┼──────────┼────────────┤
+│ https://github.com/stummjr/flake8-scrapy/pull/11 │ Document callbacks               │ stummjr  │ 2018-08-20 │
+╘══════════════════════════════════════════════════╧══════════════════════════════════╧══════════╧════════════╛
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This makes your quick and dirty scripts look more professional and it makes their output way more digestable.
+For more options, check out the &lt;a href=&#34;https://github.com/astanin/python-tabulate#python-tabulate&#34;&gt;tabulate documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;wrapping-up&#34;&gt;Wrapping up&lt;/h2&gt;
+&lt;p&gt;I love writing scripts and I feel super proud when I am able to make one that&amp;rsquo;s useful &lt;strong&gt;and&lt;/strong&gt; usable.
+I hope the tips I shared here can help you feel the same about your scripts.&lt;/p&gt;
+&lt;p&gt;And if you know any other helpful tools, please share them here in the comments as I&amp;rsquo;m always looking for
+ways to improve my own scripts.&lt;/p&gt;
+</description>
     </item>
     
   </channel>

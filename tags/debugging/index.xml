@@ -8,7 +8,7 @@
     <language>en-us</language>
     <lastBuildDate>Fri, 01 May 2020 15:42:35 -0300</lastBuildDate>
     
-	<atom:link href="http://stummjr.github.io/tags/debugging/index.xml" rel="self" type="application/rss+xml" />
+      <atom:link href="http://stummjr.github.io/tags/debugging/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -17,8 +17,48 @@
       <pubDate>Fri, 01 May 2020 15:42:35 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/debugging-python-with-pudb/</guid>
-      <description>Pudb is, in my opinion, the most underrated Python package out there. I know this is a bold statement, but that’s how I feel about it. It helped me so much in a daily basis for so many years and I still feel like not too many people know about it.
-Debugging in Python There are several good debuggers for Python. I know a ton of people that use pdb, ipdb, VSCode/PyCharm embedded debuggers, among others.</description>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/inducer/pudb&#34;&gt;&lt;strong&gt;Pudb&lt;/strong&gt;&lt;/a&gt; is, in my opinion, the most underrated Python package out there. I know this is a bold statement, but that’s how I feel about it. It helped me so much in a daily basis for so many years and I still feel like not too many people know about it.&lt;/p&gt;
+&lt;h1 id=&#34;debugging-in-python&#34;&gt;Debugging in Python&lt;/h1&gt;
+&lt;p&gt;There are several good debuggers for Python. I know a ton of people that use &lt;a href=&#34;https://docs.python.org/3/library/pdb.html&#34;&gt;pdb&lt;/a&gt;, &lt;a href=&#34;https://github.com/gotcha/ipdb&#34;&gt;ipdb&lt;/a&gt;, VSCode/PyCharm embedded debuggers, among others.&lt;/p&gt;
+&lt;p&gt;I tried most of them and they are actually pretty good, but none of them made me feel at home as &lt;strong&gt;pudb&lt;/strong&gt; did. Maybe it’s the &lt;em&gt;Turbo Pascal-esque&lt;/em&gt; UI that brings me 20 years back in time. Maybe it’s the ability to debug stuff visually in a terminal. I don’t know.&lt;/p&gt;
+&lt;h1 id=&#34;meet-pudb&#34;&gt;Meet pudb&lt;/h1&gt;
+&lt;p&gt;I was going to write a bunch of stuff here, but then I realized that it makes a lot more sense to just demo pudb’s main features, so here we go:&lt;/p&gt;
+
+&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&#34;&gt;
+  &lt;iframe src=&#34;https://www.youtube.com/embed/bJYkCWPs_UU&#34; style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;&#34; allowfullscreen title=&#34;YouTube Video&#34;&gt;&lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&#34;how-to-install-it&#34;&gt;How to install it&lt;/h1&gt;
+&lt;p&gt;Pudb is a third-party package, so you’ll need to install it first:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ pip install pudb
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;how-to-launch-it&#34;&gt;How to Launch it&lt;/h1&gt;
+&lt;p&gt;Launching pudb is similar to launching other python debuggers such as pdb and ipdb. All you have to do is to drop the line below wherever you want the execution of your program to pause:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; pudb; pudb&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;set_trace()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;You can also launch your program with pudb via command line:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ python -m pudb your_script.py
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;using-it-on-docker&#34;&gt;Using it on Docker&lt;/h1&gt;
+&lt;p&gt;Fortunately, pudb supports &lt;a href=&#34;https://documen.tician.de/pudb/starting.html#remote-debugging&#34;&gt;remote debugging&lt;/a&gt; and we can use it to debug Python code running on Docker.&lt;/p&gt;
+&lt;p&gt;First, we have to configure our app container to expose the port that we want pudb to listen to. For this example, we’ll expose it in the port 6900.&lt;/p&gt;
+&lt;p&gt;If using Docker Compose, we can add a &lt;code&gt;docker-compose.override.yml&lt;/code&gt; file in the project’s folder with the contents below:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;version&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;2&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;services&lt;/span&gt;:
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;my-service-container-name&lt;/span&gt;:
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;ports&lt;/span&gt;:
+      &lt;span style=&#34;color:#75715e&#34;&gt;# expose any that ports you have to expose&lt;/span&gt;
+      - &lt;span style=&#34;color:#ae81ff&#34;&gt;8081&lt;/span&gt;
+      &lt;span style=&#34;color:#75715e&#34;&gt;# pudb will be exposed via 6900&lt;/span&gt;
+      - &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;6900:6900&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Once that’s in place, we can drop the lines below wherever we want to inspect the service execution:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; pudb.remote &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; set_trace
+&lt;span style=&#34;color:#75715e&#34;&gt;# replace (120, 60) with your terminal dimensions&lt;/span&gt;
+set_trace(term_size&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;120&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;60&lt;/span&gt;), host&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;0.0.0.0&amp;#39;&lt;/span&gt;, port&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;6900&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Now, once our program stopped its execution in that line, we can just connect to pudb via telnet:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ telnet 0.0.0.0 &lt;span style=&#34;color:#ae81ff&#34;&gt;6900&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;And &lt;em&gt;voilá&lt;/em&gt;, pudb should open as if running locally. 🙂&lt;/p&gt;
+&lt;h1 id=&#34;wrapping-up&#34;&gt;Wrapping up&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://github.com/inducer/pudb&#34;&gt;Pudb&lt;/a&gt;&lt;/strong&gt; rocks and I wish that more people would use and promote it. While &lt;strong&gt;pdb&lt;/strong&gt; and other debuggers work pretty well, I think that they are not very intuitive and can be a rough experience for beginners.&lt;/p&gt;
+&lt;p&gt;Go ahead, give &lt;strong&gt;pudb&lt;/strong&gt; a try and let your friends/colleagues know about it. I am very grateful to my friend that introduced me to it.&lt;/p&gt;
+</description>
     </item>
     
   </channel>

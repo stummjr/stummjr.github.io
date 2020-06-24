@@ -8,7 +8,7 @@
     <language>en-us</language>
     <lastBuildDate>Mon, 31 Dec 2018 15:42:35 -0300</lastBuildDate>
     
-	<atom:link href="http://stummjr.github.io/tags/ast/index.xml" rel="self" type="application/rss+xml" />
+      <atom:link href="http://stummjr.github.io/tags/ast/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -17,8 +17,145 @@
       <pubDate>Mon, 31 Dec 2018 15:42:35 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/building-a-custom-flake8-plugin/</guid>
-      <description>Linters are everywhere. Be it in a fancy IDE, a CI pipeline or in the command line, linters help us to spot potential issues in our codebases. My favorite linter is flake8 and I use it in my VSCode setup, in my git pre-commit hooks and CI pipelines.
-But the thing is that flake8 doesn’t catch all the stuff I wanted it to catch. For example, I’d like my linter to catch the usage of the map and filter functions.</description>
+      <description>&lt;p&gt;Linters are everywhere. Be it in a fancy IDE, a CI pipeline or in the command line, linters help us to spot potential issues in our codebases. My favorite linter is &lt;a href=&#34;http://flake8.pycqa.org/en/latest/&#34;&gt;flake8&lt;/a&gt; and I use it in my VSCode setup, in my &lt;a href=&#34;http://flake8.pycqa.org/en/latest/user/using-hooks.html#built-in-hook-integration&#34;&gt;git pre-commit hooks&lt;/a&gt; and CI pipelines.&lt;/p&gt;
+&lt;p&gt;But the thing is that flake8 doesn’t catch all the stuff I wanted it to catch. For example, I’d like my linter to catch the usage of the &lt;code&gt;map&lt;/code&gt; and &lt;code&gt;filter&lt;/code&gt; functions.&lt;/p&gt;
+&lt;p&gt;So I was wondering how can I make my linter complain about it every time someone else or I write such a thing? The answer is: &lt;strong&gt;let’s write a flake8 plugin!&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;To do so, we’re gonna use two tools:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ast:&lt;/strong&gt; the stdlib module to manipulate Python Abstract Syntax Trees;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;flake8:&lt;/strong&gt; one of the (many) Python linters;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;the-anatomy-of-a-flake8-plugin&#34;&gt;The anatomy of a flake8 plugin&lt;/h1&gt;
+&lt;p&gt;For a simple plugin, all we need is to create two files in a new folder (which I called &lt;code&gt;flake8-picky/&lt;/code&gt;):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;setup.py&lt;/code&gt;: to make it installable and distributable;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;picky_checker.py&lt;/code&gt;: the module for the code checker itself.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Let’s start with the boring stuff (&lt;strong&gt;setup.py&lt;/strong&gt;) so that we are free to have fun hacking our plugin later. Here it is:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; setuptools
+ 
+setuptools&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;setup(
+   name&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;flake8-picky&amp;#39;&lt;/span&gt;,
+   license&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;MIT&amp;#39;&lt;/span&gt;,
+   version&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;0.0.1&amp;#39;&lt;/span&gt;,
+   description&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;A plugin to pick on map and filter usage :)&amp;#39;&lt;/span&gt;,
+   author&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Your name here&amp;#39;&lt;/span&gt;,
+   author_email&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;you@yourdomain.com&amp;#39;&lt;/span&gt;,
+   url&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://github.com/yourname/your-repo&amp;#39;&lt;/span&gt;,
+   py_modules&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;flake8_picky&amp;#39;&lt;/span&gt;],
+   entry_points&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;{
+       &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;flake8.extension&amp;#39;&lt;/span&gt;: [
+           &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;PCK0 = picky_checker:PickyChecker&amp;#39;&lt;/span&gt;,
+       ],
+   },
+   install_requires&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;flake8&amp;#39;&lt;/span&gt;],
+   classifiers&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;[
+       &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Topic :: Software Development :: Quality Assurance&amp;#39;&lt;/span&gt;,
+   ],
+)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Apart from the usual &lt;code&gt;setup.py&lt;/code&gt; stuff, there’s a section we need to pay attention:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;entry_points&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;{
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;flake8.extension&amp;#39;&lt;/span&gt;: [
+        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;PCK0 = picky_checker:PickyChecker&amp;#39;&lt;/span&gt;,
+    ],
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;We’ve listed a single entry point for our flake8 plugin, which is the &lt;code&gt;picky_checker.PickyChecker&lt;/code&gt; class (we’ll get there soon). As you can see, we’ve listed it under the &lt;code&gt;&#39;flake8.extension&#39;&lt;/code&gt; entry point type, because this is what we need for a plugin that will add code verifications to Flake8. You can check for more options in the &lt;a href=&#34;http://flake8.pycqa.org/en/latest/plugin-development/registering-plugins.html?highlight=flake8.extension&#34;&gt;official docs&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Another thing to notice here is the string we added to the list of entry points: &lt;code&gt;&#39;PCK0 = picky_checker:PickyChecker&#39;&lt;/code&gt;. &lt;code&gt;PCK0&lt;/code&gt; is a code prefix for the kind of issues we are going to report (they must all start with such a substring).&lt;/p&gt;
+&lt;p&gt;Now let’s focus on the &lt;code&gt;picky_checker.py&lt;/code&gt; file which will contain:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;a class to parse and check the code to be linted;&lt;/li&gt;
+&lt;li&gt;the entrypoint class for our plugin.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We’ll start with the former.&lt;/p&gt;
+&lt;h1 id=&#34;building-our-checker-with-ast&#34;&gt;Building our checker with ast&lt;/h1&gt;
+&lt;p&gt;It doesn’t surprise me that an awesome language like Python has a module in the stdlib that allows us to easily parse Python code: the ast module.&lt;/p&gt;
+&lt;p&gt;The ast module provides the &lt;a href=&#34;https://docs.python.org/3/library/ast.html#ast.NodeVisitor&#34;&gt;ast.NodeVisitor&lt;/a&gt; base class, which basically walks through the &lt;a href=&#34;https://en.wikipedia.org/wiki/Abstract_syntax_tree&#34;&gt;Abstract Syntax Tree&lt;/a&gt; calling visitor functions for every node it finds.&lt;/p&gt;
+&lt;p&gt;For example, let’s say we want to find all the function definitions in a Python snippet and print their names. Here’s how we’d do it using ast:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; ast
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;FunctionFinder&lt;/span&gt;(ast&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;NodeVisitor):
+       &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;visit_FunctionDef&lt;/span&gt;(self, node):
+           &lt;span style=&#34;color:#66d9ef&#34;&gt;print&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Found: {}&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;format(node&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;name))
+ 
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; sample &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&amp;#39;&amp;#39;
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;   def myfunc():
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;     pass
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;   def anotherfunc(x, y):
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;     return x * y
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; 
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;   x = myfunc() + 1
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;   &amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; parsed &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; ast&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;parse(sample)
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; finder &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; FunctionFinder()
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; finder&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;visit(parsed)
+Found: myfunc
+Found: anotherfunc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Easy like that. So, if we want our plugin to focus on a specific kind of AST node, all we have to do is to implement the &lt;code&gt;visit_*()&lt;/code&gt; method and add the checks inside. Check out the full list of node types here: &lt;a href=&#34;https://greentreesnakes.readthedocs.io/en/latest/nodes.html&#34;&gt;https://greentreesnakes.readthedocs.io/en/latest/nodes.html&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;the-parser&#34;&gt;The parser&lt;/h2&gt;
+&lt;p&gt;Getting back to our flake8 plugin, the issue we want to catch is the &lt;code&gt;map&lt;/code&gt; and &lt;code&gt;filter&lt;/code&gt; usage. To check for that, all we have to write is a parser like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; ast
+ 
+ 
+&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ForbiddenFunctionsFinder&lt;/span&gt;(ast&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;NodeVisitor):
+    forbidden &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;map&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;filter&amp;#39;&lt;/span&gt;]
+ 
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; __init__(self, &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;args, &lt;span style=&#34;color:#f92672&#34;&gt;**&lt;/span&gt;kwargs):
+        super()&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;__init__(&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;args, &lt;span style=&#34;color:#f92672&#34;&gt;**&lt;/span&gt;kwargs)
+        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;issues &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; []
+ 
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;visit_Call&lt;/span&gt;(self, node):
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;not&lt;/span&gt; isinstance(node&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;func, ast&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Name):
+            &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt;
+ 
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; node&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;func&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;id &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;forbidden:
+            msg &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;PCK01 Please don&amp;#39;t use {}()&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;format(node&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;func&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;id)
+            self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;issues&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;append((node&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;lineno, node&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;col_offset, msg))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;In this case, our checker will visit each and every &lt;code&gt;ast.Call&lt;/code&gt; node in the AST and check if its name is not one of the forbidden functions.&lt;/p&gt;
+&lt;p&gt;As you can see, we add some information into the &lt;code&gt;issues&lt;/code&gt; list whenever we find a call. One important thing to remember here is that the linter error message should start with an error code that matches the prefix defined in &lt;code&gt;setup.py&lt;/code&gt; for our linter (&lt;code&gt;PCK0&lt;/code&gt; in our case).&lt;/p&gt;
+&lt;p&gt;I think we’ve got enough information about how &lt;code&gt;ast.NodeVisitor&lt;/code&gt; works in order to build our plugin, so let’s move to the entry point class.&lt;/p&gt;
+&lt;h2 id=&#34;the-entry-point&#34;&gt;The entry point&lt;/h2&gt;
+&lt;p&gt;Let’s create the &lt;code&gt;picky_checker.py&lt;/code&gt; file and add the entry point code on it:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;PickyChecker&lt;/span&gt;(object):
+    options &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; None
+    name &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;picky-checker&amp;#39;&lt;/span&gt;
+    version &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;0.1&amp;#39;&lt;/span&gt;
+ 
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; __init__(self, tree, filename):
+        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;tree &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; tree
+        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;filename &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; filename
+ 
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;run&lt;/span&gt;(self):
+        parser &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; ForbiddenFunctionsFinder()
+        parser&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;visit(self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;tree)
+ 
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; lineno, column, msg &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; parser&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;issues:
+            &lt;span style=&#34;color:#66d9ef&#34;&gt;yield&lt;/span&gt; (lineno, column, msg, PickyChecker)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Most of this is boilerplate, but let’s focus on the &lt;code&gt;run()&lt;/code&gt; method. This method is the one called when Flake8 runs the verifications. There, we first instantiate our &lt;code&gt;ForbiddenFunctionsFinder&lt;/code&gt; class, which will be basically an &lt;code&gt;ast.NodeVisitor&lt;/code&gt; doing the verifications. Once we have the object, we call the &lt;code&gt;.visit()&lt;/code&gt; method so that our node visitor traverses the AST.&lt;/p&gt;
+&lt;p&gt;After that’s done, we iterate over the issues found by &lt;code&gt;ForbiddenFunctionFinder&lt;/code&gt; generating tuples with the issues in the order expected by Flake8: line number, column number, the linter message and the class that found the issues.&lt;/p&gt;
+&lt;h1 id=&#34;gluing-it-all&#34;&gt;Gluing it all&lt;/h1&gt;
+&lt;p&gt;We’ll end up with the following files in our plugin folder:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;├── picky_checker.py
+└── setup.py
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The &lt;code&gt;picky_checker.py&lt;/code&gt; file should contain both the &lt;code&gt;ForbiddenFunctionsFinder&lt;/code&gt; and &lt;code&gt;PickyChecker&lt;/code&gt; classes.&lt;/p&gt;
+&lt;h1 id=&#34;installing-our-linter&#34;&gt;Installing our linter&lt;/h1&gt;
+&lt;p&gt;Now that we have our linter code in our &lt;code&gt;flake8_picky&lt;/code&gt; folder, let’s install our plugin and run flake8 over some sample files. You can install it by running:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ pip install .
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Then you can check if the plugin got installed by running:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ flake8 --version
+3.5.0 &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;mccabe: 0.6.1, pycodestyle: 2.3.1, pyflakes: 1.6.0, picky-checker: 0.1&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Finally, create some sample files and run flake8 against them:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ flake8 samples/01.py
+samples/01.py:4:5: PCK01 Please don&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;t use map()
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;samples/01.py:7:5: PCK01 Please don&amp;#39;&lt;/span&gt;t use filter&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;wrapping-up&#34;&gt;Wrapping up&lt;/h1&gt;
+&lt;p&gt;That’s it. All we need to build a flake8 plugin is:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;a &lt;code&gt;setup.py&lt;/code&gt; file to make it installable;&lt;/li&gt;
+&lt;li&gt;an entrypoint class that will run your code checker;&lt;/li&gt;
+&lt;li&gt;the code checker itself, which can be a &lt;code&gt;NodeVisitor&lt;/code&gt; subclass.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Here you can find a repo with the linter developed here: &lt;a href=&#34;https://github.com/stummjr/flake8-picky/&#34;&gt;https://github.com/stummjr/flake8-picky/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;If you’re angry at me because you love &lt;code&gt;map&lt;/code&gt; and &lt;code&gt;filter&lt;/code&gt;, please forgive me as I had to come up with an example. 🙂&lt;/p&gt;
+</description>
     </item>
     
   </channel>

@@ -8,7 +8,7 @@
     <language>en-us</language>
     <lastBuildDate>Tue, 28 Aug 2018 15:55:13 -0300</lastBuildDate>
     
-	<atom:link href="http://stummjr.github.io/tags/rounding/index.xml" rel="self" type="application/rss+xml" />
+      <atom:link href="http://stummjr.github.io/tags/rounding/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -17,9 +17,71 @@
       <pubDate>Tue, 28 Aug 2018 15:55:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/python3-round-oddities/</guid>
-      <description>Rounding a decimal number with Python 3 is as simple as invoking the round() builtin:
-&amp;gt;&amp;gt;&amp;gt; round(1.2) 1 &amp;gt;&amp;gt;&amp;gt; round(1.8) 2 We can also pass an extra parameter called ndigits, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:
-&amp;gt;&amp;gt;&amp;gt; round(1.847, ndigits=2) 1.85 &amp;gt;&amp;gt;&amp;gt; round(1.847, ndigits=1) 1.8 And what happens when we want to round a number like 1.5? Will it round it up or down?</description>
+      <description>&lt;p&gt;Rounding a decimal number with Python 3 is as simple as invoking the &lt;a href=&#34;https://docs.python.org/3/library/functions.html#round&#34;&gt;&lt;code&gt;round()&lt;/code&gt;&lt;/a&gt; builtin:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;1.2&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;1.8&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;We can also pass an extra parameter called &lt;code&gt;ndigits&lt;/code&gt;, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;1.847&lt;/span&gt;, ndigits&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;1.85&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;1.847&lt;/span&gt;, ndigits&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;1.8&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;And what happens when we want to round a number like 1.5? Will it round it up or down? Let’s check:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;1.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It seems that it rounds up. Let’s check some other numbers to confirm:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;2.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Uh, now it went down! Let’s check some more:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;3.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;4.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;5.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;http://stummjr.github.io/img/posts/michael-scott-eli5.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Calm down, there’s an explanation for this. In Python 3, &lt;code&gt;round()&lt;/code&gt; works like this:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Round to the closest number.
+If there’s a tie, round to the closest even number.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Now it makes sense. If we check the examples above, we’ll see that the rounding was always made to the closest even number:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;3.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;4.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;5.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;what-about-python-2&#34;&gt;What about Python 2?&lt;/h1&gt;
+&lt;p&gt;Python 2 is quite different. When there’s a tie, the rounding is always made upwards in case the numbers are positive:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;1.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;2.0&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;2.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;3.0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;And downwards, when the numbers are negative:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1.5&lt;/span&gt;)
+&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;2.0&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;2.5&lt;/span&gt;)
+&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;3.0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;why-the-hell-did-python-3-changed-it&#34;&gt;Why the hell did Python 3 changed it?&lt;/h1&gt;
+&lt;p&gt;The goal is to take the &lt;strong&gt;bias&lt;/strong&gt; out of the rounding operations.&lt;/p&gt;
+&lt;p&gt;Imagine a bank where all the roundings are done upwards. By the end of the day, the bank earning report will show a value that is higher than what the bank actually earned. That’s what happens on &lt;strong&gt;Python 2&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# Python 2&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; values &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [&lt;span style=&#34;color:#ae81ff&#34;&gt;1.5&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;2.5&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;3.5&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;4.5&lt;/span&gt;]
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; sum(values)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;12.0&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; sum(round(v) &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; v &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; values)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;14.0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Using Python 3’s &lt;code&gt;round()&lt;/code&gt;, the rounded values tend to be amortized, because half of them round upwards and half of them round downwards, given that half the numbers are even and the other half are odd. Check the same code, but now running on &lt;strong&gt;Python 3&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# Python 3&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; values &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [&lt;span style=&#34;color:#ae81ff&#34;&gt;1.5&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;2.5&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;3.5&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;4.5&lt;/span&gt;]
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; sum(values)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;12.0&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; sum(round(v) &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; v &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; values)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;12&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This is no Python 3’s inovation. In fact, this kind of rounding is quite old and even has a proper name: &lt;a href=&#34;http://wiki.c2.com/?BankersRounding&#34;&gt;Bankers Rounding&lt;/a&gt;.&lt;/p&gt;
+</description>
     </item>
     
   </channel>

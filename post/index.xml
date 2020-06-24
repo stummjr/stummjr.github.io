@@ -8,7 +8,7 @@
     <language>en-us</language>
     <lastBuildDate>Fri, 19 Jun 2020 23:19:13 -0300</lastBuildDate>
     
-	<atom:link href="http://stummjr.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+      <atom:link href="http://stummjr.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -17,8 +17,186 @@
       <pubDate>Fri, 19 Jun 2020 23:19:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/cpython-optimizations/</guid>
-      <description>CPython is the reference implementation of the Python language. While there are several other implementations, CPython is by far the most popular one. These days, it comes bundled in most of the operating systems.
-Even though CPython is not the most performatic Python interpreter out there, it does some very interesting optimizations to speed itself and Python programs up. I am pretty curious about things like these and the rationale behind them, even though I know very little about it.</description>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/python/cpython/&#34;&gt;CPython&lt;/a&gt; is the reference implementation of the Python language. While there are several other implementations, CPython is by far the most popular one. These days, it comes bundled in most of the operating systems.&lt;/p&gt;
+&lt;p&gt;Even though CPython is not the most performatic Python interpreter out there, it does some very interesting optimizations to speed itself and Python programs up. I am pretty curious about things like these and the rationale behind them, even though I know very little about it. What follows is the result of some experimentation, myself reading CPython&amp;rsquo;s source code, documentation and blog posts.&lt;/p&gt;
+&lt;p&gt;By no means this blog post is supposed to be a complete reference on optimizations done by CPython, but it can give you a hint on some of the ones that it does.&lt;/p&gt;
+&lt;h2 id=&#34;caching-small-integers&#34;&gt;Caching Small Integers&lt;/h2&gt;
+&lt;p&gt;CPython caches small integers from -5 to 256 in an internal array during its initialization. That means that every time the interpreter itself or your Python program needs to use a number in that range, CPython won&amp;rsquo;t have to allocate space and create a brand new object for that. It will just return a reference to a pre-existing object.&lt;/p&gt;
+&lt;p&gt;Check this out:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;is&lt;/span&gt; y
+True
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;is&lt;/span&gt; y
+False
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;As you can see, &lt;code&gt;x&lt;/code&gt; and &lt;code&gt;y&lt;/code&gt; are initially pointing to the exact same object because &lt;code&gt;-5&lt;/code&gt; is one of the small integers cached by CPython. With &lt;code&gt;-6&lt;/code&gt;, however, we have a different outcome. Now &lt;code&gt;x&lt;/code&gt; and &lt;code&gt;y&lt;/code&gt; point to different objects, even though they have the very same value.&lt;/p&gt;
+&lt;p&gt;As you can see, these singletons are used even when computing the result of arithmetic expressions:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;is&lt;/span&gt; y
+True
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;CPython caches these small numbers because they are very often used in arithmetic operations, as boundaries in loops and as results of small computations. If CPython had to allocate memory and create a new object for each instance of these numbers, it would spend a bunch of time and space doing so.&lt;/p&gt;
+&lt;h2 id=&#34;string-interning&#34;&gt;String Interning&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/String_interning&#34;&gt;String Interning&lt;/a&gt; is an optimization technique implemented by many modern compilers and interpreters. It consists of creating and storing only a single instance of a given string, rather than multiple. It makes a lot of sense, if you think about it, as strings are immutable objects in Python.&lt;/p&gt;
+&lt;p&gt;In practical terms it means that some (not all, as we&amp;rsquo;ll see soon) strings will be &amp;ldquo;cached&amp;rdquo; by the Python interpreter. Here we can see that CPython creates a single string object to hold the &amp;ldquo;hey&amp;rdquo; string:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hey&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hey&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;is&lt;/span&gt; y
+True
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;However, CPython does not intern each and every string. Check out how the strings below were not cached/interned:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hey!&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hey!&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;is&lt;/span&gt; y
+False
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;That&amp;rsquo;s because CPython won&amp;rsquo;t intern strings that are not composed exclusively by ASCII letters, numbers or underscores (see &lt;a href=&#34;https://github.com/python/cpython/blob/314858e2763e76e77029ea0b691d749c32939087/Objects/codeobject.c#L24-L40&#34;&gt;codeobject.c&lt;/a&gt;). With this rule, CPython &amp;ldquo;ensures&amp;rdquo; that strings that look like valid Python identifiers will be interned. This way, function/method/variable names will end up interned and thus lookups will be faster during bytecode execution.&lt;/p&gt;
+&lt;p&gt;Single-character strings will also be reused. CPython checks if the string has a single digit before allocating a new object. If it has, it will just return a reference to an already existing object that represents that character (see &lt;a href=&#34;https://github.com/python/cpython/blob/eb0d5c38de7f970d8cd8524f4163d831c7720f51/Objects/unicodeobject.c#L2321-L2338&#34;&gt;unicodeobject.c&lt;/a&gt;):&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;á&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;á&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;is&lt;/span&gt; y
+True
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It&amp;rsquo;s not entirely clear to me in which cases exactly a string is interned. I&amp;rsquo;ve read conflicting information on the subject and my experiments yielded somewhat confusing results. (if you happen to know the answer, please drop a comment)&lt;/p&gt;
+&lt;p&gt;One thing I can tell is that CPython does intern code-related strings such as variable names, function name and constants, &lt;a href=&#34;https://github.com/python/cpython/blob/3b3b83c965447a8329b34cb4befe6e9908880ee5/Objects/codeobject.c#L153-L167&#34;&gt;when creating code objects&lt;/a&gt;. Check this example:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;greet&lt;/span&gt;(x):
+        msg &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; msg &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; x
+
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; s &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;greet&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; s &lt;span style=&#34;color:#f92672&#34;&gt;is&lt;/span&gt; greet&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;__name__
+True
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; code &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; dis&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Bytecode(greet)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;codeobj
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; code&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;co_consts
+(None, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hello&amp;#39;&lt;/span&gt;)
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;is&lt;/span&gt; code&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;co_consts[&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;]
+True
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; code&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;co_varnames
+(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;x&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;msg&amp;#39;&lt;/span&gt;)
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;x&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;is&lt;/span&gt; code&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;co_varnames[&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;]
+True
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The snippet above demonstrates that string constants, function name and variable names have been interned when CPython creates the code object (that is, when it creates the code object that will represent the function).&lt;/p&gt;
+&lt;h3 id=&#34;forcing-cpython-to-intern-a-string&#34;&gt;Forcing CPython to Intern a String&lt;/h3&gt;
+&lt;p&gt;If, for some reason, you want to force CPython to intern a given string, you can call the &lt;a href=&#34;https://docs.python.org/3/library/sys.html#sys.intern&#34;&gt;&lt;code&gt;sys.intern&lt;/code&gt;&lt;/a&gt; function passing a string as its argument. This may be helpful if you have huge strings that you&amp;rsquo;ll need to reuse often and that would not be automatically interned by CPython. For example:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hey!&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hey!&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;is&lt;/span&gt; y
+False
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; sys&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;intern(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hey!&amp;#39;&lt;/span&gt;)
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; sys&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;intern(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hey!&amp;#39;&lt;/span&gt;)
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;is&lt;/span&gt; y
+True
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Another advantage is that interned strings can be compared using pointer comparison, rather than char by char.&lt;/p&gt;
+&lt;h2 id=&#34;constant-folding&#34;&gt;Constant Folding&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Constant_folding&#34;&gt;Constant folding&lt;/a&gt; is another technique often employed by compilers and interpreters. It consists of precomputing in compile time the expressions that have no runtime dependencies. For example, it is quite common to find definitions like this in Python programs:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;kilobyte &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;8&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1024&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;People usually do that so that other people reading their code can get a better grasp on how an otherwise &amp;ldquo;magic&amp;rdquo; value (8192 in this case) was actually defined.&lt;/p&gt;
+&lt;p&gt;The CPython interpreter folds that expression into a constant while compiling the source code (&lt;code&gt;.py&lt;/code&gt;) into bytecode (&lt;code&gt;.pyc&lt;/code&gt;). In practical terms, it means that the resulting bytecode won&amp;rsquo;t contain the &lt;code&gt;8 * 1024&lt;/code&gt; expression, but the &lt;code&gt;8192&lt;/code&gt; constant instead. We are basically trading run time for compile time. Imagine if &lt;code&gt;kilobyte&lt;/code&gt; was defined in a function that is called thousands of times during a program execution. We&amp;rsquo;d have thousands of multiplications, all happening in runtime.&lt;/p&gt;
+&lt;h3 id=&#34;digging-a-bit-more&#34;&gt;Digging a Bit More&lt;/h3&gt;
+&lt;p&gt;Before we start digging, let me show you how we can verify if a given expression is being folded into a constant or not. An easy way to do that is to use the &lt;a href=&#34;https://docs.python.org/3/library/dis.html&#34;&gt;&lt;code&gt;dis&lt;/code&gt;&lt;/a&gt; module to disassemble a Python function into its bytecode representation.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; dis
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;func&lt;/span&gt;():
+        kilobyte &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;8&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1024&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; dis&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;dis(func)
+  &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;           &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; LOAD_CONST               &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; (&lt;span style=&#34;color:#ae81ff&#34;&gt;8192&lt;/span&gt;)
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt; STORE_FAST               &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; (kilobyte)
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt; LOAD_CONST               &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; (None)
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt; RETURN_VALUE
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;As you can see in the bytecode output of the &lt;code&gt;dis&lt;/code&gt; call above, there&amp;rsquo;s no multiplication instruction and we have &lt;code&gt;8192&lt;/code&gt; as a constant value instead. That means that CPython precomputed that expression and created a constant for its value in compile-time, so that when the bytecode runs no multiplication has to be made.&lt;/p&gt;
+&lt;h3 id=&#34;strings-can-be-folded&#34;&gt;Strings Can Be Folded&lt;/h3&gt;
+&lt;p&gt;Constant folding is not used exclusively for arithmetic expressions. Expressions that compute strings are also candidates for that optimization. Check this out:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;func&lt;/span&gt;():
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;-&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; dis&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;dis(func)
+  &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;           &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; LOAD_CONST               &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;----------&amp;#39;&lt;/span&gt;)
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt; RETURN_VALUE
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;See how the bytecode contains the computed version of the string already. Not all string operations will be folded, though:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;func&lt;/span&gt;():
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;-&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;5000&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; dis&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;dis(func)
+  &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;           &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; LOAD_CONST               &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;-&amp;#39;&lt;/span&gt;)
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt; LOAD_CONST               &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt; (&lt;span style=&#34;color:#ae81ff&#34;&gt;5000&lt;/span&gt;)
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt; BINARY_MULTIPLY
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt; RETURN_VALUE
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;As you can see in the bytecode above, we have a &lt;code&gt;BINARY_MULTIPLY&lt;/code&gt; instruction that will take place in runtime.&lt;/p&gt;
+&lt;h3 id=&#34;large-strings-wont-be-folded&#34;&gt;Large Strings Won&amp;rsquo;t Be Folded&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;Note:&lt;/strong&gt; these experiments were done using CPython 3.7.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;My first hypothesis when I saw the output above was that it was something related to the string size. It makes a ton of sense for CPython to not expand expressions like &lt;code&gt;&#39;-&#39; * 10000000&lt;/code&gt; into constants, as that would generate bigger &lt;code&gt;.pyc&lt;/code&gt; files. But I got curious on what&amp;rsquo;s CPython threshold for that.&lt;/p&gt;
+&lt;p&gt;To find that out, I wrote a quick and dirty function to check if a given expression would be folded or not:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;folds&lt;/span&gt;(string, size):
+    c &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; compile(f&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#39;{string}&amp;#39; * {size}&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;dummyfile&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;eval&amp;#39;&lt;/span&gt;)
+    &lt;span style=&#34;color:#75715e&#34;&gt;# in case the constant has not been folded, `co_consts` will be (string, size)&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;# in case it was folded, it will be represented by a tuple with the resulting string&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; c&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;co_consts[&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;] &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; string
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;That function allowed me to find out that &lt;strong&gt;CPython&amp;gt;=3.7 won&amp;rsquo;t fold strings bigger than 4096 characters into constants&lt;/strong&gt;. Check this out:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; folds(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;-&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;4096&lt;/span&gt;)
+True
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; folds(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;-&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;4097&lt;/span&gt;)
+False
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; folds(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;--&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;2048&lt;/span&gt;)
+True
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; folds(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;--&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;2049&lt;/span&gt;)
+False
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;P.S.:&lt;/strong&gt; CPython versions prior to 3.7 have a way smaller limit set to 20 chars.&lt;/p&gt;
+&lt;h3 id=&#34;tuples-are-folded-as-well&#34;&gt;Tuples Are Folded As Well&lt;/h3&gt;
+&lt;p&gt;As strings and numbers, tuples are also immutable objects in Python. So, tuples will also be folded in constants, as the experiment below shows:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;func&lt;/span&gt;():
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; (&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; (&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;)
+
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; dis&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;dis(func)
+  &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;           &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; LOAD_CONST               &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; ((&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;))
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt; RETURN_VALUE
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;what-about-constant-propagation&#34;&gt;What About Constant Propagation?&lt;/h3&gt;
+&lt;p&gt;As far as I can tell, CPython &lt;strong&gt;does not do&lt;/strong&gt; &lt;a href=&#34;https://en.wikipedia.org/wiki/Constant_folding#Constant_propagation&#34;&gt;Constant Propagation&lt;/a&gt;. That is, it does not replace variables whose values are known in compile time by their actual values. Check this out:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;func&lt;/span&gt;():
+        kilobyte &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;8192&lt;/span&gt;
+        megabyte &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; kilobyte &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1024&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; dis&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;dis(func)
+  &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;           &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; LOAD_CONST               &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; (&lt;span style=&#34;color:#ae81ff&#34;&gt;8192&lt;/span&gt;)
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt; STORE_FAST               &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; (kilobyte)
+
+  &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;           &lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt; LOAD_FAST                &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; (kilobyte)
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt; LOAD_CONST               &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt; (&lt;span style=&#34;color:#ae81ff&#34;&gt;1024&lt;/span&gt;)
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;8&lt;/span&gt; BINARY_MULTIPLY
+             &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt; STORE_FAST               &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; (megabyte)
+             &lt;span style=&#34;color:#ae81ff&#34;&gt;12&lt;/span&gt; LOAD_CONST               &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; (None)
+             &lt;span style=&#34;color:#ae81ff&#34;&gt;14&lt;/span&gt; RETURN_VALUE
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;If CPython did it, it would propagate the &lt;code&gt;kilobyte&lt;/code&gt; value into the expression that uses it and it would be able to fold the whole expression into a constant. There would be no need for a &lt;code&gt;BINARY_MULTIPLY&lt;/code&gt; instruction in the resulting bytecode in that case.&lt;/p&gt;
+&lt;h2 id=&#34;dead-code-elimination&#34;&gt;Dead Code Elimination&lt;/h2&gt;
+&lt;p&gt;CPython also eliminates dead code, such as unreachable statements. In the example below, the first &lt;code&gt;print&lt;/code&gt; will never be reached, so no bytecode is generated for that branch:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;func&lt;/span&gt;():
+      &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; False:
+          &lt;span style=&#34;color:#66d9ef&#34;&gt;print&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;)
+      &lt;span style=&#34;color:#66d9ef&#34;&gt;print&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hey!&amp;#34;&lt;/span&gt;)
+
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; dis&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;dis(func)
+  &lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;           &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; LOAD_GLOBAL              &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; (&lt;span style=&#34;color:#66d9ef&#34;&gt;print&lt;/span&gt;)
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt; LOAD_CONST               &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hey!&amp;#39;&lt;/span&gt;)
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt; CALL_FUNCTION            &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt; POP_TOP
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;8&lt;/span&gt; LOAD_CONST               &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; (None)
+             &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt; RETURN_VALUE
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Any code added after a &lt;code&gt;return&lt;/code&gt; statement will also be eliminated:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;func&lt;/span&gt;():
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hey&amp;#34;&lt;/span&gt;
+        s &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;what am I doing here?&amp;#34;&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; dis&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;dis(func)
+  &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;           &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; LOAD_CONST               &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hey&amp;#39;&lt;/span&gt;)
+              &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt; RETURN_VALUE
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;wrapping-up&#34;&gt;Wrapping Up&lt;/h2&gt;
+&lt;p&gt;Keep in mind that the optimizations listed in this blog post are specific to the CPython interpreter. Other interpreters like PyPy employ additional techniques to speed themselves up, but they were not covered in this blog post.&lt;/p&gt;
+&lt;p&gt;Optimizations like these are not part of the language specification, obviously. Each interpreter is free to implement as many optimizations as they want, as long as the semantics stays the same. One important takeaway is that the correctness of your code should never rely on any of these optimizations, as they are implementation details and could be dropped any time.&lt;/p&gt;
+&lt;h3 id=&#34;read-more&#34;&gt;Read More&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://guilload.com/python-string-interning/&#34;&gt;The Internals of Python String Interning&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://arpitbhayani.me/blogs/python-caches-integers&#34;&gt;Python Caches Integers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://stackoverflow.com/a/24245514/1084647&#34;&gt;Martijn Pieters&amp;rsquo; answer on Stack Overflow&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
     </item>
     
     <item>
@@ -27,8 +205,133 @@ Even though CPython is not the most performatic Python interpreter out there, it
       <pubDate>Sat, 06 Jun 2020 10:19:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/ipython-tricks/</guid>
-      <description>It’s no secret that IPython is my favorite Python shell. I am the guy who is always asking everyone “did you try IPython already?” as soon as I see they opening the regular Python shell. Yes, I know, you’d probably hate me.
-The reason I like it so much is that IPython makes it very easy for me to incrementally experiment when coding. I consider experimentation to be a crucial step when writing software, as it helps to reduce the unkowns in a problem or technology.</description>
+      <description>&lt;p&gt;It’s no secret that &lt;a href=&#34;https://ipython.org/&#34;&gt;IPython&lt;/a&gt; is my favorite Python shell. I am the guy who is always asking everyone “did you try IPython already?” as soon as I see they opening the regular Python shell. Yes, I know, you’d probably hate me.&lt;/p&gt;
+&lt;p&gt;The reason I like it so much is that IPython makes it very easy for me to incrementally experiment when coding. I consider experimentation to be a crucial step when writing software, as it helps to reduce the unkowns in a problem or technology.&lt;/p&gt;
+&lt;p&gt;Whenever I feel that there are gaps between what I know and what I have to accomplish, I use IPython to run experiments. After a bit of fiddling, I usually have a better understanding about what I have to do and then I feel more confident to go ahead and design a solution.&lt;/p&gt;
+&lt;p&gt;IPython provides me with the tools that I need for easier experimentation and I will share my favorite ones here.&lt;/p&gt;
+&lt;h2 id=&#34;docstrings-and-source-code-at-your-fingertips&#34;&gt;Docstrings and source code at your fingertips&lt;/h2&gt;
+&lt;p&gt;REPLs like IPython are the perfect environment for experimentation. One of the things that I need the most when trying stuff in IPython is to understand the functions/modules that I am willing to employ, and there&amp;rsquo;s nothing better than docstrings to help me with that.&lt;/p&gt;
+&lt;p&gt;IPython brings a handy shortcut to view the docstrings from any object. All I have to do is to append &lt;code&gt;?&lt;/code&gt; to the object&amp;rsquo;s name and hit enter. Check this out:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;getenv&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;?&lt;/span&gt;
+Signature: os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;getenv(key, default&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;None)
+Docstring:
+Get an environment variable, &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; None &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; it doesn&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;t exist.&lt;/span&gt;
+The optional second argument can specify an alternate default&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;
+key, default &lt;span style=&#34;color:#f92672&#34;&gt;and&lt;/span&gt; the result are str&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;
+File:      &lt;span style=&#34;color:#f92672&#34;&gt;~/.&lt;/span&gt;virtualenvs&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;python3&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;lib&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;python3&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;7&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;py
+Type:      function
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;However, sometimes I need to dig a bit further because the doctstrings are not clear enough or because I want to make sure that a corner-case is covered. Reading the source code is usually the best approach for that and IPython makes it pretty easy for pure-Python functions/classes/modules. It’s just a matter of appending &lt;code&gt;??&lt;/code&gt; and hitting enter:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;getenv&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;??&lt;/span&gt;
+Signature: os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;getenv(key, default&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;None)
+Source:
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;getenv&lt;/span&gt;(key, default&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;None):
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&amp;#34;Get an environment variable, return None if it doesn&amp;#39;t exist.
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;    The optional second argument can specify an alternate default.
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;    key, default and the result are str.&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; environ&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(key, default)
+File:      &lt;span style=&#34;color:#f92672&#34;&gt;~/.&lt;/span&gt;virtualenvs&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;python3&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;lib&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;python3&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;7&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;os&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;py
+Type:      function
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;saved-results-for-faster-experiments&#34;&gt;Saved results for faster experiments&lt;/h2&gt;
+&lt;p&gt;I find myself very often in a situation like this: I just executed a statement, saw the result and then I want to reuse that value in a follow-up statement. You&amp;rsquo;ve probably been there already too. The first instinct is to just re-execute that expression, now assigning a name to it so that you can reuse it in the next statement.&lt;/p&gt;
+&lt;p&gt;The good news is that we don&amp;rsquo;t need to do that. IPython saves the results of the 3 latest statements in these 3 names: &lt;code&gt;_&lt;/code&gt;, &lt;code&gt;__&lt;/code&gt; and &lt;code&gt;___&lt;/code&gt; (most to least recent).&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
+&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;
+&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; _ &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; __ &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; ___
+&lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; _ &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;span style=&#34;color:#ae81ff&#34;&gt;12&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;IPython also allows you to refer to the result of any statement previously executed in the current session via their numbers using the &lt;code&gt;_n&lt;/code&gt; syntax. Check this out:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;In [&lt;span style=&#34;color:#ae81ff&#34;&gt;18&lt;/span&gt;]: &lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;**&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+Out[&lt;span style=&#34;color:#ae81ff&#34;&gt;18&lt;/span&gt;]: &lt;span style=&#34;color:#ae81ff&#34;&gt;25&lt;/span&gt;
+
+In [&lt;span style=&#34;color:#ae81ff&#34;&gt;19&lt;/span&gt;]: _ &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;
+Out[&lt;span style=&#34;color:#ae81ff&#34;&gt;19&lt;/span&gt;]: &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;
+
+In [&lt;span style=&#34;color:#ae81ff&#34;&gt;20&lt;/span&gt;]: _19 &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+Out[&lt;span style=&#34;color:#ae81ff&#34;&gt;20&lt;/span&gt;]: &lt;span style=&#34;color:#ae81ff&#34;&gt;102&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;I actually customized my prompt to not show these numbers, so this is not useful for me. Also, a long session with large output objects may bloat your computer&amp;rsquo;s RAM. To avoid that, you can always disable caching by addding this to your IPython configuration:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;c&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;TerminalInteractiveShell&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;cache_size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This won&amp;rsquo;t disable the handy &lt;code&gt;_&lt;/code&gt;, &lt;code&gt;__&lt;/code&gt; and &lt;code&gt;___&lt;/code&gt; shortcuts, though.&lt;/p&gt;
+&lt;h2 id=&#34;magic-commands&#34;&gt;Magic commands&lt;/h2&gt;
+&lt;p&gt;IPython supports a variety of builtin commands that are so handy that they’re called &lt;strong&gt;magic commands&lt;/strong&gt;. They all start with the &lt;code&gt;%&lt;/code&gt; prefix and serve the most varied purposes. I am not a magic commands power user, but there are a few that I see myself using every now and then.&lt;/p&gt;
+&lt;h3 id=&#34;timeit-timing-your-python-code&#34;&gt;%timeit: timing your python code&lt;/h3&gt;
+&lt;p&gt;One of the goals of experimentation is figuring out what’d be the best solution to a particular problem, and often deciding what’s best involves performance evaluation. The &lt;a href=&#34;https://docs.python.org/3.8/library/timeit.html&#34;&gt;&lt;code&gt;timeit&lt;/code&gt;&lt;/a&gt; standard library module is great for that as it allows for measuring the time taken by a statement.&lt;/p&gt;
+&lt;p&gt;With IPython it&amp;rsquo;s even easier, as you can use the &lt;code&gt;%timeit&lt;/code&gt; magic function:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;%&lt;/span&gt;timeit [x &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; x &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; range(&lt;span style=&#34;color:#ae81ff&#34;&gt;1000&lt;/span&gt;)]
+&lt;span style=&#34;color:#ae81ff&#34;&gt;33.4&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;µ&lt;/span&gt;s &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;±&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;238&lt;/span&gt; ns per loop (mean &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;±&lt;/span&gt; std&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; dev&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; of &lt;span style=&#34;color:#ae81ff&#34;&gt;7&lt;/span&gt; runs, &lt;span style=&#34;color:#ae81ff&#34;&gt;10000&lt;/span&gt; loops each)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;prun-profiling-your-python-code&#34;&gt;%prun: profiling your python code&lt;/h3&gt;
+&lt;p&gt;When timing the execution of a given statement is not enough for the experiments, profiling it is the next step. IPython provides the &lt;code&gt;%prun&lt;/code&gt; magic command to allow for that. Check it out:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;%&lt;/span&gt;prun get_players_with_most_championships(players)
+         &lt;span style=&#34;color:#ae81ff&#34;&gt;11&lt;/span&gt; function calls &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; seconds
+
+   Ordered by: internal time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; {built&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; method builtins&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;exec&lt;/span&gt;}
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; ipython_edit_s94fadw6&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;py:&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;(players_with_most_rings)
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; {built&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; method builtins&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;max}
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;string&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;:&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;(&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;module&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;)
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; {method &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;append&amp;#39;&lt;/span&gt; of &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;list&amp;#39;&lt;/span&gt; objects}
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; {method &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;keys&amp;#39;&lt;/span&gt; of &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;dict&amp;#39;&lt;/span&gt; objects}
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; {method &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;disable&amp;#39;&lt;/span&gt; of &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;_lsprof.Profiler&amp;#39;&lt;/span&gt; objects}
+        &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt;    &lt;span style=&#34;color:#ae81ff&#34;&gt;0.000&lt;/span&gt; ipython_edit_s94fadw6&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;py:&lt;span style=&#34;color:#ae81ff&#34;&gt;7&lt;/span&gt;(&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;listcomp&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This is great, as it helps identifying possible bottlenecks in the statements that I am experimenting with.&lt;/p&gt;
+&lt;h3 id=&#34;edit-editing-snippets-in-my-editor&#34;&gt;%edit: editing snippets in my editor&lt;/h3&gt;
+&lt;p&gt;It’s a pain to write an entire function directly in the shell input. Fortunately, the &lt;code&gt;%edit&lt;/code&gt; magic function allows me to do that in my favorite editor. Once I close the editor, IPython will execute whatever I have typed in there.&lt;/p&gt;
+&lt;p&gt;Check this out:&lt;/p&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;http://stummjr.github.io/img/edit-ipython.gif&#34; width=&#34;650&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;And if I want to reopen the same snippet for editing, I can just execute &lt;code&gt;%edit -p&lt;/code&gt; and that very same code snippet will be back in my editor.&lt;/p&gt;
+&lt;p&gt;This magic command is super handy when you want to input a big function and need a better place to write it in than the IPython shell itself.&lt;/p&gt;
+&lt;h3 id=&#34;hist-listing-the-commands-history&#34;&gt;%hist: listing the commands history&lt;/h3&gt;
+&lt;p&gt;When I am writing a function for an app and I am not really sure which operations are needed to transform the input from one format into another, I just open IPython and start experimenting. After a few experiments, I usually figure out what the function must implement. The next step is to copy the relevant lines to my editor and build the function from there.&lt;/p&gt;
+&lt;p&gt;Copying them one by one is cumbersome and copying them all at once will include the shell preffix and the outputs, so I&amp;rsquo;d need to clean that up after pasting into my editor. In cases like this, I use the magic &lt;code&gt;%hist&lt;/code&gt; command:&lt;/p&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;http://stummjr.github.io/img/hist-ipython.png&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;It ouputs only the expressions I typed in (no prefix and no outputs), so now I can just copy those into my editor, cut out the irrelevant parts of the experiments and finally polish the implementation.&lt;/p&gt;
+&lt;p&gt;This commmand also allows to save the history directly into a file by running:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;%&lt;/span&gt;hist &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;f myscript&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;py &lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;25&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The command above will save all the statements from the input lines 5 to 25 into the &lt;code&gt;myscript.py&lt;/code&gt; file.&lt;/p&gt;
+&lt;p&gt;Some people refer to this process as &lt;em&gt;REPL driven development&lt;/em&gt;. I find it particularly useful when I am writing a function to transform data from a known format to another.&lt;/p&gt;
+&lt;h3 id=&#34;what-else&#34;&gt;What else?&lt;/h3&gt;
+&lt;p&gt;There are also a couple other commands that I find pretty helpful, but that I don&amp;rsquo;t use very often:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;%pycat file.py&lt;/code&gt;: to view a python file inside IPython with syntax-highlighting and pagination.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;%run file.py&lt;/code&gt;: to run a python file inside the current IPython session.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;%quickref&lt;/code&gt;: to view a quick reference about magic commands.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;running-system-commands-from-inside-the-shell&#34;&gt;Running system commands from inside the shell&lt;/h2&gt;
+&lt;p&gt;It’s quite common to need to run an external command when you’re into an IPython session. Let’s say you want to quickly list the files from the current directory and you don’t want to leave your IPython session for that. All you have to do is this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;!&lt;/span&gt;ls
+main&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;py main&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;pyc output&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;What’s even cooler is that you can assign a name to the output of the system command:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; files &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;!&lt;/span&gt;ls
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; files
+[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;main.py&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;main.pyc&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;output.txt&amp;#39;&lt;/span&gt;]
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; files&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;s
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;main.py main.pyc output.txt&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; files&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;n
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;main.py&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;main.pyc&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;output.txt&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; files&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;p
+[PosixPath(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;main.py&amp;#39;&lt;/span&gt;), PosixPath(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;main.pyc&amp;#39;&lt;/span&gt;), PosixPath(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;output.txt&amp;#39;&lt;/span&gt;)]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Of course this is not valid Python code, so you can&amp;rsquo;t just use &lt;code&gt;!ls&lt;/code&gt; in your regular python scripts, but it can be pretty helpful during experiments.&lt;/p&gt;
+&lt;h2 id=&#34;inspecting-code-with-ipython&#34;&gt;Inspecting code with IPython&lt;/h2&gt;
+&lt;p&gt;Sometimes I need to stop the execution of my app at a certain point to inspect what’s going on. Even though debuggers serve this exact purpose very well, IPython also allows to drop the line below into any Python script and it will stop its execution for you to inspect the context and run experiments:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; IPython &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; embed; embed()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Does this replace a full-fledged debugger? Not at all, but it can be pretty handy. If you want a debugger, check out &lt;a href=&#34;http://stummjr.github.io/post/debugging-python-with-pudb/&#34;&gt;this blog post that I wrote on pudb&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;wrapping-up&#34;&gt;Wrapping up&lt;/h2&gt;
+&lt;p&gt;IPython is super powerful and I am sure that there are tons of goodies that I am not even aware of, specially when it comes to notebooks and scientific computing.&lt;/p&gt;
+&lt;p&gt;The tricks that I shared here are useful for me in my daily life as a software developer and I hope some of them can be helpful to you.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;P.S.:&lt;/strong&gt; this post was heavily inspired by a talk given by my good friend &lt;a href=&#34;https://eliasdorneles.com/&#34;&gt;Elias Dorneles&lt;/a&gt; and I back in 2016.&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -37,8 +340,133 @@ The reason I like it so much is that IPython makes it very easy for me to increm
       <pubDate>Tue, 19 May 2020 23:19:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/building-scripts-in-python/</guid>
-      <description>I find myself writing quick command line scripts every so often. They usually automate a random task from my daily routine and end up saving me a bunch of time. These scripts usually start as quick and dirty snippets, but once I figure that they are not a one-off thing, then I iterate to make them more usable.
-There are several things that I find valuable in scripts like these:</description>
+      <description>&lt;p&gt;I find myself writing quick command line scripts every so often. They usually automate a
+random task from my daily routine and end up saving me a bunch of time. These scripts
+usually start as quick and dirty snippets, but once I figure that they are not a one-off
+thing, then I iterate to make them more usable.&lt;/p&gt;
+&lt;p&gt;There are several things that I find valuable in scripts like these:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Their development cycle must be fast and iterative.&lt;/li&gt;
+&lt;li&gt;They must support command line arguments.&lt;/li&gt;
+&lt;li&gt;They must display progress bars during expensive operations.&lt;/li&gt;
+&lt;li&gt;They must output the results in a human-digestable format.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I am pretty sure I am not alone on this, so I am going to share some of the tools that I use
+on my scripts to support the features above.&lt;/p&gt;
+&lt;h2 id=&#34;caching-http-responses-during-development&#34;&gt;Caching HTTP responses during development&lt;/h2&gt;
+&lt;p&gt;Building scripts that fetch data from the network can be a bit of a pain. Every time you
+want to test changes to your code, you have to re-fetch the data. In addition to slowing
+down the development cycle, you may very quickly hit API rate limits which will force you to
+stop until you&amp;rsquo;re clean again.&lt;/p&gt;
+&lt;p&gt;To avoid such issues, I&amp;rsquo;ve been using a library called
+&lt;a href=&#34;https://github.com/reclosedev/requests-cache&#34;&gt;&lt;code&gt;requests-cache&lt;/code&gt;&lt;/a&gt; that is a great companion
+to &lt;a href=&#34;https://github.com/psf/requests&#34;&gt;&lt;code&gt;requests&lt;/code&gt;&lt;/a&gt;. It basically creates a persistent cache so
+that your script does not reach out to the server every time you run it. Using it is as simple
+as importing it and installing a cache:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; requests
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; requests_cache
+
+requests_cache&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;install_cache(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;temp_cache&amp;#39;&lt;/span&gt;)
+response &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; requests&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://example.com&amp;#34;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;When the script above is ran for the first time, &lt;code&gt;requests-cache&lt;/code&gt; will create a &lt;code&gt;temp_cache.sqlite&lt;/code&gt;
+file and store the responses there. The next time the script is ran, no requests are going to hit
+the server.&lt;/p&gt;
+&lt;p&gt;In some cases, it may be useful to specify an expiration period. For example, we can force
+a cache invalidation after 1 hour by passing the &lt;code&gt;expire_after&lt;/code&gt; parameter:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;requests_cache&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;install_cache(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;temp_cache&amp;#39;&lt;/span&gt;, expire_after&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;3600&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This library has boosted my development speed considerably. For more options, check out
+the &lt;a href=&#34;https://requests-cache.readthedocs.io/en/latest/&#34;&gt;requests-cache documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;parsing-command-line-arguments&#34;&gt;Parsing Command Line Arguments&lt;/h2&gt;
+&lt;p&gt;I was a long time &lt;code&gt;argparse&lt;/code&gt; user, until I met &lt;a href=&#34;https://click.palletsprojects.com/&#34;&gt;&lt;code&gt;click&lt;/code&gt;&lt;/a&gt;.
+Click is so much simpler and yet very powerful. It allows me to define the arguments for my script
+by simply decorating a function. Check out how simple it is to parse a couple command line options
+with &lt;code&gt;click&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; click
+
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@click.command&lt;/span&gt;()
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@click.option&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;--user&amp;#34;&lt;/span&gt;, help&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;A GitHub username.&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@click.option&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;--days&amp;#34;&lt;/span&gt;, help&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;The number of days to look back.&amp;#34;&lt;/span&gt;, default&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;grab_stats&lt;/span&gt;(user, days):
+    click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;echo(click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;style(f&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Hello, {user}!&amp;#34;&lt;/span&gt;, fg&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;green&amp;#34;&lt;/span&gt;))
+    click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;echo(click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;style(f&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Fetching the PRs/issues created in the past {days} days.&amp;#34;&lt;/span&gt;, fg&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;red&amp;#34;&lt;/span&gt;))
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; __name__ &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;__main__&amp;#34;&lt;/span&gt;:
+    grab_stats()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Check out the output of the script above:&lt;/p&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;http://stummjr.github.io/img/click-output.png&#34; width=&#34;800&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;Click allowed me to easily format the output using &lt;code&gt;click.style()&lt;/code&gt;, which is a great abstraction
+around the terminal&amp;rsquo;s escape sequences.&lt;/p&gt;
+&lt;p&gt;Click&amp;rsquo;s &lt;code&gt;echo()&lt;/code&gt; function is also quite helpful as it gracefully handles multiple types of
+terminals, so that the script&amp;rsquo;s output looks the same no matter the terminal encoding.&lt;/p&gt;
+&lt;p&gt;Click also auto-generates help pages:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ python ghstats.py --help
+Usage: ghstats.py [OPTIONS]
+
+Options:
+  --user TEXT     The user&#39;s GitHub username.
+  --days INTEGER  List the PRs/issues opened in the last &#39;days&#39; days.
+  --help          Show this message and exit.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This is the simplest example ever. Click is a very robust and feature-rich tool.
+For more info, check out the &lt;a href=&#34;https://click.palletsprojects.com/&#34;&gt;click docs&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;showing-progress-bars-for-the-impatient&#34;&gt;Showing progress bars for the impatient&lt;/h2&gt;
+&lt;p&gt;Every now and then I build a script that is just slow. Sometimes it&amp;rsquo;s because it&amp;rsquo;s reading
+a ton of files, sometimes it&amp;rsquo;s doing a bunch of HTTP requests and sometimes it&amp;rsquo;s just CPU heavy.&lt;/p&gt;
+&lt;p&gt;There&amp;rsquo;s nothing worse than staring at the screen as the cursor blinks without telling us
+anything. Progress bars are excellent at giving the users a sense of (&lt;em&gt;uh &amp;hellip;&lt;/em&gt;) progress.
+A simple progress bar like this helps users to estimate how much time they&amp;rsquo;ll have to wait:&lt;/p&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;http://stummjr.github.io/img/progress-bar-tqdm.png&#34; width=&#34;800&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;Adding progress bars to Python scripts is super easy with &lt;a href=&#34;https://github.com/tqdm/tqdm&#34;&gt;&lt;code&gt;tqdm&lt;/code&gt;&lt;/a&gt;.
+Let&amp;rsquo;s say that we have a script that goes through a bunch of URLs making requests to fetch their
+resources. This is all we have to do to show a nice progress bar to follow through the progress:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; tqdm &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; tqdm
+
+&lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; url &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; tqdm(urls):
+    resp &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; requests&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(url)
+    &lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Pretty simple, huh? It&amp;rsquo;s so simple that it&amp;rsquo;s hard to notice where the progress bar is being
+introduced.&lt;/p&gt;
+&lt;p&gt;Again, this is just the simplest thing we can do with &lt;code&gt;tqdm&lt;/code&gt;. It is super configurable and even provides
+a command line tool so that you can add progress bars to your shell scripts. For more info, check out
+the &lt;a href=&#34;https://github.com/tqdm/tqdm/blob/master/README.rst&#34;&gt;tqdm docs&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;tabulating-the-output&#34;&gt;Tabulating the output&lt;/h2&gt;
+&lt;p&gt;Isn&amp;rsquo;t it better when a script outputs a nice little table on the screen instead of a confusing
+JSON object? The &lt;a href=&#34;https://github.com/astanin/python-tabulate&#34;&gt;&lt;code&gt;tabulate&lt;/code&gt;&lt;/a&gt; library is quite handy
+as it allows us to easily plot nice ASCII tables with the output of our scripts:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; tabulate &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; tabulate
+
+repo_pulls &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [
+    (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://github.com/stummjr/flake8-scrapy/pull/13&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Drop usage of lambda as callback&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;stummjr&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;2018-10-20&amp;#34;&lt;/span&gt;),
+    (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://github.com/stummjr/flake8-scrapy/pull/12&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Forbid inline callbacks&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;stummjr&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;2018-09-20&amp;#34;&lt;/span&gt;),
+    (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://github.com/stummjr/flake8-scrapy/pull/11&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Document callbacks&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;stummjr&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;2018-08-20&amp;#34;&lt;/span&gt;),
+]
+headers &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;URL&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Title&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Author&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;When&amp;#34;&lt;/span&gt;)
+table &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; tabulate(repo_pulls, headers&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;headers, tablefmt&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;fancy_grid&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#66d9ef&#34;&gt;print&lt;/span&gt;(table)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The script above will output a nice little table like this:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;╒══════════════════════════════════════════════════╤══════════════════════════════════╤══════════╤════════════╕
+│ URL                                              │ Title                            │ Author   │ When       │
+╞══════════════════════════════════════════════════╪══════════════════════════════════╪══════════╪════════════╡
+│ https://github.com/stummjr/flake8-scrapy/pull/13 │ Drop usage of lambda as callback │ stummjr  │ 2018-10-20 │
+├──────────────────────────────────────────────────┼──────────────────────────────────┼──────────┼────────────┤
+│ https://github.com/stummjr/flake8-scrapy/pull/12 │ Forbid inline callbacks          │ stummjr  │ 2018-09-20 │
+├──────────────────────────────────────────────────┼──────────────────────────────────┼──────────┼────────────┤
+│ https://github.com/stummjr/flake8-scrapy/pull/11 │ Document callbacks               │ stummjr  │ 2018-08-20 │
+╘══════════════════════════════════════════════════╧══════════════════════════════════╧══════════╧════════════╛
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This makes your quick and dirty scripts look more professional and it makes their output way more digestable.
+For more options, check out the &lt;a href=&#34;https://github.com/astanin/python-tabulate#python-tabulate&#34;&gt;tabulate documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;wrapping-up&#34;&gt;Wrapping up&lt;/h2&gt;
+&lt;p&gt;I love writing scripts and I feel super proud when I am able to make one that&amp;rsquo;s useful &lt;strong&gt;and&lt;/strong&gt; usable.
+I hope the tips I shared here can help you feel the same about your scripts.&lt;/p&gt;
+&lt;p&gt;And if you know any other helpful tools, please share them here in the comments as I&amp;rsquo;m always looking for
+ways to improve my own scripts.&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -47,7 +475,59 @@ There are several things that I find valuable in scripts like these:</descriptio
       <pubDate>Thu, 07 May 2020 15:55:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/why-i-abandoned-dark-mode/</guid>
-      <description>15 years ago, my whole desktop environment was dark. Dark terminal, dark vim, dark graphic environment, and dark mp3 player. It was pretty cool. I felt like a hacker in those unrealistic 90s movies. Whoever stepped into my room would think that I was doing some rocket science. In fact, I was probaby just listening to mp3, learning some bash scripting and taking screenshots to share my cool desktop in online forums.</description>
+      <description>&lt;p&gt;15 years ago, my whole desktop environment was dark. Dark terminal, dark vim, dark graphic environment, and dark mp3 player.
+It was pretty cool. I felt like a hacker in those unrealistic 90s movies. Whoever stepped into my room would think that I was
+doing some rocket science. In fact, I was probaby just listening to mp3, learning some bash scripting and taking screenshots
+to share my cool desktop in online forums. I can&amp;rsquo;t say it wasn&amp;rsquo;t fun, though.&lt;/p&gt;
+&lt;p&gt;10 years later I started noticing how hard it had become to read/write code in my dark environment. My eyes would feel sore
+and it was hard to focus on the code. Fonts were blurrier in my shiny retina display than they were in the 640x480 CRT monitors
+I used back in the days.&lt;/p&gt;
+&lt;p&gt;After a bit of research, I found out that it probably happened because of my &lt;a href=&#34;https://en.wikipedia.org/wiki/Astigmatism&#34;&gt;astigmatism&lt;/a&gt;.
+There are several scientific studies that show that people with astigmatism have trouble reading on &lt;em&gt;light-on-dark&lt;/em&gt; schemes.
+I found out about them in this &lt;a href=&#34;https://ux.stackexchange.com/a/53268&#34;&gt;SE answer&lt;/a&gt;. People with astigmatism experience the so-called
+&lt;a href=&#34;https://www.lexico.com/en/definition/halation&#34;&gt;halation effect&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The spreading of light beyond its proper boundaries to form a fog around the edges of a bright image in a
+photograph or on a television screen.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Check out &lt;a href=&#34;https://jessicaotis.com/academia/never-use-white-text-on-a-black-background-astygmatism-and-conference-slides/&#34;&gt;this blog post&lt;/a&gt;
+to see how it feels.&lt;/p&gt;
+&lt;h1 id=&#34;how-i-fixed-the-issue&#34;&gt;How I fixed the issue&lt;/h1&gt;
+&lt;p&gt;To avoid this issue, all I did was changing my whole desktop to use a light background for everything. &lt;a href=&#34;https://ethanschoonover.com/solarized/&#34;&gt;Solarized Light&lt;/a&gt; is my favorite color scheme for my editor, terminal, and many other apps. This is how my development environment looks
+like these days:&lt;/p&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;http://stummjr.github.io/img/light-env.png&#34; width=&#34;500&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;Not as cool as my screen two decades ago, but fully functional. 😉&lt;/p&gt;
+&lt;h1 id=&#34;dark-backgrounds-are-everywhere&#34;&gt;Dark backgrounds are everywhere&lt;/h1&gt;
+&lt;p&gt;Every week I see someone celebrating the fact that yet another app now supports dark backgrounds. The products announce it
+as if they had found the cure for cancer. It&amp;rsquo;s kind of weird to see how far they go to announce a (&lt;em&gt;wait for it&amp;hellip;&lt;/em&gt;) new color
+scheme. Apple focused a MacOS release on something that most Linux graphical environments allowed me to do 20 years ago.&lt;/p&gt;
+&lt;p&gt;I am not preaching against dark backgrounds and in favor of light ones. In fact, most people that I know can&amp;rsquo;t code in a light
+environment for too much time as they suffer from eye strain after a few hours.&lt;/p&gt;
+&lt;p&gt;From a reader perspective, though, there are multiple studies showing that it&amp;rsquo;s harder to read in &lt;em&gt;light-on-dark&lt;/em&gt; than in &lt;em&gt;dark-on-light&lt;/em&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;it-gets-worse-at-conferences&#34;&gt;It gets worse at conferences&lt;/h2&gt;
+&lt;p&gt;I&amp;rsquo;ve been in countless conferences where the speaker used a dark background to present snippets of code. Me during their talks:&lt;/p&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;http://stummjr.github.io/img/michael-scott-i-understand-nothing.png&#34; width=&#34;500&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;p&gt;And it wasn&amp;rsquo;t just me. You could see people squeezing their eyes all around the room. Sometimes even the speaker notices and
+apologizes (or blames the video projector).&lt;/p&gt;
+&lt;p&gt;Even in a world where everyone can read well in dark backgrounds, there are still crappy devices and bad lighting
+to ruin your talk. It&amp;rsquo;s not really common to find a conference with the right combination of light and good
+projection devices. It&amp;rsquo;s probably hard and expensive to do so (I have no idea, to be honest).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;But what can you, as a speaker, do?&lt;/strong&gt; Use light backgrounds for your slide decks and specially for the code snippets.
+That will give you and your audience a better experience. As a bonus you also reduce the chances of having your talk
+negatively impacted by an external factor like this.&lt;/p&gt;
+&lt;h1 id=&#34;this-is-all-about-me-though&#34;&gt;This is all about me, though&lt;/h1&gt;
+&lt;p&gt;This blog post talks about &lt;strong&gt;my personal experience&lt;/strong&gt; using dark vs light backgrounds. I am no doctor and I know nothing
+about the human eye to give any sort of advice.&lt;/p&gt;
+&lt;p&gt;Anyway, I feel it&amp;rsquo;s worth sharing what worked for me as there may be other people having similar issues and a light
+background could be worth a quick try. In any case, a doctor is probably the right call. 😀&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;Disclaimer:&lt;/strong&gt; the snippets on this website will continue to use a dark background, just because it looks cooler. 😂&lt;/em&gt;&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -56,8 +536,112 @@ There are several things that I find valuable in scripts like these:</descriptio
       <pubDate>Sun, 03 May 2020 15:55:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/scrapy-in-2020/</guid>
-      <description>I am a huge fan of Scrapy and I&amp;rsquo;ve used it extensively for 3+ wonderful years working at Scrapinghub, the company behind this framework.
-It&amp;rsquo;s been one and a half year since I used it for the last time, but last week I had to build a spider for a personal project. To my surprise, I am not just rusty but pretty outdated in terms of the new shiny features of Scrapy.</description>
+      <description>&lt;p&gt;I am a huge fan of &lt;a href=&#34;https://scrapy.org/&#34;&gt;Scrapy&lt;/a&gt; and I&amp;rsquo;ve used it extensively for 3+
+wonderful years working at Scrapinghub, the company behind this framework.&lt;/p&gt;
+&lt;p&gt;It&amp;rsquo;s been one and a half year since I used it for the last time, but last week I had to build a
+spider for a personal project. To my surprise, I am not just rusty but pretty outdated in
+terms of the new shiny features of Scrapy.&lt;/p&gt;
+&lt;p&gt;To help other people in the same situation as myself, I am going to go through some of the
+main changes since version 1.5.2 (the last one I  had used) and 2.1.0 (the current one).&lt;/p&gt;
+&lt;h1 id=&#34;following-links-in-2020&#34;&gt;Following links in 2020&lt;/h1&gt;
+&lt;p&gt;Back when I used Scrapy in a daily basis, this is how I&amp;rsquo;d make my spider follow through
+links found on the page:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;links &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;css(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;a.entry-link::attr(href)&amp;#34;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;extract()
+&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; link &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; links:
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;yield&lt;/span&gt; scrapy&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Request(url&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;urljoin(link), callback&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;parse_blog_post)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;In 2020, I can rewrite this snippet using &lt;a href=&#34;https://docs.scrapy.org/en/latest/topics/request-response.html#scrapy.http.Response.follow&#34;&gt;&lt;code&gt;Response.follow&lt;/code&gt;&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;links &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;css(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;a.entry-link&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; link &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; links:
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;yield&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;follow(link, callback&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;parse_blog_post)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Notice how I didn&amp;rsquo;t even have to extract the link as a string. That is pretty cool.&lt;/p&gt;
+&lt;p&gt;But now that we&amp;rsquo;re all using Python 3 (&lt;em&gt;wait, aren&amp;rsquo;t you yet?&lt;/em&gt;), we can just do it like
+this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;links &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;css(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;a.entry-link&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#66d9ef&#34;&gt;yield&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; response.follow_all(links, callback&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;parse_blog_post)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;em&gt;Neat, huh?&lt;/em&gt;&lt;/p&gt;
+&lt;h1 id=&#34;extracting-data-in-2020&#34;&gt;Extracting data in 2020&lt;/h1&gt;
+&lt;h2 id=&#34;get-and-getall&#34;&gt;get() and getall()&lt;/h2&gt;
+&lt;p&gt;There are tons of docs on Scrapy around the web showing you how to scrape data
+using the &lt;code&gt;extract&lt;/code&gt; and &lt;code&gt;extract_first&lt;/code&gt; selector methods. This is how I used to write the
+data extraction side of a spider using them:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;parse_blog_post&lt;/span&gt;(self, response):
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;yield&lt;/span&gt; {
+        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;title&amp;#34;&lt;/span&gt;: response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;css(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.post-title::text&amp;#34;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;extract_first(),
+        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;author&amp;#34;&lt;/span&gt;: response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;css(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.entry-author::text&amp;#34;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;extract_first(),
+        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;tags&amp;#34;&lt;/span&gt;: response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;css(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.tag::text&amp;#34;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;extract(),
+    }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This isn&amp;rsquo;t a big change, but now we can use &lt;code&gt;getall&lt;/code&gt; and &lt;code&gt;get&lt;/code&gt; instead of &lt;code&gt;extract&lt;/code&gt; and &lt;code&gt;extract_first&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;parse_blog_post&lt;/span&gt;(self, response):
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;yield&lt;/span&gt; {
+        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;title&amp;#34;&lt;/span&gt;: response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;css(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.post-title::text&amp;#34;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(),
+        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;author&amp;#34;&lt;/span&gt;: response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;css(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.entry-author::text&amp;#34;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(),
+        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;tags&amp;#34;&lt;/span&gt;: response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;css(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.tag::text&amp;#34;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;getall(),
+    }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Looks cleaner and easier to understand to me.&lt;/p&gt;
+&lt;h2 id=&#34;the-new-attrib-dict&#34;&gt;The new attrib dict&lt;/h2&gt;
+&lt;p&gt;A quite common case that I had back in the days was to have to extract multiple attributes
+from a single node. For example, let&amp;rsquo;s say I want to extract both the &lt;code&gt;alt&lt;/code&gt; and the &lt;code&gt;src&lt;/code&gt;
+attributes from this &lt;code&gt;img&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-html&#34; data-lang=&#34;html&#34;&gt;&amp;lt;&lt;span style=&#34;color:#f92672&#34;&gt;img&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;alt&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Super cool&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;src&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/img/supercool.jpg&amp;#34;&lt;/span&gt; /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Back in the days, I&amp;rsquo;d do something like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;yield&lt;/span&gt; {
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;url&amp;#34;&lt;/span&gt;: response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;css(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.header img::attr(src)&amp;#34;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;extract_first(),
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;description&amp;#34;&lt;/span&gt;: response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;css(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.header img::attr(alt)&amp;#34;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;extract_first(),
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;size&amp;#34;&lt;/span&gt;: response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;css(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.header img::attr(sizes)&amp;#34;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;extract_first(),
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;There&amp;rsquo;s more repetition in this snippet that a person should be allowed to write in their life.&lt;/p&gt;
+&lt;p&gt;In 2020, I can avoid such repetition by using the
+&lt;a href=&#34;https://docs.scrapy.org/en/latest/topics/selectors.html#selecting-element-attributes&#34;&gt;&lt;code&gt;attrib&lt;/code&gt;&lt;/a&gt;
+dict available in &lt;code&gt;Selector&lt;/code&gt; and &lt;code&gt;SelectorList&lt;/code&gt; objects:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;img_sel &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;css(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.header img&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#66d9ef&#34;&gt;yield&lt;/span&gt; {
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;url&amp;#34;&lt;/span&gt;: img_sel&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;attrib[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;src&amp;#34;&lt;/span&gt;],
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;description&amp;#34;&lt;/span&gt;: img_sel&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;attrib[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;alt&amp;#34;&lt;/span&gt;],
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;size&amp;#34;&lt;/span&gt;: img_sel&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;attrib[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;sizes&amp;#34;&lt;/span&gt;],
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;em&gt;Pretty sick!&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;I remember doing ugly hacks using string interpolation in the selectors to avoid repetition.
+This is so much better!&lt;/p&gt;
+&lt;h1 id=&#34;passing-callback-arguments-in-2020&#34;&gt;Passing callback arguments in 2020&lt;/h1&gt;
+&lt;p&gt;Every now and then, I&amp;rsquo;d have to pass some data from one callback to another so that they
+could share some state. Back then, I&amp;rsquo;d pass it via the &lt;code&gt;meta&lt;/code&gt; parameter in &lt;code&gt;Request&lt;/code&gt;
+objects.&lt;/p&gt;
+&lt;p&gt;While that worked pretty well, it wasn&amp;rsquo;t that great for the spider readability, as you
+couldn&amp;rsquo;t tell a callback&amp;rsquo;s interface just by looking at its signature. Check it out:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;parse_blog_post&lt;/span&gt;(self, response):
+    &lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; link &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; links:
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;yield&lt;/span&gt; scrapy&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Request(
+            link,
+            meta&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;{&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;author&amp;#34;&lt;/span&gt;: author, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;date&amp;#34;&lt;/span&gt;: post_date},
+            callback&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;parse_full_blog_post,
+        )
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;parse_full_blog_post&lt;/span&gt;(self, response):
+    author &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;meta[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;author]&lt;/span&gt;
+    post_date &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;meta[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;post_date]&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;em&gt;Cool, but not so cool.&lt;/em&gt; Now we can use &lt;code&gt;cb_kwargs&lt;/code&gt; and declare the parameters in the
+callback&amp;rsquo;s signature instead:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;parse_blog_post&lt;/span&gt;(self, response):
+    &lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;yield&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; response.follow_all(
+        links,
+        cb_kwargs&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;{&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;author&amp;#34;&lt;/span&gt;: author, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;date&amp;#34;&lt;/span&gt;: post_date},
+        callback&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;parse_full_blog_post,
+    )
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;parse_full_blog_post&lt;/span&gt;(self, response, author, post_date):
+    &lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;That&amp;rsquo;s much better. Now my callback has a proper signature and the spider will fail in case I
+don&amp;rsquo;t provide the proper callback arguments.&lt;/p&gt;
+&lt;h1 id=&#34;wrapping-up&#34;&gt;Wrapping up&lt;/h1&gt;
+&lt;p&gt;I am sure there are tons of new features on Scrapy that would deserve each a blog post.
+As I am not a power user anymore, the changes that I listed above are the ones that
+impact me the most.&lt;/p&gt;
+&lt;p&gt;If you&amp;rsquo;re a Scrapy user, please start writing Scrapy as if you were in 2020 and spread
+these new features in your circles.&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -66,8 +650,48 @@ It&amp;rsquo;s been one and a half year since I used it for the last time, but l
       <pubDate>Fri, 01 May 2020 15:42:35 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/debugging-python-with-pudb/</guid>
-      <description>Pudb is, in my opinion, the most underrated Python package out there. I know this is a bold statement, but that’s how I feel about it. It helped me so much in a daily basis for so many years and I still feel like not too many people know about it.
-Debugging in Python There are several good debuggers for Python. I know a ton of people that use pdb, ipdb, VSCode/PyCharm embedded debuggers, among others.</description>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/inducer/pudb&#34;&gt;&lt;strong&gt;Pudb&lt;/strong&gt;&lt;/a&gt; is, in my opinion, the most underrated Python package out there. I know this is a bold statement, but that’s how I feel about it. It helped me so much in a daily basis for so many years and I still feel like not too many people know about it.&lt;/p&gt;
+&lt;h1 id=&#34;debugging-in-python&#34;&gt;Debugging in Python&lt;/h1&gt;
+&lt;p&gt;There are several good debuggers for Python. I know a ton of people that use &lt;a href=&#34;https://docs.python.org/3/library/pdb.html&#34;&gt;pdb&lt;/a&gt;, &lt;a href=&#34;https://github.com/gotcha/ipdb&#34;&gt;ipdb&lt;/a&gt;, VSCode/PyCharm embedded debuggers, among others.&lt;/p&gt;
+&lt;p&gt;I tried most of them and they are actually pretty good, but none of them made me feel at home as &lt;strong&gt;pudb&lt;/strong&gt; did. Maybe it’s the &lt;em&gt;Turbo Pascal-esque&lt;/em&gt; UI that brings me 20 years back in time. Maybe it’s the ability to debug stuff visually in a terminal. I don’t know.&lt;/p&gt;
+&lt;h1 id=&#34;meet-pudb&#34;&gt;Meet pudb&lt;/h1&gt;
+&lt;p&gt;I was going to write a bunch of stuff here, but then I realized that it makes a lot more sense to just demo pudb’s main features, so here we go:&lt;/p&gt;
+
+&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&#34;&gt;
+  &lt;iframe src=&#34;https://www.youtube.com/embed/bJYkCWPs_UU&#34; style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;&#34; allowfullscreen title=&#34;YouTube Video&#34;&gt;&lt;/iframe&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&#34;how-to-install-it&#34;&gt;How to install it&lt;/h1&gt;
+&lt;p&gt;Pudb is a third-party package, so you’ll need to install it first:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ pip install pudb
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;how-to-launch-it&#34;&gt;How to Launch it&lt;/h1&gt;
+&lt;p&gt;Launching pudb is similar to launching other python debuggers such as pdb and ipdb. All you have to do is to drop the line below wherever you want the execution of your program to pause:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; pudb; pudb&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;set_trace()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;You can also launch your program with pudb via command line:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ python -m pudb your_script.py
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;using-it-on-docker&#34;&gt;Using it on Docker&lt;/h1&gt;
+&lt;p&gt;Fortunately, pudb supports &lt;a href=&#34;https://documen.tician.de/pudb/starting.html#remote-debugging&#34;&gt;remote debugging&lt;/a&gt; and we can use it to debug Python code running on Docker.&lt;/p&gt;
+&lt;p&gt;First, we have to configure our app container to expose the port that we want pudb to listen to. For this example, we’ll expose it in the port 6900.&lt;/p&gt;
+&lt;p&gt;If using Docker Compose, we can add a &lt;code&gt;docker-compose.override.yml&lt;/code&gt; file in the project’s folder with the contents below:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;version&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;2&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;services&lt;/span&gt;:
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;my-service-container-name&lt;/span&gt;:
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;ports&lt;/span&gt;:
+      &lt;span style=&#34;color:#75715e&#34;&gt;# expose any that ports you have to expose&lt;/span&gt;
+      - &lt;span style=&#34;color:#ae81ff&#34;&gt;8081&lt;/span&gt;
+      &lt;span style=&#34;color:#75715e&#34;&gt;# pudb will be exposed via 6900&lt;/span&gt;
+      - &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;6900:6900&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Once that’s in place, we can drop the lines below wherever we want to inspect the service execution:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; pudb.remote &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; set_trace
+&lt;span style=&#34;color:#75715e&#34;&gt;# replace (120, 60) with your terminal dimensions&lt;/span&gt;
+set_trace(term_size&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;120&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;60&lt;/span&gt;), host&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;0.0.0.0&amp;#39;&lt;/span&gt;, port&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;6900&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Now, once our program stopped its execution in that line, we can just connect to pudb via telnet:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ telnet 0.0.0.0 &lt;span style=&#34;color:#ae81ff&#34;&gt;6900&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;And &lt;em&gt;voilá&lt;/em&gt;, pudb should open as if running locally. 🙂&lt;/p&gt;
+&lt;h1 id=&#34;wrapping-up&#34;&gt;Wrapping up&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://github.com/inducer/pudb&#34;&gt;Pudb&lt;/a&gt;&lt;/strong&gt; rocks and I wish that more people would use and promote it. While &lt;strong&gt;pdb&lt;/strong&gt; and other debuggers work pretty well, I think that they are not very intuitive and can be a rough experience for beginners.&lt;/p&gt;
+&lt;p&gt;Go ahead, give &lt;strong&gt;pudb&lt;/strong&gt; a try and let your friends/colleagues know about it. I am very grateful to my friend that introduced me to it.&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -76,8 +700,145 @@ Debugging in Python There are several good debuggers for Python. I know a ton of
       <pubDate>Mon, 31 Dec 2018 15:42:35 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/building-a-custom-flake8-plugin/</guid>
-      <description>Linters are everywhere. Be it in a fancy IDE, a CI pipeline or in the command line, linters help us to spot potential issues in our codebases. My favorite linter is flake8 and I use it in my VSCode setup, in my git pre-commit hooks and CI pipelines.
-But the thing is that flake8 doesn’t catch all the stuff I wanted it to catch. For example, I’d like my linter to catch the usage of the map and filter functions.</description>
+      <description>&lt;p&gt;Linters are everywhere. Be it in a fancy IDE, a CI pipeline or in the command line, linters help us to spot potential issues in our codebases. My favorite linter is &lt;a href=&#34;http://flake8.pycqa.org/en/latest/&#34;&gt;flake8&lt;/a&gt; and I use it in my VSCode setup, in my &lt;a href=&#34;http://flake8.pycqa.org/en/latest/user/using-hooks.html#built-in-hook-integration&#34;&gt;git pre-commit hooks&lt;/a&gt; and CI pipelines.&lt;/p&gt;
+&lt;p&gt;But the thing is that flake8 doesn’t catch all the stuff I wanted it to catch. For example, I’d like my linter to catch the usage of the &lt;code&gt;map&lt;/code&gt; and &lt;code&gt;filter&lt;/code&gt; functions.&lt;/p&gt;
+&lt;p&gt;So I was wondering how can I make my linter complain about it every time someone else or I write such a thing? The answer is: &lt;strong&gt;let’s write a flake8 plugin!&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;To do so, we’re gonna use two tools:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ast:&lt;/strong&gt; the stdlib module to manipulate Python Abstract Syntax Trees;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;flake8:&lt;/strong&gt; one of the (many) Python linters;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;the-anatomy-of-a-flake8-plugin&#34;&gt;The anatomy of a flake8 plugin&lt;/h1&gt;
+&lt;p&gt;For a simple plugin, all we need is to create two files in a new folder (which I called &lt;code&gt;flake8-picky/&lt;/code&gt;):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;setup.py&lt;/code&gt;: to make it installable and distributable;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;picky_checker.py&lt;/code&gt;: the module for the code checker itself.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Let’s start with the boring stuff (&lt;strong&gt;setup.py&lt;/strong&gt;) so that we are free to have fun hacking our plugin later. Here it is:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; setuptools
+ 
+setuptools&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;setup(
+   name&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;flake8-picky&amp;#39;&lt;/span&gt;,
+   license&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;MIT&amp;#39;&lt;/span&gt;,
+   version&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;0.0.1&amp;#39;&lt;/span&gt;,
+   description&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;A plugin to pick on map and filter usage :)&amp;#39;&lt;/span&gt;,
+   author&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Your name here&amp;#39;&lt;/span&gt;,
+   author_email&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;you@yourdomain.com&amp;#39;&lt;/span&gt;,
+   url&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://github.com/yourname/your-repo&amp;#39;&lt;/span&gt;,
+   py_modules&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;flake8_picky&amp;#39;&lt;/span&gt;],
+   entry_points&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;{
+       &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;flake8.extension&amp;#39;&lt;/span&gt;: [
+           &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;PCK0 = picky_checker:PickyChecker&amp;#39;&lt;/span&gt;,
+       ],
+   },
+   install_requires&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;flake8&amp;#39;&lt;/span&gt;],
+   classifiers&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;[
+       &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Topic :: Software Development :: Quality Assurance&amp;#39;&lt;/span&gt;,
+   ],
+)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Apart from the usual &lt;code&gt;setup.py&lt;/code&gt; stuff, there’s a section we need to pay attention:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;entry_points&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;{
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;flake8.extension&amp;#39;&lt;/span&gt;: [
+        &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;PCK0 = picky_checker:PickyChecker&amp;#39;&lt;/span&gt;,
+    ],
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;We’ve listed a single entry point for our flake8 plugin, which is the &lt;code&gt;picky_checker.PickyChecker&lt;/code&gt; class (we’ll get there soon). As you can see, we’ve listed it under the &lt;code&gt;&#39;flake8.extension&#39;&lt;/code&gt; entry point type, because this is what we need for a plugin that will add code verifications to Flake8. You can check for more options in the &lt;a href=&#34;http://flake8.pycqa.org/en/latest/plugin-development/registering-plugins.html?highlight=flake8.extension&#34;&gt;official docs&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Another thing to notice here is the string we added to the list of entry points: &lt;code&gt;&#39;PCK0 = picky_checker:PickyChecker&#39;&lt;/code&gt;. &lt;code&gt;PCK0&lt;/code&gt; is a code prefix for the kind of issues we are going to report (they must all start with such a substring).&lt;/p&gt;
+&lt;p&gt;Now let’s focus on the &lt;code&gt;picky_checker.py&lt;/code&gt; file which will contain:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;a class to parse and check the code to be linted;&lt;/li&gt;
+&lt;li&gt;the entrypoint class for our plugin.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We’ll start with the former.&lt;/p&gt;
+&lt;h1 id=&#34;building-our-checker-with-ast&#34;&gt;Building our checker with ast&lt;/h1&gt;
+&lt;p&gt;It doesn’t surprise me that an awesome language like Python has a module in the stdlib that allows us to easily parse Python code: the ast module.&lt;/p&gt;
+&lt;p&gt;The ast module provides the &lt;a href=&#34;https://docs.python.org/3/library/ast.html#ast.NodeVisitor&#34;&gt;ast.NodeVisitor&lt;/a&gt; base class, which basically walks through the &lt;a href=&#34;https://en.wikipedia.org/wiki/Abstract_syntax_tree&#34;&gt;Abstract Syntax Tree&lt;/a&gt; calling visitor functions for every node it finds.&lt;/p&gt;
+&lt;p&gt;For example, let’s say we want to find all the function definitions in a Python snippet and print their names. Here’s how we’d do it using ast:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; ast
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;FunctionFinder&lt;/span&gt;(ast&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;NodeVisitor):
+       &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;visit_FunctionDef&lt;/span&gt;(self, node):
+           &lt;span style=&#34;color:#66d9ef&#34;&gt;print&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Found: {}&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;format(node&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;name))
+ 
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; sample &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&amp;#39;&amp;#39;
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;   def myfunc():
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;     pass
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;   def anotherfunc(x, y):
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;     return x * y
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; 
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;   x = myfunc() + 1
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;   &amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; parsed &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; ast&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;parse(sample)
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; finder &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; FunctionFinder()
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; finder&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;visit(parsed)
+Found: myfunc
+Found: anotherfunc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Easy like that. So, if we want our plugin to focus on a specific kind of AST node, all we have to do is to implement the &lt;code&gt;visit_*()&lt;/code&gt; method and add the checks inside. Check out the full list of node types here: &lt;a href=&#34;https://greentreesnakes.readthedocs.io/en/latest/nodes.html&#34;&gt;https://greentreesnakes.readthedocs.io/en/latest/nodes.html&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;the-parser&#34;&gt;The parser&lt;/h2&gt;
+&lt;p&gt;Getting back to our flake8 plugin, the issue we want to catch is the &lt;code&gt;map&lt;/code&gt; and &lt;code&gt;filter&lt;/code&gt; usage. To check for that, all we have to write is a parser like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; ast
+ 
+ 
+&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ForbiddenFunctionsFinder&lt;/span&gt;(ast&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;NodeVisitor):
+    forbidden &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;map&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;filter&amp;#39;&lt;/span&gt;]
+ 
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; __init__(self, &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;args, &lt;span style=&#34;color:#f92672&#34;&gt;**&lt;/span&gt;kwargs):
+        super()&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;__init__(&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;args, &lt;span style=&#34;color:#f92672&#34;&gt;**&lt;/span&gt;kwargs)
+        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;issues &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; []
+ 
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;visit_Call&lt;/span&gt;(self, node):
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;not&lt;/span&gt; isinstance(node&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;func, ast&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Name):
+            &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt;
+ 
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; node&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;func&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;id &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;forbidden:
+            msg &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;PCK01 Please don&amp;#39;t use {}()&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;format(node&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;func&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;id)
+            self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;issues&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;append((node&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;lineno, node&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;col_offset, msg))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;In this case, our checker will visit each and every &lt;code&gt;ast.Call&lt;/code&gt; node in the AST and check if its name is not one of the forbidden functions.&lt;/p&gt;
+&lt;p&gt;As you can see, we add some information into the &lt;code&gt;issues&lt;/code&gt; list whenever we find a call. One important thing to remember here is that the linter error message should start with an error code that matches the prefix defined in &lt;code&gt;setup.py&lt;/code&gt; for our linter (&lt;code&gt;PCK0&lt;/code&gt; in our case).&lt;/p&gt;
+&lt;p&gt;I think we’ve got enough information about how &lt;code&gt;ast.NodeVisitor&lt;/code&gt; works in order to build our plugin, so let’s move to the entry point class.&lt;/p&gt;
+&lt;h2 id=&#34;the-entry-point&#34;&gt;The entry point&lt;/h2&gt;
+&lt;p&gt;Let’s create the &lt;code&gt;picky_checker.py&lt;/code&gt; file and add the entry point code on it:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;PickyChecker&lt;/span&gt;(object):
+    options &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; None
+    name &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;picky-checker&amp;#39;&lt;/span&gt;
+    version &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;0.1&amp;#39;&lt;/span&gt;
+ 
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; __init__(self, tree, filename):
+        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;tree &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; tree
+        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;filename &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; filename
+ 
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;run&lt;/span&gt;(self):
+        parser &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; ForbiddenFunctionsFinder()
+        parser&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;visit(self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;tree)
+ 
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; lineno, column, msg &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; parser&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;issues:
+            &lt;span style=&#34;color:#66d9ef&#34;&gt;yield&lt;/span&gt; (lineno, column, msg, PickyChecker)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Most of this is boilerplate, but let’s focus on the &lt;code&gt;run()&lt;/code&gt; method. This method is the one called when Flake8 runs the verifications. There, we first instantiate our &lt;code&gt;ForbiddenFunctionsFinder&lt;/code&gt; class, which will be basically an &lt;code&gt;ast.NodeVisitor&lt;/code&gt; doing the verifications. Once we have the object, we call the &lt;code&gt;.visit()&lt;/code&gt; method so that our node visitor traverses the AST.&lt;/p&gt;
+&lt;p&gt;After that’s done, we iterate over the issues found by &lt;code&gt;ForbiddenFunctionFinder&lt;/code&gt; generating tuples with the issues in the order expected by Flake8: line number, column number, the linter message and the class that found the issues.&lt;/p&gt;
+&lt;h1 id=&#34;gluing-it-all&#34;&gt;Gluing it all&lt;/h1&gt;
+&lt;p&gt;We’ll end up with the following files in our plugin folder:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;├── picky_checker.py
+└── setup.py
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The &lt;code&gt;picky_checker.py&lt;/code&gt; file should contain both the &lt;code&gt;ForbiddenFunctionsFinder&lt;/code&gt; and &lt;code&gt;PickyChecker&lt;/code&gt; classes.&lt;/p&gt;
+&lt;h1 id=&#34;installing-our-linter&#34;&gt;Installing our linter&lt;/h1&gt;
+&lt;p&gt;Now that we have our linter code in our &lt;code&gt;flake8_picky&lt;/code&gt; folder, let’s install our plugin and run flake8 over some sample files. You can install it by running:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ pip install .
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Then you can check if the plugin got installed by running:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ flake8 --version
+3.5.0 &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;mccabe: 0.6.1, pycodestyle: 2.3.1, pyflakes: 1.6.0, picky-checker: 0.1&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Finally, create some sample files and run flake8 against them:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ flake8 samples/01.py
+samples/01.py:4:5: PCK01 Please don&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;t use map()
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;samples/01.py:7:5: PCK01 Please don&amp;#39;&lt;/span&gt;t use filter&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;wrapping-up&#34;&gt;Wrapping up&lt;/h1&gt;
+&lt;p&gt;That’s it. All we need to build a flake8 plugin is:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;a &lt;code&gt;setup.py&lt;/code&gt; file to make it installable;&lt;/li&gt;
+&lt;li&gt;an entrypoint class that will run your code checker;&lt;/li&gt;
+&lt;li&gt;the code checker itself, which can be a &lt;code&gt;NodeVisitor&lt;/code&gt; subclass.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Here you can find a repo with the linter developed here: &lt;a href=&#34;https://github.com/stummjr/flake8-picky/&#34;&gt;https://github.com/stummjr/flake8-picky/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;If you’re angry at me because you love &lt;code&gt;map&lt;/code&gt; and &lt;code&gt;filter&lt;/code&gt;, please forgive me as I had to come up with an example. 🙂&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -86,9 +847,21 @@ But the thing is that flake8 doesn’t catch all the stuff I wanted it to catch.
       <pubDate>Wed, 05 Sep 2018 15:42:35 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/else-in-python-loops/</guid>
-      <description>One of the first things to stand out when I was starting with Python was the else clause. I guess everyone knows the normal usage of such clauses in any programming language, which is to define an alternate path for the if condition. Oddly enough, in Python we can add else clauses in loop constructions, such as for and while.
-For example, this is valid Python:
-for number in some_sequence: if is_the_magic_number(number): print(&amp;#39;found the magic number&amp;#39;) break else: print(&amp;#39;magic number not found&amp;#39;) Notice how the else is aligned with the for and not with the if.</description>
+      <description>&lt;p&gt;One of the first things to stand out when I was starting with Python was the &lt;code&gt;else&lt;/code&gt; clause. I guess everyone knows the normal usage of such clauses in any programming language, which is to define an alternate path for the &lt;code&gt;if&lt;/code&gt; condition. Oddly enough, in Python we can add &lt;code&gt;else&lt;/code&gt; clauses in loop constructions, such as &lt;code&gt;for&lt;/code&gt; and &lt;code&gt;while&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;For example, this is valid Python:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; number &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; some_sequence:
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; is_the_magic_number(number):
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;print&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;found the magic number&amp;#39;&lt;/span&gt;)
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt;:
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;print&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;magic number not found&amp;#39;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Notice how the &lt;code&gt;else&lt;/code&gt; is aligned with the &lt;code&gt;for&lt;/code&gt; and not with the &lt;code&gt;if&lt;/code&gt;. What this means is that commands inside the &lt;code&gt;else&lt;/code&gt; block will be executed if, and only if, the loop was not finished by a &lt;code&gt;break&lt;/code&gt;. The same is true for &lt;code&gt;while&lt;/code&gt; loops.&lt;/p&gt;
+&lt;p&gt;I must admit that I’ve always had some trouble to remember the meaning of an &lt;code&gt;else&lt;/code&gt; in loops, specially because I don’t see them very often (and I’m grateful for that). But, at some day I was watching &lt;a href=&#34;https://youtu.be/OSGv2VnC0go&#34;&gt;Raymond Hettinger’s Transforming Code into Beautiful, Idiomatic Python&lt;/a&gt; talk where he brilliantly says something like this at some point:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Why don’t you call the else in loops as ‘nobreak’?&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;That’s all I needed to not forget the meaning anymore. 🙂&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -97,9 +870,61 @@ for number in some_sequence: if is_the_magic_number(number): print(&amp;#39;foun
       <pubDate>Sun, 02 Sep 2018 15:55:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/customize-ipython5-prompt/</guid>
-      <description>IPython is wonderful and I ❤️ it. I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:
-Some of the things that I dislike:
- the banner displayed when we start it; the In[x] and Out[x] displayed for inputs and outputs; the newline in between commands; and last, but far from least, the uber-annoying “do you really want to exit?</description>
+      <description>&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://ipython.org/&#34;&gt;IPython&lt;/a&gt; is wonderful and I ❤️ it.&lt;/strong&gt; I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://stummjr.github.io/img/posts/ipython1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Some of the things that I dislike:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the banner displayed when we start it;&lt;/li&gt;
+&lt;li&gt;the &lt;code&gt;In[x]&lt;/code&gt; and &lt;code&gt;Out[x]&lt;/code&gt; displayed for inputs and outputs;&lt;/li&gt;
+&lt;li&gt;the newline in between commands;&lt;/li&gt;
+&lt;li&gt;and last, but far from least, the uber-annoying &lt;em&gt;“do you really want to exit?”&lt;/em&gt; message.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As you can see, it doesn’t take much to get on my nerves. 😆&lt;/p&gt;
+&lt;p&gt;The bright side is that it’s easy to change that and have a more pleasant experience with IPython. This is my ideal shell, more compact and less bureaucratic:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://stummjr.github.io/img/posts/ipython2.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;If you like it, follow me through the next steps to make your IPython shell look and behave like that.&lt;/p&gt;
+&lt;h1 id=&#34;customizing-the-prompt&#34;&gt;Customizing the prompt&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;First&lt;/strong&gt; you have to create a default profile for your shell with this command:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;$ ipython profile create
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;As a result, a &lt;code&gt;.ipython&lt;/code&gt; folder will be created in your home folder, with the following contents:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;.ipython
+├── extensions
+├── nbextensions
+└── profile_default
+    ├── ipython_config.py
+    ├── log
+    ├── pid
+    ├── security
+    └── startup
+        └── README
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;Next&lt;/strong&gt;, create  &lt;code&gt;.ipython/custom_prompt.py&lt;/code&gt; file with the following content:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; IPython.terminal.prompts &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; Prompts, Token
+ 
+&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;CustomPrompt&lt;/span&gt;(Prompts):
+ 
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;in_prompt_tokens&lt;/span&gt;(self, cli&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;None):
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; [(Token&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Prompt, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&amp;gt;&amp;gt;&amp;gt; &amp;#39;&lt;/span&gt;), ]
+ 
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;out_prompt_tokens&lt;/span&gt;(self, cli&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;None):
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; [(Token&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Prompt, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&amp;#39;&lt;/span&gt;), ]
+ 
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;continuation_prompt_tokens&lt;/span&gt;(self, cli&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;None, width&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;None):
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; [(Token&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Prompt, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&amp;#39;&lt;/span&gt;), ]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;And last&lt;/strong&gt;, you have to tell IPython to use this new class as your prompt and in addition to custom settings.&lt;/p&gt;
+&lt;p&gt;You can do so by adding this code to &lt;code&gt;.ipython/profile_default/ipython_config.py&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; custom_prompt &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; CustomPrompt
+ 
+ 
+c &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; get_config()
+ 
+c&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;TerminalInteractiveShell&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;prompts_class &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; CustomPrompt
+c&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;TerminalInteractiveShell&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;separate_in &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&amp;#39;&lt;/span&gt;
+c&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;TerminalInteractiveShell&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;confirm_exit &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; False
+c&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;TerminalIPythonApp&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;display_banner &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; False
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;That’s it&lt;/strong&gt;, now you have a prompt like the one I’ve shown earlier. I hope it improves your experience with IPython as it did for me.&lt;/p&gt;
+&lt;p&gt;If you want to learn how to do further customizations, check &lt;a href=&#34;https://ipython.readthedocs.io/en/stable/config/details.html#custom-prompts&#34;&gt;the official documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Ah, did I mention that &lt;strong&gt;I love IPython&lt;/strong&gt;? Huge kudos and thanks for the team behind it! 👏&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -108,9 +933,71 @@ Some of the things that I dislike:
       <pubDate>Tue, 28 Aug 2018 15:55:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/python3-round-oddities/</guid>
-      <description>Rounding a decimal number with Python 3 is as simple as invoking the round() builtin:
-&amp;gt;&amp;gt;&amp;gt; round(1.2) 1 &amp;gt;&amp;gt;&amp;gt; round(1.8) 2 We can also pass an extra parameter called ndigits, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:
-&amp;gt;&amp;gt;&amp;gt; round(1.847, ndigits=2) 1.85 &amp;gt;&amp;gt;&amp;gt; round(1.847, ndigits=1) 1.8 And what happens when we want to round a number like 1.5? Will it round it up or down?</description>
+      <description>&lt;p&gt;Rounding a decimal number with Python 3 is as simple as invoking the &lt;a href=&#34;https://docs.python.org/3/library/functions.html#round&#34;&gt;&lt;code&gt;round()&lt;/code&gt;&lt;/a&gt; builtin:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;1.2&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;1.8&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;We can also pass an extra parameter called &lt;code&gt;ndigits&lt;/code&gt;, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;1.847&lt;/span&gt;, ndigits&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;1.85&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;1.847&lt;/span&gt;, ndigits&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;1.8&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;And what happens when we want to round a number like 1.5? Will it round it up or down? Let’s check:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;1.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It seems that it rounds up. Let’s check some other numbers to confirm:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;2.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Uh, now it went down! Let’s check some more:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;3.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;4.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;5.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;http://stummjr.github.io/img/posts/michael-scott-eli5.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Calm down, there’s an explanation for this. In Python 3, &lt;code&gt;round()&lt;/code&gt; works like this:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Round to the closest number.
+If there’s a tie, round to the closest even number.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Now it makes sense. If we check the examples above, we’ll see that the rounding was always made to the closest even number:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;3.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;4.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;4&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;5.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;what-about-python-2&#34;&gt;What about Python 2?&lt;/h1&gt;
+&lt;p&gt;Python 2 is quite different. When there’s a tie, the rounding is always made upwards in case the numbers are positive:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;1.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;2.0&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#ae81ff&#34;&gt;2.5&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;3.0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;And downwards, when the numbers are negative:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1.5&lt;/span&gt;)
+&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;2.0&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; round(&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;2.5&lt;/span&gt;)
+&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;3.0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h1 id=&#34;why-the-hell-did-python-3-changed-it&#34;&gt;Why the hell did Python 3 changed it?&lt;/h1&gt;
+&lt;p&gt;The goal is to take the &lt;strong&gt;bias&lt;/strong&gt; out of the rounding operations.&lt;/p&gt;
+&lt;p&gt;Imagine a bank where all the roundings are done upwards. By the end of the day, the bank earning report will show a value that is higher than what the bank actually earned. That’s what happens on &lt;strong&gt;Python 2&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# Python 2&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; values &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [&lt;span style=&#34;color:#ae81ff&#34;&gt;1.5&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;2.5&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;3.5&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;4.5&lt;/span&gt;]
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; sum(values)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;12.0&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; sum(round(v) &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; v &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; values)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;14.0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Using Python 3’s &lt;code&gt;round()&lt;/code&gt;, the rounded values tend to be amortized, because half of them round upwards and half of them round downwards, given that half the numbers are even and the other half are odd. Check the same code, but now running on &lt;strong&gt;Python 3&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# Python 3&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; values &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [&lt;span style=&#34;color:#ae81ff&#34;&gt;1.5&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;2.5&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;3.5&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;4.5&lt;/span&gt;]
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; sum(values)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;12.0&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; sum(round(v) &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; v &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; values)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;12&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This is no Python 3’s inovation. In fact, this kind of rounding is quite old and even has a proper name: &lt;a href=&#34;http://wiki.c2.com/?BankersRounding&#34;&gt;Bankers Rounding&lt;/a&gt;.&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -119,9 +1006,42 @@ Some of the things that I dislike:
       <pubDate>Mon, 27 Aug 2018 15:42:35 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/drop-duplicates-in-order/</guid>
-      <description>Let’s say you have a list containing all the URLs extracted from a web page and you want to get rid of duplicate URLs.
-The most common way of achieving that might be building a set from that list, given that such operation automatically drops the duplicates. Something like:
-&amp;gt;&amp;gt;&amp;gt; urls = [ &amp;#39;http://api.example.com/b&amp;#39;, &amp;#39;http://api.example.com/a&amp;#39;, &amp;#39;http://api.example.com/c&amp;#39;, &amp;#39;http://api.example.com/b&amp;#39; ] &amp;gt;&amp;gt;&amp;gt; set(urls) {&amp;#39;http://api.example.com/a&amp;#39;, &amp;#39;http://api.example.com/b&amp;#39;, &amp;#39;http://api.example.com/c&amp;#39;} The problem is that we just lost the original order of the list.</description>
+      <description>&lt;p&gt;Let’s say you have a list containing all the URLs extracted from a web page and you want to get rid of duplicate URLs.&lt;/p&gt;
+&lt;p&gt;The most common way of achieving that might be building a set from that list, given that such operation automatically drops the duplicates. Something like:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; urls &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/b&amp;#39;&lt;/span&gt;,
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/a&amp;#39;&lt;/span&gt;,
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/c&amp;#39;&lt;/span&gt;,
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/b&amp;#39;&lt;/span&gt;
+]
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; set(urls)
+{&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/a&amp;#39;&lt;/span&gt;,
+ &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/b&amp;#39;&lt;/span&gt;,
+ &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/c&amp;#39;&lt;/span&gt;}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The problem is that we just lost the original order of the list.&lt;/p&gt;
+&lt;p&gt;A good way to maintain the original order of the elements after removing the duplicates is by using this trick with &lt;a href=&#34;https://docs.python.org/3/library/collections.html#collections.OrderedDict&#34;&gt;&lt;code&gt;collections.OrderedDict&lt;/code&gt;&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; collections &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; OrderedDict
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; list(OrderedDict&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;fromkeys(urls)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;keys())
+[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/b&amp;#39;&lt;/span&gt;,
+ &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/a&amp;#39;&lt;/span&gt;,
+ &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/c&amp;#39;&lt;/span&gt;]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Cool, huh? Now let’s dig into details to understand what the code above does.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;OrderedDict&lt;/code&gt; is like a traditional Python &lt;code&gt;dict&lt;/code&gt; with a (not so) slight difference: &lt;code&gt;OrderedDict&lt;/code&gt; keeps the elements’ insertion order internally. This way, when we iterate over such an object, it will return its elements in the order in which they’ve been inserted.&lt;/p&gt;
+&lt;p&gt;Now, let’s break down the operations to understand what’s going on:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; odict &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; OrderedDict&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;fromkeys(urls)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The &lt;a href=&#34;https://docs.python.org/3/library/collections.html#collections.Counter.fromkeys&#34;&gt;&lt;code&gt;fromkeys()&lt;/code&gt;&lt;/a&gt; method creates a dictionary using the values passed as its first parameters as the keys and the second parameter as its values (or &lt;code&gt;None&lt;/code&gt; if we pass nothing, as we did).&lt;/p&gt;
+&lt;p&gt;As a result we get:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; odict
+OrderedDict([(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/b&amp;#39;&lt;/span&gt;, None),
+             (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/a&amp;#39;&lt;/span&gt;, None),
+             (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/c&amp;#39;&lt;/span&gt;, None)])
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Now that we have a dictionary with the URLs as the keys, we can call the &lt;code&gt;keys()&lt;/code&gt; method to get only a sequence containing the URLs:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; list(odict&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;keys())
+[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/b&amp;#39;&lt;/span&gt;,
+ &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/a&amp;#39;&lt;/span&gt;,
+ &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;http://api.example.com/c&amp;#39;&lt;/span&gt;]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Easy like that. 😀&lt;/p&gt;
+</description>
     </item>
     
   </channel>
