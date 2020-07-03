@@ -311,13 +311,13 @@ couldn&rsquo;t tell a callback&rsquo;s interface just by looking at its signatur
     <span style="color:#66d9ef">for</span> link <span style="color:#f92672">in</span> links:
         <span style="color:#66d9ef">yield</span> scrapy<span style="color:#f92672">.</span>Request(
             link,
-            meta<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;author&#34;</span>: author, <span style="color:#e6db74">&#34;date&#34;</span>: post_date},
+            meta<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;author&#34;</span>: author, <span style="color:#e6db74">&#34;post_date&#34;</span>: post_date},
             callback<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>parse_full_blog_post,
         )
 
 <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">parse_full_blog_post</span>(self, response):
-    author <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>meta[<span style="color:#e6db74">&#34;author]</span>
-    post_date <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>meta[<span style="color:#e6db74">&#34;post_date]</span>
+    author <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>meta[<span style="color:#e6db74">&#34;author&#34;</span>]
+    post_date <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>meta[<span style="color:#e6db74">&#34;post_date&#34;</span>]
     <span style="color:#f92672">...</span>
 </code></pre></div><p><em>Cool, but not so cool.</em> Now we can use <code>cb_kwargs</code> and declare the parameters in the
 callback&rsquo;s signature instead:</p>
@@ -325,7 +325,7 @@ callback&rsquo;s signature instead:</p>
     <span style="color:#f92672">...</span>
     <span style="color:#66d9ef">yield</span> <span style="color:#f92672">from</span> response.follow_all(
         links,
-        cb_kwargs<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;author&#34;</span>: author, <span style="color:#e6db74">&#34;date&#34;</span>: post_date},
+        cb_kwargs<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;author&#34;</span>: author, <span style="color:#e6db74">&#34;post_date&#34;</span>: post_date},
         callback<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>parse_full_blog_post,
     )
 

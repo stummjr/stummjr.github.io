@@ -613,13 +613,13 @@ couldn&amp;rsquo;t tell a callback&amp;rsquo;s interface just by looking at its 
     &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; link &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; links:
         &lt;span style=&#34;color:#66d9ef&#34;&gt;yield&lt;/span&gt; scrapy&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Request(
             link,
-            meta&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;{&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;author&amp;#34;&lt;/span&gt;: author, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;date&amp;#34;&lt;/span&gt;: post_date},
+            meta&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;{&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;author&amp;#34;&lt;/span&gt;: author, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;post_date&amp;#34;&lt;/span&gt;: post_date},
             callback&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;parse_full_blog_post,
         )
 
 &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;parse_full_blog_post&lt;/span&gt;(self, response):
-    author &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;meta[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;author]&lt;/span&gt;
-    post_date &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;meta[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;post_date]&lt;/span&gt;
+    author &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;meta[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;author&amp;#34;&lt;/span&gt;]
+    post_date &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;meta[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;post_date&amp;#34;&lt;/span&gt;]
     &lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;em&gt;Cool, but not so cool.&lt;/em&gt; Now we can use &lt;code&gt;cb_kwargs&lt;/code&gt; and declare the parameters in the
 callback&amp;rsquo;s signature instead:&lt;/p&gt;
@@ -627,7 +627,7 @@ callback&amp;rsquo;s signature instead:&lt;/p&gt;
     &lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;
     &lt;span style=&#34;color:#66d9ef&#34;&gt;yield&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; response.follow_all(
         links,
-        cb_kwargs&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;{&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;author&amp;#34;&lt;/span&gt;: author, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;date&amp;#34;&lt;/span&gt;: post_date},
+        cb_kwargs&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;{&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;author&amp;#34;&lt;/span&gt;: author, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;post_date&amp;#34;&lt;/span&gt;: post_date},
         callback&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;parse_full_blog_post,
     )
 
