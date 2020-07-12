@@ -12,7 +12,7 @@
 
     
     <title>
-  Tag → tips
+  Tag → python
   
    | Dunder Doc
 </title>
@@ -40,7 +40,7 @@
 <meta name="generator" content="Hugo 0.69.2" />
 
 
-<link rel="canonical" href="http://stummjr.github.io/tags/tips/">
+<link rel="canonical" href="http://stummjr.github.io/tags/python/">
 <link rel="alternative" href="/index.xml" title="Dunder Doc" type="application/atom+xml">
 
 
@@ -238,41 +238,19 @@
         <article class="entry-single">
   
   <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/handling-headers-based-pagination/" title="Handling Headers-Based Pagination on APIs with Python" class="entry-link">Handling Headers-Based Pagination on APIs with Python</a></h3>
+    <h3 class="entry-title"><a href="http://stummjr.github.io/post/drop-duplicates-in-order/" title="Drop Duplicates from a List in Order" class="entry-link">Drop Duplicates from a List in Order</a></h3>
   </header>
 
-  <p class="entry-summary">The other day I was building a Python script to fetch some information about all my repositories on GitHub. Their API is pretty straightforward and well documented.
-Fetching my repos was as simple as:
-&gt;&gt;&gt; import requests &gt;&gt;&gt; response = requests.get(&#34;https://api.github.com/users/stummjr/repos&#34;) The thing is that such request gave me a list with all my repos on it. No info on pagination whatsoever on the response body. After a bit of research, I found out that GitHub APIs take advantage of the Link header to expose several pagination options.</p>
+  <p class="entry-summary">Let’s say you have a list containing all the URLs extracted from a web page and you want to get rid of duplicate URLs.
+The most common way of achieving that might be building a set from that list, given that such operation automatically drops the duplicates. Something like:
+&gt;&gt;&gt; urls = [ &#39;http://api.example.com/b&#39;, &#39;http://api.example.com/a&#39;, &#39;http://api.example.com/c&#39;, &#39;http://api.example.com/b&#39; ] &gt;&gt;&gt; set(urls) {&#39;http://api.example.com/a&#39;, &#39;http://api.example.com/b&#39;, &#39;http://api.example.com/c&#39;} The problem is that we just lost the original order of the list.</p>
   <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Jul 12, 2020</span> 2 min read</p>
+    <p class="entry-meta"><span class="entry-time">Aug 27, 2018</span> 2 min read</p>
     <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Handling%20Headers-Based%20Pagination%20on%20APIs%20with%20Python&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fhandling-headers-based-pagination%2f" title="Share on Twitter">
+      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Drop%20Duplicates%20from%20a%20List%20in%20Order&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fdrop-duplicates-in-order%2f" title="Share on Twitter">
         <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
       </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fhandling-headers-based-pagination%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/ipython-tricks/" title="My Favorite IPython Tricks" class="entry-link">My Favorite IPython Tricks</a></h3>
-  </header>
-
-  <p class="entry-summary">It’s no secret that IPython is my favorite Python shell. I am the guy who is always asking everyone “did you try IPython already?” as soon as I see they opening the regular Python shell. Yes, I know, you’d probably hate me.
-The reason I like it so much is that IPython makes it very easy for me to incrementally experiment when coding. I consider experimentation to be a crucial step when writing software, as it helps to reduce the unkowns in a problem or technology.</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Jun 6, 2020</span> 8 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=My%20Favorite%20IPython%20Tricks&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fipython-tricks%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fipython-tricks%2f" title="Share on Facebook">
+      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fdrop-duplicates-in-order%2f" title="Share on Facebook">
         <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
       </a>
     </div>
@@ -281,6 +259,13 @@ The reason I like it so much is that IPython makes it very easy for me to increm
 
       
     
+    
+      <nav class="pagination">
+        
+          <a class="pagination-btn" href="/tags/python/">← Newer Posts</a>
+        
+        
+      </nav>
     
   </section>
 

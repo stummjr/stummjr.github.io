@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>til on Dunder Doc</title>
+    <link>http://stummjr.github.io/tags/til/</link>
+    <description>Recent content in til on Dunder Doc</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 12 Jul 2020 15:55:13 -0300</lastBuildDate>
+    
+      <atom:link href="http://stummjr.github.io/tags/til/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Handling Headers-Based Pagination on APIs with Python</title>
+      <link>http://stummjr.github.io/post/handling-headers-based-pagination/</link>
+      <pubDate>Sun, 12 Jul 2020 15:55:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/handling-headers-based-pagination/</guid>
+      <description>&lt;p&gt;The other day I was building a Python script to fetch some information about all my repositories on GitHub.
+Their API is pretty straightforward and &lt;a href=&#34;https://developer.github.com/v3/&#34;&gt;well documented&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Fetching my repos was as simple as:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; requests
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; response &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; requests&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://api.github.com/users/stummjr/repos&amp;#34;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The thing is that such request gave me a list with all my repos on it. No info on pagination whatsoever on the response &lt;strong&gt;body&lt;/strong&gt;. After a bit of research, I found out that &lt;a href=&#34;https://developer.github.com/v3/#link-header&#34;&gt;GitHub APIs take advantage of the Link header&lt;/a&gt; to expose several pagination options. Given that I hadn&amp;rsquo;t seen such a header before, I went ahead and inspected it:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;headers[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;link&amp;#34;&lt;/span&gt;]
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&amp;lt;https://api.github.com/user/1170435/repos?page=2&amp;gt;; rel=&amp;#34;next&amp;#34;, &amp;lt;https://api.github.com/user/1170435/repos?page=2&amp;gt;; rel=&amp;#34;last&amp;#34;&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Cool! It&amp;rsquo;s not just giving me a link to the next page, but also to the last one. Nice!&lt;/p&gt;
+&lt;p&gt;But wait, that&amp;rsquo;s a string! What am I supposed to do with that? Write a small parser to extract such headers? Shouldn&amp;rsquo;t be hard to do so, but there must be a better way.&lt;/p&gt;
+&lt;p&gt;Of course there is! The awesome requests library never let me down and this time was no exception. It parses such headers and exposes the pagination info via the &lt;a href=&#34;https://2.python-requests.org/en/master/user/advanced/#link-headers&#34;&gt;&lt;code&gt;Response.links&lt;/code&gt;&lt;/a&gt; attribute:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;links
+{
+  &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;next&amp;#39;&lt;/span&gt;: {
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;url&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://api.github.com/user/1170435/repos?page=2&amp;#39;&lt;/span&gt;,
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;rel&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;next&amp;#39;&lt;/span&gt;
+  },
+  &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;last&amp;#39;&lt;/span&gt;: {
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;url&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://api.github.com/user/1170435/repos?page=2&amp;#39;&lt;/span&gt;,
+    &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;rel&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;last&amp;#39;&lt;/span&gt;
+  }
+}
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;links[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;next&amp;#34;&lt;/span&gt;]
+{&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;url&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://api.github.com/user/1170435/repos?page=2&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;rel&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;next&amp;#39;&lt;/span&gt;}
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; response&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;links[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;last&amp;#34;&lt;/span&gt;]
+{&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;url&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://api.github.com/user/1170435/repos?page=2&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;rel&amp;#39;&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;last&amp;#39;&lt;/span&gt;}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Simple like that. 🙂&lt;/p&gt;
+&lt;p&gt;If you want to learn more about this standard, check out the &lt;a href=&#34;https://tools.ietf.org/html/rfc8288&#34;&gt;IETF&amp;rsquo;s RFC8288&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

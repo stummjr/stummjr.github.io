@@ -11,28 +11,30 @@
     
 
     
-    <title>
-  Tag → tips
+    <title>Handling Headers-Based Pagination on APIs with Python</title>
+
+    
+    
+
+
+
   
-   | Dunder Doc
-</title>
-
-    
-    
-
-
-
-
   
   <meta name="author" content="Valdir Stumm Jr" />
-  <meta name="description" content="Random thoughts and tips on programming." />
+  <meta name="description" content="The other day I was building a Python script to fetch some information about all my repositories on GitHub. Their API is pretty straightforward and well documented.
+Fetching my repos was as simple as:
+&amp;gt;&amp;gt;&amp;gt; import requests &amp;gt;&amp;gt;&amp;gt; response = requests.get(&amp;#34;https://api.github.com/users/stummjr/repos&amp;#34;) The thing is that such request gave me a list with all my repos on it. No info on pagination whatsoever on the response body. After a bit of research, I found out that GitHub APIs take advantage of the Link header to expose several pagination options.">
 
   
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="@stummjr" />
-  <meta name="twitter:title" content="Dunder Doc" />
-  <meta name="twitter:description" content="Random thoughts and tips on programming." />
-  <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
+  
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@stummjr" />
+    <meta name="twitter:title" content="Handling Headers-Based Pagination on APIs with Python" />
+    <meta name="twitter:description" content="The other day I was building a Python script to fetch some information about all my repositories on GitHub. Their API is pretty straightforward and well documented.
+Fetching my repos was as simple as:
+&amp;gt;&amp;gt;&amp;gt; import requests &amp;gt;&amp;gt;&amp;gt; response = requests.get(&amp;#34;https://api.github.com/users/stummjr/repos&amp;#34;) The thing is that such request gave me a list with all my repos on it. No info on pagination whatsoever on the response body. After a bit of research, I found out that GitHub APIs take advantage of the Link header to expose several pagination options." />
+    <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
+  
 
 
 
@@ -40,7 +42,7 @@
 <meta name="generator" content="Hugo 0.69.2" />
 
 
-<link rel="canonical" href="http://stummjr.github.io/tags/tips/">
+<link rel="canonical" href="http://stummjr.github.io/post/handling-headers-based-pagination/">
 <link rel="alternative" href="/index.xml" title="Dunder Doc" type="application/atom+xml">
 
 
@@ -223,65 +225,82 @@
 </amp-sidebar>
 
     
-  <section class="main entry-list">
-    <header class="list-header">
-      
-      
-        
-      
-        
-      
+  <section class="main post-detail">
+    <header class="post-header">
+      <h1 class="post-title">Handling Headers-Based Pagination on APIs with Python</h1>
+      <p class="entry-meta">
+        <span class="entry-time">Jul 12, 2020</span>
+        <span class="entry-author">Valdir Stumm Jr</span>
+        2 min read
+      </p>
     </header>
     
-    
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/handling-headers-based-pagination/" title="Handling Headers-Based Pagination on APIs with Python" class="entry-link">Handling Headers-Based Pagination on APIs with Python</a></h3>
-  </header>
 
-  <p class="entry-summary">The other day I was building a Python script to fetch some information about all my repositories on GitHub. Their API is pretty straightforward and well documented.
-Fetching my repos was as simple as:
-&gt;&gt;&gt; import requests &gt;&gt;&gt; response = requests.get(&#34;https://api.github.com/users/stummjr/repos&#34;) The thing is that such request gave me a list with all my repos on it. No info on pagination whatsoever on the response body. After a bit of research, I found out that GitHub APIs take advantage of the Link header to expose several pagination options.</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Jul 12, 2020</span> 2 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Handling%20Headers-Based%20Pagination%20on%20APIs%20with%20Python&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fhandling-headers-based-pagination%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fhandling-headers-based-pagination%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
+    <article class="post-content"><p>The other day I was building a Python script to fetch some information about all my repositories on GitHub.
+Their API is pretty straightforward and <a href="https://developer.github.com/v3/">well documented</a>.</p>
+<p>Fetching my repos was as simple as:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">import</span> requests
+<span style="color:#f92672">&gt;&gt;&gt;</span> response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;https://api.github.com/users/stummjr/repos&#34;</span>)
+</code></pre></div><p>The thing is that such request gave me a list with all my repos on it. No info on pagination whatsoever on the response <strong>body</strong>. After a bit of research, I found out that <a href="https://developer.github.com/v3/#link-header">GitHub APIs take advantage of the Link header</a> to expose several pagination options. Given that I hadn&rsquo;t seen such a header before, I went ahead and inspected it:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> response<span style="color:#f92672">.</span>headers[<span style="color:#e6db74">&#34;link&#34;</span>]
+<span style="color:#e6db74">&#39;&lt;https://api.github.com/user/1170435/repos?page=2&gt;; rel=&#34;next&#34;, &lt;https://api.github.com/user/1170435/repos?page=2&gt;; rel=&#34;last&#34;&#39;</span>
+</code></pre></div><p>Cool! It&rsquo;s not just giving me a link to the next page, but also to the last one. Nice!</p>
+<p>But wait, that&rsquo;s a string! What am I supposed to do with that? Write a small parser to extract such headers? Shouldn&rsquo;t be hard to do so, but there must be a better way.</p>
+<p>Of course there is! The awesome requests library never let me down and this time was no exception. It parses such headers and exposes the pagination info via the <a href="https://2.python-requests.org/en/master/user/advanced/#link-headers"><code>Response.links</code></a> attribute:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> response<span style="color:#f92672">.</span>links
+{
+  <span style="color:#e6db74">&#39;next&#39;</span>: {
+    <span style="color:#e6db74">&#39;url&#39;</span>: <span style="color:#e6db74">&#39;https://api.github.com/user/1170435/repos?page=2&#39;</span>,
+    <span style="color:#e6db74">&#39;rel&#39;</span>: <span style="color:#e6db74">&#39;next&#39;</span>
+  },
+  <span style="color:#e6db74">&#39;last&#39;</span>: {
+    <span style="color:#e6db74">&#39;url&#39;</span>: <span style="color:#e6db74">&#39;https://api.github.com/user/1170435/repos?page=2&#39;</span>,
+    <span style="color:#e6db74">&#39;rel&#39;</span>: <span style="color:#e6db74">&#39;last&#39;</span>
+  }
+}
+<span style="color:#f92672">&gt;&gt;&gt;</span> response<span style="color:#f92672">.</span>links[<span style="color:#e6db74">&#34;next&#34;</span>]
+{<span style="color:#e6db74">&#39;url&#39;</span>: <span style="color:#e6db74">&#39;https://api.github.com/user/1170435/repos?page=2&#39;</span>, <span style="color:#e6db74">&#39;rel&#39;</span>: <span style="color:#e6db74">&#39;next&#39;</span>}
+<span style="color:#f92672">&gt;&gt;&gt;</span> response<span style="color:#f92672">.</span>links[<span style="color:#e6db74">&#34;last&#34;</span>]
+{<span style="color:#e6db74">&#39;url&#39;</span>: <span style="color:#e6db74">&#39;https://api.github.com/user/1170435/repos?page=2&#39;</span>, <span style="color:#e6db74">&#39;rel&#39;</span>: <span style="color:#e6db74">&#39;last&#39;</span>}
+</code></pre></div><p>Simple like that. 🙂</p>
+<p>If you want to learn more about this standard, check out the <a href="https://tools.ietf.org/html/rfc8288">IETF&rsquo;s RFC8288</a>.</p>
 </article>
+    <footer class="post-footer">
+      
+      <ul class="post-tags">
+        
+          <li class="post-tag"><a href="/tags/python"><span class="tag">Python</span></a></li>
+        
+          <li class="post-tag"><a href="/tags/til"><span class="tag">Til</span></a></li>
+        
+          <li class="post-tag"><a href="/tags/tips"><span class="tag">Tips</span></a></li>
+        
+      </ul>
+      
+      <div class="sharing">
+        <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Handling%20Headers-Based%20Pagination%20on%20APIs%20with%20Python&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fhandling-headers-based-pagination%2f" title="Share on Twitter">
+          <svg class="icon icon-twitter" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
+        </a>
+        <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fhandling-headers-based-pagination%2f" title="Share on Facebook">
+          <svg class="icon icon-facebook" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
+        </a>
+      </div>
+
+      <div id="disqus_thread"></div>
+      <script>
+      
 
       
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/ipython-tricks/" title="My Favorite IPython Tricks" class="entry-link">My Favorite IPython Tricks</a></h3>
-  </header>
 
-  <p class="entry-summary">It’s no secret that IPython is my favorite Python shell. I am the guy who is always asking everyone “did you try IPython already?” as soon as I see they opening the regular Python shell. Yes, I know, you’d probably hate me.
-The reason I like it so much is that IPython makes it very easy for me to incrementally experiment when coding. I consider experimentation to be a crucial step when writing software, as it helps to reduce the unkowns in a problem or technology.</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Jun 6, 2020</span> 8 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=My%20Favorite%20IPython%20Tricks&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fipython-tricks%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fipython-tricks%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-    
-    
+      (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://dunderdoc.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+      })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                       
+    </footer>
   </section>
 
     <footer class="footer">
