@@ -6,10 +6,90 @@
     <description>Recent content in tools on Dunder Doc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 06 Jun 2020 10:19:13 -0300</lastBuildDate>
+    <lastBuildDate>Sat, 18 Jul 2020 10:19:13 -0300</lastBuildDate>
     
       <atom:link href="http://stummjr.github.io/tags/tools/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Black formats my code, and maybe it should format yours too</title>
+      <link>http://stummjr.github.io/post/use-a-code-formatter/</link>
+      <pubDate>Sat, 18 Jul 2020 10:19:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/use-a-code-formatter/</guid>
+      <description>&lt;p&gt;I’ve always been a bit skeptical about code formatters. I don’t know, I always felt like
+they would curb my freedom to format the code in my own way. &lt;em&gt;Because, you know, no one formats code
+better than me.&lt;/em&gt; 😛&lt;/p&gt;
+&lt;p&gt;Joking aside, I got to know &lt;a href=&#34;https://github.com/psf/black&#34;&gt;&lt;code&gt;black&lt;/code&gt;&lt;/a&gt; about 2 years ago.
+Everyone was talking about it. A bunch of people adopted it.
+Massive codebases were being reformatted daily. It was the new kid on the block.&lt;/p&gt;
+&lt;p&gt;My initial reaction? Contempt. I didn&amp;rsquo;t want to use a code formatter that did not allow me to customize
+it to format the code the way I like. &lt;em&gt;Double quotes? Get the hell out of here!&lt;/em&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Black is opinionated and so was I.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Silly me. &lt;strong&gt;It should have never been about me or my own taste&lt;/strong&gt;, but the opposite. Black&amp;rsquo;s goal is
+to make Python codebases all around look at least similar in their format.&lt;/p&gt;
+&lt;h1 id=&#34;what-changed-my-mind&#34;&gt;What changed my mind?&lt;/h1&gt;
+&lt;p&gt;Fast forward one year and I see myself posting a lot of change requests in PRs asking people
+to format their code to match &lt;strong&gt;my personal preferences&lt;/strong&gt;. That attitude can delay PRs and trigger
+long and frustrating discussions.&lt;/p&gt;
+&lt;p&gt;Perhaps having coding guidelines outlining the rules on code style could have helped. It would certainly have
+helped onboarding new team members. While we all have PEP-8 as a common idiom, there are many issues that go
+beyond what&amp;rsquo;s defined there and that&amp;rsquo;s why having a written reference is always a good idea.&lt;/p&gt;
+&lt;p&gt;I do not think that coding guidelines is the ultimate solution though. People will challenge what&amp;rsquo;s defined
+there. Discussions will still take place. Your guidelines will have several gaps that will leave margins for
+pure interpretation.&lt;/p&gt;
+&lt;p&gt;That&amp;rsquo;s exactly why these days I think that not being highly customizable is black&amp;rsquo;s greatest strength.
+Once you adopt it, your &amp;ldquo;code style czar&amp;rdquo; badge will be instantly dropped. And what a relief!&lt;/p&gt;
+&lt;h2 id=&#34;how-do-i-feel-about-it-now&#34;&gt;How do I feel about it now?&lt;/h2&gt;
+&lt;p&gt;I love &lt;code&gt;black&lt;/code&gt;. Code reviews these days have less bike-shedding and more meaningful contributions. They
+focus on what really matters, basically. Don&amp;rsquo;t get me wrong, I do think that style matters, but we now have
+&lt;code&gt;black&lt;/code&gt; as our (not so) benevolent dictator in any discussion regarding that. The code doesn&amp;rsquo;t necessarily
+look exactly how I would like it to look. But at least there is consensus now and &lt;code&gt;black&lt;/code&gt; is always ready
+to take the fall. No hard feelings at all.&lt;/p&gt;
+&lt;h1 id=&#34;a-word-of-advice-if-i-may&#34;&gt;A word of advice, if I may&lt;/h1&gt;
+&lt;p&gt;I work on a small team, in a relatively new codebase well covered with tests. We rarely have
+more than 20 pull requests open simultaneosuly. That all made it easier to start using black.&lt;/p&gt;
+&lt;p&gt;Once you decide to adopt it, you&amp;rsquo;ll want to reformat your whole codebase using it. That means that
+most of your open PRs will have some sort of conflict, and that can be a pain if you have tons of them.
+The PR reformatting your code will likely be humongous. A solution to this may be to apply &lt;code&gt;black&lt;/code&gt;
+incrementally in your codebase. Check out this Github Action to help you with that:
+&lt;a href=&#34;https://github.com/marketplace/actions/gradual-black-formatter&#34;&gt;Gradual Black Formatter&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Finally, your revision history will now have a huge &amp;ldquo;Reformat codebase&amp;rdquo; commit under your name. If you have the
+habit of digging into your project&amp;rsquo;s revisions, I am sure that&amp;rsquo;s going to bother you. The good news is that
+&lt;code&gt;git blame&lt;/code&gt; allows you to ignore specific revisions so that they don&amp;rsquo;t show up when you are scavenging
+commits. You can do that via the
+&lt;a href=&#34;https://git-scm.com/docs/git-blame#Documentation/git-blame.txt---ignore-revltrevgt&#34;&gt;&lt;code&gt;--ignore-rev&lt;/code&gt;&lt;/a&gt; and
+&lt;a href=&#34;https://git-scm.com/docs/git-blame#Documentation/git-blame.txt---ignore-revs-fileltfilegt&#34;&gt;&lt;code&gt;--ignore-revs-file&lt;/code&gt;&lt;/a&gt; options.&lt;/p&gt;
+&lt;p&gt;This section is not meant to discourage you, as adopting &lt;code&gt;black&lt;/code&gt; is worth the potential trouble.
+I just want you to know that you may face some roadbumps to get there.&lt;/p&gt;
+&lt;h1 id=&#34;a-suggested-setup&#34;&gt;A suggested setup&lt;/h1&gt;
+&lt;p&gt;Once you managed to apply &lt;code&gt;black&lt;/code&gt; to your whole codebase, you have to make sure that any new changes
+will be &lt;code&gt;black&lt;/code&gt;-compliant. The easiest, but not so effective, way to do that is by kindly asking everyone
+to run &lt;code&gt;black&lt;/code&gt; before any commit. Don&amp;rsquo;t get me wrong, it&amp;rsquo;s not that I don&amp;rsquo;t trust people to run it. The
+thing is that we&amp;rsquo;re all humans and we&amp;rsquo;ll just forget it.&lt;/p&gt;
+&lt;p&gt;My team enforces &lt;code&gt;black&lt;/code&gt; via git commit hooks. To do that, we use the excellent
+&lt;a href=&#34;https://pre-commit.com/&#34;&gt;&lt;code&gt;pre-commit&lt;/code&gt;&lt;/a&gt; package and ask all the team members to run &lt;code&gt;pre-commit install&lt;/code&gt;
+in their local setup. Once everyone does that, no one will be allowed to even commit their changes locally
+in case there are violations.&lt;/p&gt;
+&lt;p&gt;This is &lt;em&gt;somewhat&lt;/em&gt; effective. But, as I said before, we&amp;rsquo;re all humans and humans forget stuff. I did forget it
+once (&lt;em&gt;or maybe twice&amp;hellip;&lt;/em&gt; 😄) when setting up the development environment in new machines. Thankfully, the
+project has a CI setup that fails the PR build in case &lt;code&gt;black&lt;/code&gt; detects violations.&lt;/p&gt;
+&lt;p&gt;So this is what I suggest you to do:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Use &lt;code&gt;pre-commit&lt;/code&gt; to enforce &lt;code&gt;black&lt;/code&gt; in local commits.&lt;/li&gt;
+&lt;li&gt;Make sure your &amp;ldquo;Contribution Guidelines&amp;rdquo; doc provides the installation instructions.&lt;/li&gt;
+&lt;li&gt;Setup a check on your CI to fail the build in case &lt;code&gt;black&lt;/code&gt; detects violations.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This can all be easily achieved with pre-commit and GitHub Actions. I&amp;rsquo;ve created a very simple
+project to demonstrate that setup: &lt;a href=&#34;https://github.com/stummjr/black_setup_project&#34;&gt;https://github.com/stummjr/black_setup_project&lt;/a&gt;&lt;/p&gt;
+&lt;h1 id=&#34;wrapping-up&#34;&gt;Wrapping up&lt;/h1&gt;
+&lt;p&gt;These days, I am a huge fan of &lt;code&gt;black&lt;/code&gt;. Of course, there are still some lingering pet-peeves.
+But that&amp;rsquo;s just because black is as opinionated as me. Black ain&amp;rsquo;t gonna change, but I can. :)&lt;/p&gt;
+&lt;p&gt;Setting up black worked pretty well on my team, and may be worth a shot on yours as well.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>My Favorite IPython Tricks</title>

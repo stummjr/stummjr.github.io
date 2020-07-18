@@ -12,15 +12,7 @@
 
     
     <title>
-  
-    
-    
-      
-        Blog
-      
-    
-      
-    
+  Tag → best practices
   
    | Dunder Doc
 </title>
@@ -30,19 +22,17 @@
 
 
 
-  
-  
-  <meta name="author" content="Valdir Stumm Jr" />
-  <meta name="description" content="">
 
   
+  <meta name="author" content="Valdir Stumm Jr" />
+  <meta name="description" content="Random thoughts and tips on programming." />
+
   
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@stummjr" />
-    <meta name="twitter:title" content="Posts" />
-    <meta name="twitter:description" content="" />
-    <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
-  
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@stummjr" />
+  <meta name="twitter:title" content="Dunder Doc" />
+  <meta name="twitter:description" content="Random thoughts and tips on programming." />
+  <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
 
 
 
@@ -50,7 +40,7 @@
 <meta name="generator" content="Hugo 0.69.2" />
 
 
-<link rel="canonical" href="http://stummjr.github.io/post/">
+<link rel="canonical" href="http://stummjr.github.io/tags/best-practices/">
 <link rel="alternative" href="/index.xml" title="Dunder Doc" type="application/atom+xml">
 
 
@@ -151,7 +141,7 @@
       
       
       
-        <li class="menu-item  is-active"><a href="/post/">Blog</a></li>
+        <li class="menu-item "><a href="/post/">Blog</a></li>
       
         <li class="menu-item "><a href="/about/">About</a></li>
       
@@ -225,7 +215,7 @@
     
     
     
-      <li class="sidebar-item  is-active"><a class="sidebar-link" href="/post/">Blog</a></li>
+      <li class="sidebar-item "><a class="sidebar-link" href="/post/">Blog</a></li>
     
       <li class="sidebar-item "><a class="sidebar-link" href="/about/">About</a></li>
     
@@ -238,8 +228,6 @@
       
       
         
-          <h2 class="list-label">Blog Posts</h2>
-        
       
         
       
@@ -250,65 +238,18 @@
         <article class="entry-single">
   
   <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/customize-ipython5-prompt/" title="How to customize your IPython 5&#43; prompt" class="entry-link">How to customize your IPython 5&#43; prompt</a></h3>
+    <h3 class="entry-title"><a href="http://stummjr.github.io/post/use-a-code-formatter/" title="Black formats my code, and maybe it should format yours too" class="entry-link">Black formats my code, and maybe it should format yours too</a></h3>
   </header>
 
-  <p class="entry-summary">IPython is wonderful and I ❤️ it. I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:
-Some of the things that I dislike:
- the banner displayed when we start it; the In[x] and Out[x] displayed for inputs and outputs; the newline in between commands; and last, but far from least, the uber-annoying “do you really want to exit?</p>
+  <p class="entry-summary">I’ve always been a bit skeptical about code formatters. I don’t know, I always felt like they would curb my freedom to format the code in my own way. Because, you know, no one formats code better than me. 😛
+Joking aside, I got to know black about 2 years ago. Everyone was talking about it. A bunch of people adopted it. Massive codebases were being reformatted daily. It was the new kid on the block.</p>
   <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Sep 2, 2018</span> 2 min read</p>
+    <p class="entry-meta"><span class="entry-time">Jul 18, 2020</span> 5 min read</p>
     <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=How%20to%20customize%20your%20IPython%205%2b%20prompt&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Twitter">
+      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Black%20formats%20my%20code%2c%20and%20maybe%20it%20should%20format%20yours%20too&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fuse-a-code-formatter%2f" title="Share on Twitter">
         <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
       </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/python3-round-oddities/" title="Python 3 rounding oddities" class="entry-link">Python 3 rounding oddities</a></h3>
-  </header>
-
-  <p class="entry-summary">Rounding a decimal number with Python 3 is as simple as invoking the round() builtin:
-&gt;&gt;&gt; round(1.2) 1 &gt;&gt;&gt; round(1.8) 2 We can also pass an extra parameter called ndigits, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:
-&gt;&gt;&gt; round(1.847, ndigits=2) 1.85 &gt;&gt;&gt; round(1.847, ndigits=1) 1.8 And what happens when we want to round a number like 1.5? Will it round it up or down?</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Aug 28, 2018</span> 2 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Python%203%20rounding%20oddities&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fpython3-round-oddities%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fpython3-round-oddities%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/drop-duplicates-in-order/" title="Drop Duplicates from a List in Order" class="entry-link">Drop Duplicates from a List in Order</a></h3>
-  </header>
-
-  <p class="entry-summary">Let’s say you have a list containing all the URLs extracted from a web page and you want to get rid of duplicate URLs.
-The most common way of achieving that might be building a set from that list, given that such operation automatically drops the duplicates. Something like:
-&gt;&gt;&gt; urls = [ &#39;http://api.example.com/b&#39;, &#39;http://api.example.com/a&#39;, &#39;http://api.example.com/c&#39;, &#39;http://api.example.com/b&#39; ] &gt;&gt;&gt; set(urls) {&#39;http://api.example.com/a&#39;, &#39;http://api.example.com/b&#39;, &#39;http://api.example.com/c&#39;} The problem is that we just lost the original order of the list.</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Aug 27, 2018</span> 2 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Drop%20Duplicates%20from%20a%20List%20in%20Order&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fdrop-duplicates-in-order%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fdrop-duplicates-in-order%2f" title="Share on Facebook">
+      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fuse-a-code-formatter%2f" title="Share on Facebook">
         <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
       </a>
     </div>
@@ -317,13 +258,6 @@ The most common way of achieving that might be building a set from that list, gi
 
       
     
-    
-      <nav class="pagination">
-        
-          <a class="pagination-btn" href="/post/">← Newer Posts</a>
-        
-        
-      </nav>
     
   </section>
 

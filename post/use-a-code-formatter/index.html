@@ -11,19 +11,7 @@
     
 
     
-    <title>
-  
-    
-    
-      
-        Blog
-      
-    
-      
-    
-  
-   | Dunder Doc
-</title>
+    <title>Black formats my code, and maybe it should format yours too</title>
 
     
     
@@ -33,14 +21,16 @@
   
   
   <meta name="author" content="Valdir Stumm Jr" />
-  <meta name="description" content="">
+  <meta name="description" content="I’ve always been a bit skeptical about code formatters. I don’t know, I always felt like they would curb my freedom to format the code in my own way. Because, you know, no one formats code better than me. 😛
+Joking aside, I got to know black about 2 years ago. Everyone was talking about it. A bunch of people adopted it. Massive codebases were being reformatted daily. It was the new kid on the block.">
 
   
   
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@stummjr" />
-    <meta name="twitter:title" content="Posts" />
-    <meta name="twitter:description" content="" />
+    <meta name="twitter:title" content="Black formats my code, and maybe it should format yours too" />
+    <meta name="twitter:description" content="I’ve always been a bit skeptical about code formatters. I don’t know, I always felt like they would curb my freedom to format the code in my own way. Because, you know, no one formats code better than me. 😛
+Joking aside, I got to know black about 2 years ago. Everyone was talking about it. A bunch of people adopted it. Massive codebases were being reformatted daily. It was the new kid on the block." />
     <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
   
 
@@ -50,7 +40,7 @@
 <meta name="generator" content="Hugo 0.69.2" />
 
 
-<link rel="canonical" href="http://stummjr.github.io/post/">
+<link rel="canonical" href="http://stummjr.github.io/post/use-a-code-formatter/">
 <link rel="alternative" href="/index.xml" title="Dunder Doc" type="application/atom+xml">
 
 
@@ -151,7 +141,7 @@
       
       
       
-        <li class="menu-item  is-active"><a href="/post/">Blog</a></li>
+        <li class="menu-item "><a href="/post/">Blog</a></li>
       
         <li class="menu-item "><a href="/about/">About</a></li>
       
@@ -225,7 +215,7 @@
     
     
     
-      <li class="sidebar-item  is-active"><a class="sidebar-link" href="/post/">Blog</a></li>
+      <li class="sidebar-item "><a class="sidebar-link" href="/post/">Blog</a></li>
     
       <li class="sidebar-item "><a class="sidebar-link" href="/about/">About</a></li>
     
@@ -233,98 +223,125 @@
 </amp-sidebar>
 
     
-  <section class="main entry-list">
-    <header class="list-header">
-      
-      
-        
-          <h2 class="list-label">Blog Posts</h2>
-        
-      
-        
-      
+  <section class="main post-detail">
+    <header class="post-header">
+      <h1 class="post-title">Black formats my code, and maybe it should format yours too</h1>
+      <p class="entry-meta">
+        <span class="entry-time">Jul 18, 2020</span>
+        <span class="entry-author">Valdir Stumm Jr</span>
+        5 min read
+      </p>
     </header>
     
-    
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/customize-ipython5-prompt/" title="How to customize your IPython 5&#43; prompt" class="entry-link">How to customize your IPython 5&#43; prompt</a></h3>
-  </header>
 
-  <p class="entry-summary">IPython is wonderful and I ❤️ it. I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:
-Some of the things that I dislike:
- the banner displayed when we start it; the In[x] and Out[x] displayed for inputs and outputs; the newline in between commands; and last, but far from least, the uber-annoying “do you really want to exit?</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Sep 2, 2018</span> 2 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=How%20to%20customize%20your%20IPython%205%2b%20prompt&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
+    <article class="post-content"><p>I’ve always been a bit skeptical about code formatters. I don’t know, I always felt like
+they would curb my freedom to format the code in my own way. <em>Because, you know, no one formats code
+better than me.</em> 😛</p>
+<p>Joking aside, I got to know <a href="https://github.com/psf/black"><code>black</code></a> about 2 years ago.
+Everyone was talking about it. A bunch of people adopted it.
+Massive codebases were being reformatted daily. It was the new kid on the block.</p>
+<p>My initial reaction? Contempt. I didn&rsquo;t want to use a code formatter that did not allow me to customize
+it to format the code the way I like. <em>Double quotes? Get the hell out of here!</em></p>
+<blockquote>
+<p>Black is opinionated and so was I.</p>
+</blockquote>
+<p>Silly me. <strong>It should have never been about me or my own taste</strong>, but the opposite. Black&rsquo;s goal is
+to make Python codebases all around look at least similar in their format.</p>
+<h1 id="what-changed-my-mind">What changed my mind?</h1>
+<p>Fast forward one year and I see myself posting a lot of change requests in PRs asking people
+to format their code to match <strong>my personal preferences</strong>. That attitude can delay PRs and trigger
+long and frustrating discussions.</p>
+<p>Perhaps having coding guidelines outlining the rules on code style could have helped. It would certainly have
+helped onboarding new team members. While we all have PEP-8 as a common idiom, there are many issues that go
+beyond what&rsquo;s defined there and that&rsquo;s why having a written reference is always a good idea.</p>
+<p>I do not think that coding guidelines is the ultimate solution though. People will challenge what&rsquo;s defined
+there. Discussions will still take place. Your guidelines will have several gaps that will leave margins for
+pure interpretation.</p>
+<p>That&rsquo;s exactly why these days I think that not being highly customizable is black&rsquo;s greatest strength.
+Once you adopt it, your &ldquo;code style czar&rdquo; badge will be instantly dropped. And what a relief!</p>
+<h2 id="how-do-i-feel-about-it-now">How do I feel about it now?</h2>
+<p>I love <code>black</code>. Code reviews these days have less bike-shedding and more meaningful contributions. They
+focus on what really matters, basically. Don&rsquo;t get me wrong, I do think that style matters, but we now have
+<code>black</code> as our (not so) benevolent dictator in any discussion regarding that. The code doesn&rsquo;t necessarily
+look exactly how I would like it to look. But at least there is consensus now and <code>black</code> is always ready
+to take the fall. No hard feelings at all.</p>
+<h1 id="a-word-of-advice-if-i-may">A word of advice, if I may</h1>
+<p>I work on a small team, in a relatively new codebase well covered with tests. We rarely have
+more than 20 pull requests open simultaneosuly. That all made it easier to start using black.</p>
+<p>Once you decide to adopt it, you&rsquo;ll want to reformat your whole codebase using it. That means that
+most of your open PRs will have some sort of conflict, and that can be a pain if you have tons of them.
+The PR reformatting your code will likely be humongous. A solution to this may be to apply <code>black</code>
+incrementally in your codebase. Check out this Github Action to help you with that:
+<a href="https://github.com/marketplace/actions/gradual-black-formatter">Gradual Black Formatter</a>.</p>
+<p>Finally, your revision history will now have a huge &ldquo;Reformat codebase&rdquo; commit under your name. If you have the
+habit of digging into your project&rsquo;s revisions, I am sure that&rsquo;s going to bother you. The good news is that
+<code>git blame</code> allows you to ignore specific revisions so that they don&rsquo;t show up when you are scavenging
+commits. You can do that via the
+<a href="https://git-scm.com/docs/git-blame#Documentation/git-blame.txt---ignore-revltrevgt"><code>--ignore-rev</code></a> and
+<a href="https://git-scm.com/docs/git-blame#Documentation/git-blame.txt---ignore-revs-fileltfilegt"><code>--ignore-revs-file</code></a> options.</p>
+<p>This section is not meant to discourage you, as adopting <code>black</code> is worth the potential trouble.
+I just want you to know that you may face some roadbumps to get there.</p>
+<h1 id="a-suggested-setup">A suggested setup</h1>
+<p>Once you managed to apply <code>black</code> to your whole codebase, you have to make sure that any new changes
+will be <code>black</code>-compliant. The easiest, but not so effective, way to do that is by kindly asking everyone
+to run <code>black</code> before any commit. Don&rsquo;t get me wrong, it&rsquo;s not that I don&rsquo;t trust people to run it. The
+thing is that we&rsquo;re all humans and we&rsquo;ll just forget it.</p>
+<p>My team enforces <code>black</code> via git commit hooks. To do that, we use the excellent
+<a href="https://pre-commit.com/"><code>pre-commit</code></a> package and ask all the team members to run <code>pre-commit install</code>
+in their local setup. Once everyone does that, no one will be allowed to even commit their changes locally
+in case there are violations.</p>
+<p>This is <em>somewhat</em> effective. But, as I said before, we&rsquo;re all humans and humans forget stuff. I did forget it
+once (<em>or maybe twice&hellip;</em> 😄) when setting up the development environment in new machines. Thankfully, the
+project has a CI setup that fails the PR build in case <code>black</code> detects violations.</p>
+<p>So this is what I suggest you to do:</p>
+<ol>
+<li>Use <code>pre-commit</code> to enforce <code>black</code> in local commits.</li>
+<li>Make sure your &ldquo;Contribution Guidelines&rdquo; doc provides the installation instructions.</li>
+<li>Setup a check on your CI to fail the build in case <code>black</code> detects violations.</li>
+</ol>
+<p>This can all be easily achieved with pre-commit and GitHub Actions. I&rsquo;ve created a very simple
+project to demonstrate that setup: <a href="https://github.com/stummjr/black_setup_project">https://github.com/stummjr/black_setup_project</a></p>
+<h1 id="wrapping-up">Wrapping up</h1>
+<p>These days, I am a huge fan of <code>black</code>. Of course, there are still some lingering pet-peeves.
+But that&rsquo;s just because black is as opinionated as me. Black ain&rsquo;t gonna change, but I can. :)</p>
+<p>Setting up black worked pretty well on my team, and may be worth a shot on yours as well.</p>
 </article>
+    <footer class="post-footer">
+      
+      <ul class="post-tags">
+        
+          <li class="post-tag"><a href="/tags/python"><span class="tag">Python</span></a></li>
+        
+          <li class="post-tag"><a href="/tags/tools"><span class="tag">Tools</span></a></li>
+        
+          <li class="post-tag"><a href="/tags/best-practices"><span class="tag">Best Practices</span></a></li>
+        
+      </ul>
+      
+      <div class="sharing">
+        <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Black%20formats%20my%20code%2c%20and%20maybe%20it%20should%20format%20yours%20too&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fuse-a-code-formatter%2f" title="Share on Twitter">
+          <svg class="icon icon-twitter" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
+        </a>
+        <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fuse-a-code-formatter%2f" title="Share on Facebook">
+          <svg class="icon icon-facebook" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
+        </a>
+      </div>
+
+      <div id="disqus_thread"></div>
+      <script>
+      
 
       
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/python3-round-oddities/" title="Python 3 rounding oddities" class="entry-link">Python 3 rounding oddities</a></h3>
-  </header>
 
-  <p class="entry-summary">Rounding a decimal number with Python 3 is as simple as invoking the round() builtin:
-&gt;&gt;&gt; round(1.2) 1 &gt;&gt;&gt; round(1.8) 2 We can also pass an extra parameter called ndigits, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:
-&gt;&gt;&gt; round(1.847, ndigits=2) 1.85 &gt;&gt;&gt; round(1.847, ndigits=1) 1.8 And what happens when we want to round a number like 1.5? Will it round it up or down?</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Aug 28, 2018</span> 2 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Python%203%20rounding%20oddities&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fpython3-round-oddities%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fpython3-round-oddities%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/drop-duplicates-in-order/" title="Drop Duplicates from a List in Order" class="entry-link">Drop Duplicates from a List in Order</a></h3>
-  </header>
-
-  <p class="entry-summary">Let’s say you have a list containing all the URLs extracted from a web page and you want to get rid of duplicate URLs.
-The most common way of achieving that might be building a set from that list, given that such operation automatically drops the duplicates. Something like:
-&gt;&gt;&gt; urls = [ &#39;http://api.example.com/b&#39;, &#39;http://api.example.com/a&#39;, &#39;http://api.example.com/c&#39;, &#39;http://api.example.com/b&#39; ] &gt;&gt;&gt; set(urls) {&#39;http://api.example.com/a&#39;, &#39;http://api.example.com/b&#39;, &#39;http://api.example.com/c&#39;} The problem is that we just lost the original order of the list.</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Aug 27, 2018</span> 2 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Drop%20Duplicates%20from%20a%20List%20in%20Order&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fdrop-duplicates-in-order%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fdrop-duplicates-in-order%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-    
-    
-      <nav class="pagination">
-        
-          <a class="pagination-btn" href="/post/">← Newer Posts</a>
-        
-        
-      </nav>
-    
+      (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://dunderdoc.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+      })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                       
+    </footer>
   </section>
 
     <footer class="footer">
