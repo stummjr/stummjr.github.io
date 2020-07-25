@@ -6,10 +6,58 @@
     <description>Recent content on Dunder Doc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 18 Jul 2020 10:19:13 -0300</lastBuildDate>
+    <lastBuildDate>Sat, 25 Jul 2020 10:19:13 -0300</lastBuildDate>
     
       <atom:link href="http://stummjr.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Stop writing for the audience</title>
+      <link>http://stummjr.github.io/post/stop-writing-for-the-audience/</link>
+      <pubDate>Sat, 25 Jul 2020 10:19:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/stop-writing-for-the-audience/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;ve been blogging for a long time already, but lately I noticed that it has been becoming harder and harder to finish a blog post. I have an idea, I write a draft, but in many cases the blog post never gets published.&lt;/p&gt;
+&lt;p&gt;I recently realized that the further I get into writing a blog post, the bigger my anxiety on writing something &lt;em&gt;perfect&lt;/em&gt; gets. That&amp;rsquo;s mostly because my mind gets swamped with questions like:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Is this blog post going to be game-changing for anyone?&lt;/li&gt;
+&lt;li&gt;Do I look stupid by writing about such a basic thing?&lt;/li&gt;
+&lt;li&gt;Am I being 100% accurate on all technical details?&lt;/li&gt;
+&lt;li&gt;Will people like/upvote/retweet it in social media?&lt;/li&gt;
+&lt;li&gt;Are haters gonna hate?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;By looking at all these concerns, it&amp;rsquo;s easy to realize that writing became a pain because I am too concerned with how the world will perceive &lt;strong&gt;me&lt;/strong&gt; after reading something that I have written. Perhaps the best way to overcome this is by not caring much about the audience and focus on the reasons I write.&lt;/p&gt;
+&lt;h2 id=&#34;what-motivates-me-to-write&#34;&gt;What motivates me to write?&lt;/h2&gt;
+&lt;p&gt;I&amp;rsquo;ve been blogging for 15+ years. It&amp;rsquo;s not something that I am very good at, but I really love doing it. Despite the absolute joy that I feel when typing markdown on an empty editor, there are other factors that drive me:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Writing helps me to think deeply on the subjects.&lt;/li&gt;
+&lt;li&gt;Writing something down helps me to commit the new knowledge to my memory.&lt;/li&gt;
+&lt;li&gt;Writing generates reusable knowledge. If I notice that I am repeating something over and over in discussions, I can just write about it and save time in the future.&lt;/li&gt;
+&lt;li&gt;The more I write, the better I get at it. And that helps me at my professional life.&lt;/li&gt;
+&lt;li&gt;And yes, I love the feeling that I may be helping someone.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;But there&amp;rsquo;s something else: as a human, I love the feeling that I am leaving some legacy behind me. Don&amp;rsquo;t get me wrong, I don&amp;rsquo;t think my blog is going to be relevant for anyone in the future. However, it will be &lt;strong&gt;for me&lt;/strong&gt; (and perhaps to my dear ones).&lt;/p&gt;
+&lt;h3 id=&#34;writing-for-my-future-self&#34;&gt;Writing for my (future) self&lt;/h3&gt;
+&lt;p&gt;It is really nice to be able to go back 15 years in time and see a blog post that you&amp;rsquo;ve written back then. You&amp;rsquo;ll spot tons of misconceptions and technical mistakes. You&amp;rsquo;ll perhaps even feel a bit ashamed. But hey, that was you 15 freaking years ago! And it&amp;rsquo;s super cool to make a time-travel and see how different you were back then.&lt;/p&gt;
+&lt;p&gt;The other day I was reading a blog post that I&amp;rsquo;ve published in 2006. I was celebrating the release of Ubuntu 6.06. I don&amp;rsquo;t think that blog post helped anyone and I did not become popular or landed a nice new job because of that. But now, 14 years later, I remember the joy and excitement my friends and I had every time the new version of a Linux distro was released. That excitement is long gone, I&amp;rsquo;ve been using Macs for a while now, but it brings back good memories.&lt;/p&gt;
+&lt;h2 id=&#34;should-i-care-about-the-external-audience&#34;&gt;Should I care about the external audience?&lt;/h2&gt;
+&lt;p&gt;I should, even though they should not be my main target &lt;strong&gt;for now&lt;/strong&gt;. If I get past my ego and fears of not being accepted when writing, I am sure that I will eventually produce something worth for someone. I still want to be able to help people with my posts. I just think that I should stop putting too much pressure on writing, and to do that I have to stop focusing on the outside world and remember the &lt;strong&gt;absolute joy&lt;/strong&gt; that I feel when writing.&lt;/p&gt;
+&lt;p&gt;It is still super nice when someone reaches out saying that something that I wrote helped them somehow, but that&amp;rsquo;s not everything. I still want to write so that in 15 years I can see how was my understanding of things these days, which kinds of ideas were driving me, which topics were exciting for me.&lt;/p&gt;
+&lt;p&gt;Maybe there&amp;rsquo;s a better way to put this: it&amp;rsquo;s not that I should stop caring about the audience, but I should stop caring too much about their reactions.&lt;/p&gt;
+&lt;h2 id=&#34;how-to-care-less-about-reactions&#34;&gt;How to care less about reactions?&lt;/h2&gt;
+&lt;p&gt;I believe that, lately, my main problem with writing has become this habit of immediately sharing any blog post on twitter/reddit/linkedin. That puts a lot of pressure on myself, as I want to look good in front of the others.&lt;/p&gt;
+&lt;p&gt;I have been putting an overwhelming amount of value on likes and upvotes. Posting something that does not get any traction has been a source of frustration. However, if you think about it, likes and upvotes do not mean much these days. Looking at my twitter stats, I found out that some posts that I shared there had 50% less link impressions than likes. How come, internet? 😂&lt;/p&gt;
+&lt;p&gt;Posting on Linkedin also adds an extra layer of pressure: what will recruiters or potential new teammates think about me if they see this piece of crap that I am about to publish?&lt;/p&gt;
+&lt;p&gt;That said, I will still post stuff on social media every now and then, but I am surely not posting everything there. If there&amp;rsquo;s something that I think that is really worth sharing with the world, then I will. Otherwise it stays in my blog, waiting to be discovered.&lt;/p&gt;
+&lt;h2 id=&#34;why-is-my-ego-so-involved&#34;&gt;Why is my ego so involved?&lt;/h2&gt;
+&lt;p&gt;One problem that I see these days is that there&amp;rsquo;s a ton of pressure on us to know at least &lt;strong&gt;a bit about a whole bunch of stuff&lt;/strong&gt; when it comes to software engineering. The fact is that we all know just a teeny tiny bit about a small fraction of what&amp;rsquo;s out there, and there will always be someone that already knows very well what we just learned.&lt;/p&gt;
+&lt;p&gt;It should be OK to be vulnerable and let the world know that it took us 10 years of industry to get to know something that is known for 40 years already. The problem is that we care about what other people think about us. But that&amp;rsquo;s a huge trap, as we have zero control over that.&lt;/p&gt;
+&lt;p&gt;There will always be people ready to let you know that what you just discovered is already known by them for a while already. After all, it feels good telling people that we know about something. The secret is to not let that sort of discouragement prevent us from being ourselves.&lt;/p&gt;
+&lt;h2 id=&#34;what-now&#34;&gt;What now?&lt;/h2&gt;
+&lt;p&gt;All that said, I hope to write more in the future and try to not let my ego stop me from doing so. I hope I can produce more stuff and eventually something really good may come up. As for the rest, they will bring me good memories from these days in the future.&lt;/p&gt;
+&lt;p&gt;Thanks for reading this! 🙂&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Black formats my code, and maybe it should format yours too</title>
