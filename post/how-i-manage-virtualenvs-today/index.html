@@ -11,28 +11,28 @@
     
 
     
-    <title>
-  Tag → libraries
+    <title>How I manage Virtualenvs with Pyenv</title>
+
+    
+    
+
+
+
   
-   | Dunder Doc
-</title>
-
-    
-    
-
-
-
-
   
   <meta name="author" content="Valdir Stumm Jr" />
-  <meta name="description" content="Random thoughts and tips on programming." />
+  <meta name="description" content="I have always been a happy virtualenvwrapper user, but I abandoned it last year to use pyenv and pyenv-virtualenv. I don&amp;rsquo;t really remember why, as virtualenvwrapper is awesome.
+The problem is that lately I haven&amp;rsquo;t been creating and managing a lot of virtualenvs, so I often find myself having to search through pyenv docs to do basic stuff when needed. That&amp;rsquo;s why I wrote down the usual steps that I follow so that next time I can remember (or find) more easily.">
 
   
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="@stummjr" />
-  <meta name="twitter:title" content="Dunder Doc" />
-  <meta name="twitter:description" content="Random thoughts and tips on programming." />
-  <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
+  
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@stummjr" />
+    <meta name="twitter:title" content="How I manage Virtualenvs with Pyenv" />
+    <meta name="twitter:description" content="I have always been a happy virtualenvwrapper user, but I abandoned it last year to use pyenv and pyenv-virtualenv. I don&amp;rsquo;t really remember why, as virtualenvwrapper is awesome.
+The problem is that lately I haven&amp;rsquo;t been creating and managing a lot of virtualenvs, so I often find myself having to search through pyenv docs to do basic stuff when needed. That&amp;rsquo;s why I wrote down the usual steps that I follow so that next time I can remember (or find) more easily." />
+    <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
+  
 
 
 
@@ -40,7 +40,7 @@
 <meta name="generator" content="Hugo 0.78.2" />
 
 
-<link rel="canonical" href="http://stummjr.github.io/tags/libraries/">
+<link rel="canonical" href="http://stummjr.github.io/post/how-i-manage-virtualenvs-today/">
 <link rel="alternative" href="/index.xml" title="Dunder Doc" type="application/atom+xml">
 
 
@@ -223,42 +223,93 @@
 </amp-sidebar>
 
     
-  <section class="main entry-list">
-    <header class="list-header">
-      
-      
-        
-      
-        
-      
+  <section class="main post-detail">
+    <header class="post-header">
+      <h1 class="post-title">How I manage Virtualenvs with Pyenv</h1>
+      <p class="entry-meta">
+        <span class="entry-time">Feb 14, 2021</span>
+        <span class="entry-author">Valdir Stumm Jr</span>
+        3 min read
+      </p>
     </header>
     
-    
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/building-scripts-in-python/" title="Tips for boosting your Python scripts" class="entry-link">Tips for boosting your Python scripts</a></h3>
-  </header>
 
-  <p class="entry-summary">I find myself writing quick command line scripts every so often. They usually automate a random task from my daily routine and end up saving me a bunch of time. These scripts usually start as quick and dirty snippets, but once I figure that they are not a one-off thing, then I iterate to make them more usable.
-There are several things that I find valuable in scripts like these:</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">May 19, 2020</span> 5 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Tips%20for%20boosting%20your%20Python%20scripts&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fbuilding-scripts-in-python%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fbuilding-scripts-in-python%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
+    <article class="post-content"><p>I have always been a happy <a href="https://virtualenvwrapper.readthedocs.io/en/latest/">virtualenvwrapper</a> user, but I abandoned it last year to use <a href="https://github.com/pyenv/pyenv">pyenv</a> and <a href="https://github.com/pyenv/pyenv-virtualenv">pyenv-virtualenv</a>. I don&rsquo;t really remember why, as virtualenvwrapper is awesome.</p>
+<p>The problem is that lately I haven&rsquo;t been creating and managing a lot of virtualenvs, so I often find myself having to search through pyenv docs to do basic stuff when needed. That&rsquo;s why I
+wrote down the usual steps that I follow so that next time I can remember (or find) more easily.</p>
+<p><strong>Note:</strong> this is not a comprehensive guide or tutorial on virtualenvs and pyenv. It&rsquo;s just a collection of notes that I had on my note taking app that I thought that could be useful to someone else.</p>
+<h2 id="installing-pyenv-and-pyenv-virtualenv">Installing pyenv and pyenv-virtualenv</h2>
+<p>Here&rsquo;s how I install it on my Mac + Zsh:</p>
+<pre><code>$ brew install pyenv pyenv-virtualenv
+$ echo 'eval &quot;$(pyenv init -)&quot;' &gt;&gt; ~/.zshrc
+$ echo 'eval &quot;$(pyenv virtualenv-init -)&quot;' &gt;&gt; ~/.zshrc
+</code></pre><p>There are other ways to install it, as you can see <a href="https://github.com/pyenv/pyenv#installation">here</a>.</p>
+<h2 id="updating-the-list-of-python-versions">Updating the list of Python versions</h2>
+<p>Every now and then a new Python version comes out and you&rsquo;ll want to be able to install it.
+To do that, you&rsquo;ll have to update the list of Python versions that are available on your
+local machine.</p>
+<p>If pyenv was installed via homebrew as I did above, you can just run:</p>
+<pre><code>$ brew upgrade pyenv
+</code></pre><p>If you manually installed pyenv by cloning the project repository, then you can run
+this command to update your local copy of the repo:</p>
+<pre><code>$ cd `pyenv root` &amp;&amp; git pull
+</code></pre><h2 id="installing-a-new-python-version">Installing a new Python version</h2>
+<p>First, list the versions available for installation:</p>
+<pre><code>$ pyenv install  --list
+</code></pre><p>If the version that you&rsquo;re looking for is not listed, try the commands listed in the previous topic.</p>
+<p>Once you found the target version on the list (let&rsquo;s say it&rsquo;s <code>3.8.3</code>), you can install it via:</p>
+<pre><code>$ pyenv install 3.8.3
+</code></pre><h2 id="creating-a-virtualenv-with-a-specific-version">Creating a virtualenv with a specific version</h2>
+<p>Let&rsquo;s say that you want to create a new virtualenv using the version you just installed (<code>3.8.3</code>). You can do so via:</p>
+<pre><code>$ pyenv virtualenv 3.8.3 my-venv-3.8.3
+</code></pre><h2 id="listing-virtualenvs">Listing virtualenvs</h2>
+<pre><code>$ pyenv virtualenvs
+</code></pre><h2 id="activating-a-virtualenv">Activating a virtualenv</h2>
+<pre><code>$ pyenv activate my-venv-3.8.3
+</code></pre><h2 id="deactivating-a-virtualenv">Deactivating a virtualenv</h2>
+<pre><code>$ pyenv deactivate
+</code></pre><h2 id="activating-a-virtualenv-by-default-on-a-project">Activating a virtualenv by default on a project</h2>
+<p>Let&rsquo;s say that you have a project on a folder in your filesystem and you always want to activate
+a given virtualenv when entering that folder. To do that, all you have to do is to place a
+<code>.python-version</code> file in that folder with the name of your virtualenv:</p>
+<pre><code>$ echo &quot;my-env-3.8.3&quot; &gt; .python-version
+</code></pre><p>That&rsquo;s it, now whenever you enter that folder, the virtualenv will be activated. This also
+works for Python versions that you have installed via <code>pyenv</code>, not just virualenvs.</p>
 </article>
+    <footer class="post-footer">
+      
+      <ul class="post-tags">
+        
+          <li class="post-tag"><a href="/tags/coding"><span class="tag">Coding</span></a></li>
+        
+          <li class="post-tag"><a href="/tags/python"><span class="tag">Python</span></a></li>
+        
+      </ul>
+      
+      <div class="sharing">
+        <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=How%20I%20manage%20Virtualenvs%20with%20Pyenv&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fhow-i-manage-virtualenvs-today%2f" title="Share on Twitter">
+          <svg class="icon icon-twitter" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
+        </a>
+        <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fhow-i-manage-virtualenvs-today%2f" title="Share on Facebook">
+          <svg class="icon icon-facebook" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
+        </a>
+      </div>
+
+      <div id="disqus_thread"></div>
+      <script>
+      
 
       
-    
-    
+
+      (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://dunderdoc.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+      })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                       
+    </footer>
   </section>
 
     <footer class="footer">

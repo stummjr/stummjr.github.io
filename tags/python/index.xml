@@ -6,10 +6,60 @@
     <description>Recent content in python on Dunder Doc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 18 Jul 2020 10:19:13 -0300</lastBuildDate>
+    <lastBuildDate>Sun, 14 Feb 2021 19:50:13 -0300</lastBuildDate>
     
       <atom:link href="http://stummjr.github.io/tags/python/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>How I manage Virtualenvs with Pyenv</title>
+      <link>http://stummjr.github.io/post/how-i-manage-virtualenvs-today/</link>
+      <pubDate>Sun, 14 Feb 2021 19:50:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/how-i-manage-virtualenvs-today/</guid>
+      <description>&lt;p&gt;I have always been a happy &lt;a href=&#34;https://virtualenvwrapper.readthedocs.io/en/latest/&#34;&gt;virtualenvwrapper&lt;/a&gt; user, but I abandoned it last year to use &lt;a href=&#34;https://github.com/pyenv/pyenv&#34;&gt;pyenv&lt;/a&gt; and &lt;a href=&#34;https://github.com/pyenv/pyenv-virtualenv&#34;&gt;pyenv-virtualenv&lt;/a&gt;. I don&amp;rsquo;t really remember why, as virtualenvwrapper is awesome.&lt;/p&gt;
+&lt;p&gt;The problem is that lately I haven&amp;rsquo;t been creating and managing a lot of virtualenvs, so I often find myself having to search through pyenv docs to do basic stuff when needed. That&amp;rsquo;s why I
+wrote down the usual steps that I follow so that next time I can remember (or find) more easily.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; this is not a comprehensive guide or tutorial on virtualenvs and pyenv. It&amp;rsquo;s just a collection of notes that I had on my note taking app that I thought that could be useful to someone else.&lt;/p&gt;
+&lt;h2 id=&#34;installing-pyenv-and-pyenv-virtualenv&#34;&gt;Installing pyenv and pyenv-virtualenv&lt;/h2&gt;
+&lt;p&gt;Here&amp;rsquo;s how I install it on my Mac + Zsh:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ brew install pyenv pyenv-virtualenv
+$ echo &#39;eval &amp;quot;$(pyenv init -)&amp;quot;&#39; &amp;gt;&amp;gt; ~/.zshrc
+$ echo &#39;eval &amp;quot;$(pyenv virtualenv-init -)&amp;quot;&#39; &amp;gt;&amp;gt; ~/.zshrc
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;There are other ways to install it, as you can see &lt;a href=&#34;https://github.com/pyenv/pyenv#installation&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;updating-the-list-of-python-versions&#34;&gt;Updating the list of Python versions&lt;/h2&gt;
+&lt;p&gt;Every now and then a new Python version comes out and you&amp;rsquo;ll want to be able to install it.
+To do that, you&amp;rsquo;ll have to update the list of Python versions that are available on your
+local machine.&lt;/p&gt;
+&lt;p&gt;If pyenv was installed via homebrew as I did above, you can just run:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ brew upgrade pyenv
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;If you manually installed pyenv by cloning the project repository, then you can run
+this command to update your local copy of the repo:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ cd `pyenv root` &amp;amp;&amp;amp; git pull
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;installing-a-new-python-version&#34;&gt;Installing a new Python version&lt;/h2&gt;
+&lt;p&gt;First, list the versions available for installation:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ pyenv install  --list
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;If the version that you&amp;rsquo;re looking for is not listed, try the commands listed in the previous topic.&lt;/p&gt;
+&lt;p&gt;Once you found the target version on the list (let&amp;rsquo;s say it&amp;rsquo;s &lt;code&gt;3.8.3&lt;/code&gt;), you can install it via:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ pyenv install 3.8.3
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;creating-a-virtualenv-with-a-specific-version&#34;&gt;Creating a virtualenv with a specific version&lt;/h2&gt;
+&lt;p&gt;Let&amp;rsquo;s say that you want to create a new virtualenv using the version you just installed (&lt;code&gt;3.8.3&lt;/code&gt;). You can do so via:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ pyenv virtualenv 3.8.3 my-venv-3.8.3
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;listing-virtualenvs&#34;&gt;Listing virtualenvs&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ pyenv virtualenvs
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;activating-a-virtualenv&#34;&gt;Activating a virtualenv&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ pyenv activate my-venv-3.8.3
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;deactivating-a-virtualenv&#34;&gt;Deactivating a virtualenv&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;$ pyenv deactivate
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;activating-a-virtualenv-by-default-on-a-project&#34;&gt;Activating a virtualenv by default on a project&lt;/h2&gt;
+&lt;p&gt;Let&amp;rsquo;s say that you have a project on a folder in your filesystem and you always want to activate
+a given virtualenv when entering that folder. To do that, all you have to do is to place a
+&lt;code&gt;.python-version&lt;/code&gt; file in that folder with the name of your virtualenv:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ echo &amp;quot;my-env-3.8.3&amp;quot; &amp;gt; .python-version
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;That&amp;rsquo;s it, now whenever you enter that folder, the virtualenv will be activated. This also
+works for Python versions that you have installed via &lt;code&gt;pyenv&lt;/code&gt;, not just virualenvs.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Black formats my code, and maybe it should format yours too</title>
@@ -311,7 +361,7 @@ False
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://guilload.com/python-string-interning/&#34;&gt;The Internals of Python String Interning&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://arpitbhayani.me/blogs/python-caches-integers&#34;&gt;Python Caches Integers&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://stackoverflow.com/a/24245514/1084647&#34;&gt;Martijn Pieters&amp;rsquo; answer on Stack Overflow&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://stackoverflow.com/a/24245514/1084647&#34;&gt;Martijn Pieters&#39; answer on Stack Overflow&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 </description>
     </item>
@@ -729,10 +779,10 @@ these new features in your circles.&lt;/p&gt;
 &lt;p&gt;Fortunately, pudb supports &lt;a href=&#34;https://documen.tician.de/pudb/starting.html#remote-debugging&#34;&gt;remote debugging&lt;/a&gt; and we can use it to debug Python code running on Docker.&lt;/p&gt;
 &lt;p&gt;First, we have to configure our app container to expose the port that we want pudb to listen to. For this example, we’ll expose it in the port 6900.&lt;/p&gt;
 &lt;p&gt;If using Docker Compose, we can add a &lt;code&gt;docker-compose.override.yml&lt;/code&gt; file in the project’s folder with the contents below:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;version&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;2&amp;#39;&lt;/span&gt;
-&lt;span style=&#34;color:#66d9ef&#34;&gt;services&lt;/span&gt;:
-  &lt;span style=&#34;color:#66d9ef&#34;&gt;my-service-container-name&lt;/span&gt;:
-    &lt;span style=&#34;color:#66d9ef&#34;&gt;ports&lt;/span&gt;:
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;version&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;2&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;services&lt;/span&gt;:
+  &lt;span style=&#34;color:#f92672&#34;&gt;my-service-container-name&lt;/span&gt;:
+    &lt;span style=&#34;color:#f92672&#34;&gt;ports&lt;/span&gt;:
       &lt;span style=&#34;color:#75715e&#34;&gt;# expose any that ports you have to expose&lt;/span&gt;
       - &lt;span style=&#34;color:#ae81ff&#34;&gt;8081&lt;/span&gt;
       &lt;span style=&#34;color:#75715e&#34;&gt;# pudb will be exposed via 6900&lt;/span&gt;

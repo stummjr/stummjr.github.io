@@ -40,10 +40,10 @@
 &lt;p&gt;Fortunately, pudb supports &lt;a href=&#34;https://documen.tician.de/pudb/starting.html#remote-debugging&#34;&gt;remote debugging&lt;/a&gt; and we can use it to debug Python code running on Docker.&lt;/p&gt;
 &lt;p&gt;First, we have to configure our app container to expose the port that we want pudb to listen to. For this example, we’ll expose it in the port 6900.&lt;/p&gt;
 &lt;p&gt;If using Docker Compose, we can add a &lt;code&gt;docker-compose.override.yml&lt;/code&gt; file in the project’s folder with the contents below:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;version&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;2&amp;#39;&lt;/span&gt;
-&lt;span style=&#34;color:#66d9ef&#34;&gt;services&lt;/span&gt;:
-  &lt;span style=&#34;color:#66d9ef&#34;&gt;my-service-container-name&lt;/span&gt;:
-    &lt;span style=&#34;color:#66d9ef&#34;&gt;ports&lt;/span&gt;:
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;version&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;2&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;services&lt;/span&gt;:
+  &lt;span style=&#34;color:#f92672&#34;&gt;my-service-container-name&lt;/span&gt;:
+    &lt;span style=&#34;color:#f92672&#34;&gt;ports&lt;/span&gt;:
       &lt;span style=&#34;color:#75715e&#34;&gt;# expose any that ports you have to expose&lt;/span&gt;
       - &lt;span style=&#34;color:#ae81ff&#34;&gt;8081&lt;/span&gt;
       &lt;span style=&#34;color:#75715e&#34;&gt;# pudb will be exposed via 6900&lt;/span&gt;

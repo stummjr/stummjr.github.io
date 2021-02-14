@@ -6,10 +6,28 @@
     <description>Recent content in Tags on Dunder Doc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 25 Jul 2020 10:19:13 -0300</lastBuildDate>
+    <lastBuildDate>Sun, 14 Feb 2021 19:50:13 -0300</lastBuildDate>
     
       <atom:link href="http://stummjr.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>coding</title>
+      <link>http://stummjr.github.io/tags/coding/</link>
+      <pubDate>Sun, 14 Feb 2021 19:50:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/coding/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>python</title>
+      <link>http://stummjr.github.io/tags/python/</link>
+      <pubDate>Sun, 14 Feb 2021 19:50:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/python/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>life</title>
@@ -44,15 +62,6 @@
       <pubDate>Sat, 18 Jul 2020 10:19:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/tags/best-practices/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>python</title>
-      <link>http://stummjr.github.io/tags/python/</link>
-      <pubDate>Sat, 18 Jul 2020 10:19:13 -0300</pubDate>
-      
-      <guid>http://stummjr.github.io/tags/python/</guid>
       <description></description>
     </item>
     
@@ -107,15 +116,6 @@
       <pubDate>Tue, 19 May 2020 23:19:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/tags/libraries/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>coding</title>
-      <link>http://stummjr.github.io/tags/coding/</link>
-      <pubDate>Thu, 07 May 2020 15:55:13 -0300</pubDate>
-      
-      <guid>http://stummjr.github.io/tags/coding/</guid>
       <description></description>
     </item>
     
