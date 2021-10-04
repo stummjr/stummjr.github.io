@@ -6,7 +6,7 @@
     <description>Recent content on Dunder Doc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 19 Sep 2021 23:19:13 -0300</lastBuildDate>
+    <lastBuildDate>Mon, 04 Oct 2021 20:21:10 -0300</lastBuildDate>
     
       <atom:link href="http://stummjr.github.io/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>How Does CPython Multiply Big Numbers?</title>
       <link>http://stummjr.github.io/post/multiplication-in-cpython/</link>
-      <pubDate>Sun, 19 Sep 2021 23:19:13 -0300</pubDate>
+      <pubDate>Mon, 04 Oct 2021 20:21:10 -0300</pubDate>
       
       <guid>http://stummjr.github.io/post/multiplication-in-cpython/</guid>
       <description>&lt;p&gt;I am used to write code that multiplies numbers several times a week. Usually when I do that, I don&amp;rsquo;t think much about the operation itself or how the machine will execute it.&lt;/p&gt;
