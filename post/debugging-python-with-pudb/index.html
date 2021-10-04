@@ -37,7 +37,7 @@ Debugging in Python There are several good debuggers for Python. I know a ton of
 
 
 
-<meta name="generator" content="Hugo 0.78.2" />
+<meta name="generator" content="Hugo 0.69.2" />
 
 
 <link rel="canonical" href="http://stummjr.github.io/post/debugging-python-with-pudb/">
@@ -257,10 +257,10 @@ Debugging in Python There are several good debuggers for Python. I know a ton of
 <p>Fortunately, pudb supports <a href="https://documen.tician.de/pudb/starting.html#remote-debugging">remote debugging</a> and we can use it to debug Python code running on Docker.</p>
 <p>First, we have to configure our app container to expose the port that we want pudb to listen to. For this example, we’ll expose it in the port 6900.</p>
 <p>If using Docker Compose, we can add a <code>docker-compose.override.yml</code> file in the project’s folder with the contents below:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;2&#39;</span>
-<span style="color:#f92672">services</span>:
-  <span style="color:#f92672">my-service-container-name</span>:
-    <span style="color:#f92672">ports</span>:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">version</span>: <span style="color:#e6db74">&#39;2&#39;</span>
+<span style="color:#66d9ef">services</span>:
+  <span style="color:#66d9ef">my-service-container-name</span>:
+    <span style="color:#66d9ef">ports</span>:
       <span style="color:#75715e"># expose any that ports you have to expose</span>
       - <span style="color:#ae81ff">8081</span>
       <span style="color:#75715e"># pudb will be exposed via 6900</span>

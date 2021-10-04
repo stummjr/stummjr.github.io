@@ -6,10 +6,69 @@
     <description>Recent content in Posts on Dunder Doc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 14 Feb 2021 19:50:13 -0300</lastBuildDate>
+    <lastBuildDate>Sun, 19 Sep 2021 23:19:13 -0300</lastBuildDate>
     
       <atom:link href="http://stummjr.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>How Does CPython Multiply Big Numbers?</title>
+      <link>http://stummjr.github.io/post/multiplication-in-cpython/</link>
+      <pubDate>Sun, 19 Sep 2021 23:19:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/multiplication-in-cpython/</guid>
+      <description>&lt;p&gt;I am used to write code that multiplies numbers several times a week. Usually when I do that, I don&amp;rsquo;t think much about the operation itself or how the machine will execute it.&lt;/p&gt;
+&lt;p&gt;But if we start thinking about it, how in hell can the &lt;a href=&#34;https://github.com/python/cpython&#34;&gt;CPython&lt;/a&gt; interpreter multiply numbers as large as the ones below? The CPU definitely does not support huge numbers like that out of the box, so how does it work?&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;92982374592874395723984756872342342234&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;670878370598623450872390483452435&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The answer is both simple and complex. 😃&lt;/p&gt;
+&lt;p&gt;First of all, we have to acknowledge the fact that the numbers that we can represent in Python are way larger than the numbers that a modern CPU can. For example 10^100 is huuuuge but Python can handle it:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;**&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;
+&lt;span style=&#34;color:#ae81ff&#34;&gt;10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;To support that, CPython implements a long object (any integer number, basically) with an &lt;a href=&#34;https://github.com/python/cpython/blob/bb3e0c240bc60fe08d332ff5955d54197f79751c/Include/longintrepr.h#L85-L88&#34;&gt;array of digits&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;struct&lt;/span&gt; _longobject {
+    PyObject_VAR_HEAD
+    digit ob_digit[&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;];
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;I don&amp;rsquo;t know about you, but the first thing that comes to my mind when I think on how to multiply two numbers that are broken down digit by digit is to use that good old algorithm that we learn in grade school, creatively called &lt;a href=&#34;https://en.wikipedia.org/wiki/Multiplication_algorithm#Long_multiplication&#34;&gt;Grade-School Multiplication&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;That is, given that I want to multiply 232 * 23, I can do something along these lines:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;  232
+  *23
+ ----
+  696
++464
+-----
+ 5336
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;I am pretty sure you did that a bunch of times in your life and, believe it or not, CPython uses the very same multiplication algorithm &lt;em&gt;most of the time&lt;/em&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;diving-into-cpython-multiplication&#34;&gt;Diving Into CPython Multiplication&lt;/h2&gt;
+&lt;p&gt;Before multiplying two numbers, CPython checks if at least one of the numbers is small enough to be handled efficiently with the grade-school algorithm.&lt;/p&gt;
+&lt;p&gt;Simply put, CPython will use the grade-school algorithm (implemented in &lt;a href=&#34;https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c#L3197&#34;&gt;&lt;code&gt;x_mul&lt;/code&gt;&lt;/a&gt;) to multiply two operands when at least one of these operands is less than 71 digits long (in &lt;strong&gt;base 2^30&lt;/strong&gt;), as we can see &lt;a href=&#34;https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c#L3356-L3363&#34;&gt;here&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;/* Use gradeschool math when either number is too small. */&lt;/span&gt;
+i &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; a &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; b &lt;span style=&#34;color:#f92672&#34;&gt;?&lt;/span&gt; KARATSUBA_SQUARE_CUTOFF : KARATSUBA_CUTOFF;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (asize &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;=&lt;/span&gt; i) {
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (asize &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;)
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; (PyLongObject &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;)PyLong_FromLong(&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;);
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;x_mul&lt;/span&gt;(a, b);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;base-230&#34;&gt;Base 2^30?&lt;/h3&gt;
+&lt;p&gt;That&amp;rsquo;s right, CPython internally represents the numbers as an array of &lt;code&gt;uint32_t&lt;/code&gt;, where 30 out of 32 bits of each element are used for the actual value of that digit. And CPython will employ the grade-school algorithm when any of the operands have less than 71 base 2^30 digits.&lt;/p&gt;
+&lt;p&gt;A 71 digits number, where each digit can represent up to 2^30-1, is quite a huge number! Think about it, a 71 &lt;strong&gt;decimal&lt;/strong&gt; digits number is a humongous number already, even though each digit can represent only up to 9. Now think about a number broken down in 71 parts, where each part can represent up to 1073741823.&lt;/p&gt;
+&lt;h3 id=&#34;optimizations&#34;&gt;Optimizations&lt;/h3&gt;
+&lt;p&gt;In order to be fast, CPython employs many optimizations for special cases. If you look at the snippet above, you will notice that if one of the numbers is zero, CPython doesn&amp;rsquo;t even try to multiply them and &lt;a href=&#34;https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c#L3360&#34;&gt;returns 0 immediately&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;CPython also optimizes the multiplication of identical numbers (aka squaring) by using a separate algorithm for that case, as you can see in the &lt;a href=&#34;https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c#L3209-L3252&#34;&gt;&lt;code&gt;x_mul&lt;/code&gt;&lt;/a&gt; function implementation.&lt;/p&gt;
+&lt;h3 id=&#34;what-if-the-numbers-are-too-big&#34;&gt;What if the numbers are too big?&lt;/h3&gt;
+&lt;p&gt;CPython defines &lt;code&gt;KARATSUBA_CUTOFF&lt;/code&gt; as 70 and the reason for the constant name is that in case both operands are too big (more than 70 digits long), CPython will employ the &lt;a href=&#34;https://en.wikipedia.org/wiki/Karatsuba_algorithm&#34;&gt;Karatsuba multiplication algorithm&lt;/a&gt; (implemented in &lt;a href=&#34;https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c#L3322&#34;&gt;&lt;code&gt;k_mul&lt;/code&gt;&lt;/a&gt;), which is significantly faster than the traditional algorithm.&lt;/p&gt;
+&lt;p&gt;Given that Karatsuba is a recursive algorithm, &lt;code&gt;k_mul&lt;/code&gt; recursively breaks the numbers in sub-parts and before multiplying them, it checks again if they are still big enough to use Karatsuba, otherwise it applies the grade-school algorithm. Now, I am not an expert on Karatsuba to explain it in any straightforward way, but &lt;a href=&#34;https://www.youtube.com/watch?v=JCbZayFr9RE&#34;&gt;this video&lt;/a&gt; is super helpful in case you want to understand it.&lt;/p&gt;
+&lt;h2 id=&#34;wrapping-up&#34;&gt;Wrapping up&lt;/h2&gt;
+&lt;p&gt;This is not supposed to be a super deep dive into CPython, but I just wanted to show how fascinating it is to dive a tad bit on the stuff that we take for granted. Take multiplication for example: how often do we think that a simple multiplication in our program may actually be a O(N^2) operation? Even simpler operations, like adding two numbers, can be much more complex than we think when we use high level languages that support big numbers.&lt;/p&gt;
+&lt;p&gt;And please don&amp;rsquo;t get me wrong, I really love the fact that I can easily multiply two huge numbers in Python without caring about overflows. However, it&amp;rsquo;s also great to know about what actually happens under the hood.&lt;/p&gt;
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://rushter.com/blog/python-integer-implementation/&#34;&gt;Python internals: Arbitrary-precision integer implementation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c&#34;&gt;longobject.c&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>How I manage Virtualenvs with Pyenv</title>
@@ -409,7 +468,7 @@ False
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://guilload.com/python-string-interning/&#34;&gt;The Internals of Python String Interning&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://arpitbhayani.me/blogs/python-caches-integers&#34;&gt;Python Caches Integers&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://stackoverflow.com/a/24245514/1084647&#34;&gt;Martijn Pieters&#39; answer on Stack Overflow&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://stackoverflow.com/a/24245514/1084647&#34;&gt;Martijn Pieters&amp;rsquo; answer on Stack Overflow&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 </description>
     </item>
@@ -888,10 +947,10 @@ these new features in your circles.&lt;/p&gt;
 &lt;p&gt;Fortunately, pudb supports &lt;a href=&#34;https://documen.tician.de/pudb/starting.html#remote-debugging&#34;&gt;remote debugging&lt;/a&gt; and we can use it to debug Python code running on Docker.&lt;/p&gt;
 &lt;p&gt;First, we have to configure our app container to expose the port that we want pudb to listen to. For this example, we’ll expose it in the port 6900.&lt;/p&gt;
 &lt;p&gt;If using Docker Compose, we can add a &lt;code&gt;docker-compose.override.yml&lt;/code&gt; file in the project’s folder with the contents below:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;version&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;2&amp;#39;&lt;/span&gt;
-&lt;span style=&#34;color:#f92672&#34;&gt;services&lt;/span&gt;:
-  &lt;span style=&#34;color:#f92672&#34;&gt;my-service-container-name&lt;/span&gt;:
-    &lt;span style=&#34;color:#f92672&#34;&gt;ports&lt;/span&gt;:
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;version&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;2&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;services&lt;/span&gt;:
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;my-service-container-name&lt;/span&gt;:
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;ports&lt;/span&gt;:
       &lt;span style=&#34;color:#75715e&#34;&gt;# expose any that ports you have to expose&lt;/span&gt;
       - &lt;span style=&#34;color:#ae81ff&#34;&gt;8081&lt;/span&gt;
       &lt;span style=&#34;color:#75715e&#34;&gt;# pudb will be exposed via 6900&lt;/span&gt;

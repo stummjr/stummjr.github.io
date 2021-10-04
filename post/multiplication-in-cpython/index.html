@@ -11,28 +11,28 @@
     
 
     
-    <title>
-  Tag → ipython
+    <title>How Does CPython Multiply Big Numbers?</title>
+
+    
+    
+
+
+
   
-   | Dunder Doc
-</title>
-
-    
-    
-
-
-
-
   
   <meta name="author" content="Valdir Stumm Jr" />
-  <meta name="description" content="Random thoughts and tips on programming." />
+  <meta name="description" content="I am used to write code that multiplies numbers several times a week. Usually when I do that, I don&amp;rsquo;t think much about the operation itself or how the machine will execute it.
+But if we start thinking about it, how in hell can the CPython interpreter multiply numbers as large as the ones below? The CPU definitely does not support huge numbers like that out of the box, so how does it work?">
 
   
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="@stummjr" />
-  <meta name="twitter:title" content="Dunder Doc" />
-  <meta name="twitter:description" content="Random thoughts and tips on programming." />
-  <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
+  
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@stummjr" />
+    <meta name="twitter:title" content="How Does CPython Multiply Big Numbers?" />
+    <meta name="twitter:description" content="I am used to write code that multiplies numbers several times a week. Usually when I do that, I don&amp;rsquo;t think much about the operation itself or how the machine will execute it.
+But if we start thinking about it, how in hell can the CPython interpreter multiply numbers as large as the ones below? The CPU definitely does not support huge numbers like that out of the box, so how does it work?" />
+    <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
+  
 
 
 
@@ -40,7 +40,7 @@
 <meta name="generator" content="Hugo 0.69.2" />
 
 
-<link rel="canonical" href="http://stummjr.github.io/tags/ipython/">
+<link rel="canonical" href="http://stummjr.github.io/post/multiplication-in-cpython/">
 <link rel="alternative" href="/index.xml" title="Dunder Doc" type="application/atom+xml">
 
 
@@ -223,65 +223,102 @@
 </amp-sidebar>
 
     
-  <section class="main entry-list">
-    <header class="list-header">
-      
-      
-        
-      
-        
-      
+  <section class="main post-detail">
+    <header class="post-header">
+      <h1 class="post-title">How Does CPython Multiply Big Numbers?</h1>
+      <p class="entry-meta">
+        <span class="entry-time">Sep 19, 2021</span>
+        <span class="entry-author">Valdir Stumm Jr</span>
+        4 min read
+      </p>
     </header>
     
-    
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/ipython-tricks/" title="My Favorite IPython Tricks" class="entry-link">My Favorite IPython Tricks</a></h3>
-  </header>
 
-  <p class="entry-summary">It’s no secret that IPython is my favorite Python shell. I am the guy who is always asking everyone “did you try IPython already?” as soon as I see they opening the regular Python shell. Yes, I know, you’d probably hate me.
-The reason I like it so much is that IPython makes it very easy for me to incrementally experiment when coding. I consider experimentation to be a crucial step when writing software, as it helps to reduce the unkowns in a problem or technology.</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Jun 6, 2020</span> 8 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=My%20Favorite%20IPython%20Tricks&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fipython-tricks%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fipython-tricks%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
+    <article class="post-content"><p>I am used to write code that multiplies numbers several times a week. Usually when I do that, I don&rsquo;t think much about the operation itself or how the machine will execute it.</p>
+<p>But if we start thinking about it, how in hell can the <a href="https://github.com/python/cpython">CPython</a> interpreter multiply numbers as large as the ones below? The CPU definitely does not support huge numbers like that out of the box, so how does it work?</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#ae81ff">92982374592874395723984756872342342234</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">670878370598623450872390483452435</span>
+</code></pre></div><p>The answer is both simple and complex. 😃</p>
+<p>First of all, we have to acknowledge the fact that the numbers that we can represent in Python are way larger than the numbers that a modern CPU can. For example 10^100 is huuuuge but Python can handle it:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#ae81ff">10</span> <span style="color:#f92672">**</span> <span style="color:#ae81ff">100</span>
+<span style="color:#ae81ff">10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000</span>
+</code></pre></div><p>To support that, CPython implements a long object (any integer number, basically) with an <a href="https://github.com/python/cpython/blob/bb3e0c240bc60fe08d332ff5955d54197f79751c/Include/longintrepr.h#L85-L88">array of digits</a>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">struct</span> _longobject {
+    PyObject_VAR_HEAD
+    digit ob_digit[<span style="color:#ae81ff">1</span>];
+};
+</code></pre></div><p>I don&rsquo;t know about you, but the first thing that comes to my mind when I think on how to multiply two numbers that are broken down digit by digit is to use that good old algorithm that we learn in grade school, creatively called <a href="https://en.wikipedia.org/wiki/Multiplication_algorithm#Long_multiplication">Grade-School Multiplication</a>.</p>
+<p>That is, given that I want to multiply 232 * 23, I can do something along these lines:</p>
+<pre><code>  232
+  *23
+ ----
+  696
++464
+-----
+ 5336
+</code></pre><p>I am pretty sure you did that a bunch of times in your life and, believe it or not, CPython uses the very same multiplication algorithm <em>most of the time</em>.</p>
+<h2 id="diving-into-cpython-multiplication">Diving Into CPython Multiplication</h2>
+<p>Before multiplying two numbers, CPython checks if at least one of the numbers is small enough to be handled efficiently with the grade-school algorithm.</p>
+<p>Simply put, CPython will use the grade-school algorithm (implemented in <a href="https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c#L3197"><code>x_mul</code></a>) to multiply two operands when at least one of these operands is less than 71 digits long (in <strong>base 2^30</strong>), as we can see <a href="https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c#L3356-L3363">here</a>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">/* Use gradeschool math when either number is too small. */</span>
+i <span style="color:#f92672">=</span> a <span style="color:#f92672">==</span> b <span style="color:#f92672">?</span> KARATSUBA_SQUARE_CUTOFF : KARATSUBA_CUTOFF;
+<span style="color:#66d9ef">if</span> (asize <span style="color:#f92672">&lt;=</span> i) {
+    <span style="color:#66d9ef">if</span> (asize <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>)
+        <span style="color:#66d9ef">return</span> (PyLongObject <span style="color:#f92672">*</span>)PyLong_FromLong(<span style="color:#ae81ff">0</span>);
+    <span style="color:#66d9ef">else</span>
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x_mul</span>(a, b);
+}
+</code></pre></div><h3 id="base-230">Base 2^30?</h3>
+<p>That&rsquo;s right, CPython internally represents the numbers as an array of <code>uint32_t</code>, where 30 out of 32 bits of each element are used for the actual value of that digit. And CPython will employ the grade-school algorithm when any of the operands have less than 71 base 2^30 digits.</p>
+<p>A 71 digits number, where each digit can represent up to 2^30-1, is quite a huge number! Think about it, a 71 <strong>decimal</strong> digits number is a humongous number already, even though each digit can represent only up to 9. Now think about a number broken down in 71 parts, where each part can represent up to 1073741823.</p>
+<h3 id="optimizations">Optimizations</h3>
+<p>In order to be fast, CPython employs many optimizations for special cases. If you look at the snippet above, you will notice that if one of the numbers is zero, CPython doesn&rsquo;t even try to multiply them and <a href="https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c#L3360">returns 0 immediately</a>.</p>
+<p>CPython also optimizes the multiplication of identical numbers (aka squaring) by using a separate algorithm for that case, as you can see in the <a href="https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c#L3209-L3252"><code>x_mul</code></a> function implementation.</p>
+<h3 id="what-if-the-numbers-are-too-big">What if the numbers are too big?</h3>
+<p>CPython defines <code>KARATSUBA_CUTOFF</code> as 70 and the reason for the constant name is that in case both operands are too big (more than 70 digits long), CPython will employ the <a href="https://en.wikipedia.org/wiki/Karatsuba_algorithm">Karatsuba multiplication algorithm</a> (implemented in <a href="https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c#L3322"><code>k_mul</code></a>), which is significantly faster than the traditional algorithm.</p>
+<p>Given that Karatsuba is a recursive algorithm, <code>k_mul</code> recursively breaks the numbers in sub-parts and before multiplying them, it checks again if they are still big enough to use Karatsuba, otherwise it applies the grade-school algorithm. Now, I am not an expert on Karatsuba to explain it in any straightforward way, but <a href="https://www.youtube.com/watch?v=JCbZayFr9RE">this video</a> is super helpful in case you want to understand it.</p>
+<h2 id="wrapping-up">Wrapping up</h2>
+<p>This is not supposed to be a super deep dive into CPython, but I just wanted to show how fascinating it is to dive a tad bit on the stuff that we take for granted. Take multiplication for example: how often do we think that a simple multiplication in our program may actually be a O(N^2) operation? Even simpler operations, like adding two numbers, can be much more complex than we think when we use high level languages that support big numbers.</p>
+<p>And please don&rsquo;t get me wrong, I really love the fact that I can easily multiply two huge numbers in Python without caring about overflows. However, it&rsquo;s also great to know about what actually happens under the hood.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://rushter.com/blog/python-integer-implementation/">Python internals: Arbitrary-precision integer implementation</a></li>
+<li><a href="https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c">longobject.c</a></li>
+</ul>
 </article>
+    <footer class="post-footer">
+      
+      <ul class="post-tags">
+        
+          <li class="post-tag"><a href="/tags/python"><span class="tag">Python</span></a></li>
+        
+          <li class="post-tag"><a href="/tags/internals"><span class="tag">Internals</span></a></li>
+        
+      </ul>
+      
+      <div class="sharing">
+        <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=How%20Does%20CPython%20Multiply%20Big%20Numbers%3f&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fmultiplication-in-cpython%2f" title="Share on Twitter">
+          <svg class="icon icon-twitter" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
+        </a>
+        <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fmultiplication-in-cpython%2f" title="Share on Facebook">
+          <svg class="icon icon-facebook" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
+        </a>
+      </div>
+
+      <div id="disqus_thread"></div>
+      <script>
+      
 
       
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/customize-ipython5-prompt/" title="How to customize your IPython 5&#43; prompt" class="entry-link">How to customize your IPython 5&#43; prompt</a></h3>
-  </header>
 
-  <p class="entry-summary">IPython is wonderful and I ❤️ it. I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:
-Some of the things that I dislike:
- the banner displayed when we start it; the In[x] and Out[x] displayed for inputs and outputs; the newline in between commands; and last, but far from least, the uber-annoying “do you really want to exit?</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Sep 2, 2018</span> 2 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=How%20to%20customize%20your%20IPython%205%2b%20prompt&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-    
-    
+      (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://dunderdoc.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+      })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                       
+    </footer>
   </section>
 
     <footer class="footer">
