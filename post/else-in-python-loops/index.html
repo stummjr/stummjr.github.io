@@ -39,7 +39,7 @@ for number in some_sequence: if is_the_magic_number(number): print(&amp;#39;foun
 
 
 
-<meta name="generator" content="Hugo 0.69.2" />
+<meta name="generator" content="Hugo 0.88.1" />
 
 
 <link rel="canonical" href="http://stummjr.github.io/post/else-in-python-loops/">
@@ -238,12 +238,12 @@ for number in some_sequence: if is_the_magic_number(number): print(&amp;#39;foun
 
     <article class="post-content"><p>One of the first things to stand out when I was starting with Python was the <code>else</code> clause. I guess everyone knows the normal usage of such clauses in any programming language, which is to define an alternate path for the <code>if</code> condition. Oddly enough, in Python we can add <code>else</code> clauses in loop constructions, such as <code>for</code> and <code>while</code>.</p>
 <p>For example, this is valid Python:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">for</span> number <span style="color:#f92672">in</span> some_sequence:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">for</span> number <span style="color:#f92672">in</span> some_sequence:
     <span style="color:#66d9ef">if</span> is_the_magic_number(number):
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;found the magic number&#39;</span>)
+        print(<span style="color:#e6db74">&#39;found the magic number&#39;</span>)
         <span style="color:#66d9ef">break</span>
 <span style="color:#66d9ef">else</span>:
-    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#39;magic number not found&#39;</span>)
+    print(<span style="color:#e6db74">&#39;magic number not found&#39;</span>)
 </code></pre></div><p>Notice how the <code>else</code> is aligned with the <code>for</code> and not with the <code>if</code>. What this means is that commands inside the <code>else</code> block will be executed if, and only if, the loop was not finished by a <code>break</code>. The same is true for <code>while</code> loops.</p>
 <p>I must admit that I’ve always had some trouble to remember the meaning of an <code>else</code> in loops, specially because I don’t see them very often (and I’m grateful for that). But, at some day I was watching <a href="https://youtu.be/OSGv2VnC0go">Raymond Hettinger’s Transforming Code into Beautiful, Idiomatic Python</a> talk where he brilliantly says something like this at some point:</p>
 <blockquote>

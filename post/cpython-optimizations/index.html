@@ -37,7 +37,7 @@ Even though CPython is not the most performatic Python interpreter out there, it
 
 
 
-<meta name="generator" content="Hugo 0.69.2" />
+<meta name="generator" content="Hugo 0.88.1" />
 
 
 <link rel="canonical" href="http://stummjr.github.io/post/cpython-optimizations/">
@@ -240,96 +240,96 @@ Even though CPython is not the most performatic Python interpreter out there, it
 <h2 id="caching-small-integers">Caching Small Integers</h2>
 <p>CPython caches small integers from -5 to 256 in an internal array during its initialization. That means that every time the interpreter itself or your Python program needs to use a number in that range, CPython won&rsquo;t have to allocate space and create a brand new object for that. It will just return a reference to a pre-existing object.</p>
 <p>Check this out:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">5</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">5</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> y <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">5</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">is</span> y
-True
+<span style="color:#66d9ef">True</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">6</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> y <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">6</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">is</span> y
-False
+<span style="color:#66d9ef">False</span>
 </code></pre></div><p>As you can see, <code>x</code> and <code>y</code> are initially pointing to the exact same object because <code>-5</code> is one of the small integers cached by CPython. With <code>-6</code>, however, we have a different outcome. Now <code>x</code> and <code>y</code> point to different objects, even though they have the very same value.</p>
 <p>As you can see, these singletons are used even when computing the result of arithmetic expressions:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> y <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">is</span> y
-True
+<span style="color:#66d9ef">True</span>
 </code></pre></div><p>CPython caches these small numbers because they are very often used in arithmetic operations, as boundaries in loops and as results of small computations. If CPython had to allocate memory and create a new object for each instance of these numbers, it would spend a bunch of time and space doing so.</p>
 <h2 id="string-interning">String Interning</h2>
 <p><a href="https://en.wikipedia.org/wiki/String_interning">String Interning</a> is an optimization technique implemented by many modern compilers and interpreters. It consists of creating and storing only a single instance of a given string, rather than multiple. It makes a lot of sense, if you think about it, as strings are immutable objects in Python.</p>
 <p>In practical terms it means that some (not all, as we&rsquo;ll see soon) strings will be &ldquo;cached&rdquo; by the Python interpreter. Here we can see that CPython creates a single string object to hold the &ldquo;hey&rdquo; string:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;hey&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;hey&#39;</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;hey&#39;</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">is</span> y
-True
+<span style="color:#66d9ef">True</span>
 </code></pre></div><p>However, CPython does not intern each and every string. Check out how the strings below were not cached/interned:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;hey!&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;hey!&#39;</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;hey!&#39;</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">is</span> y
-False
+<span style="color:#66d9ef">False</span>
 </code></pre></div><p>That&rsquo;s because CPython won&rsquo;t intern strings that are not composed exclusively by ASCII letters, numbers or underscores (see <a href="https://github.com/python/cpython/blob/314858e2763e76e77029ea0b691d749c32939087/Objects/codeobject.c#L24-L40">codeobject.c</a>). With this rule, CPython &ldquo;ensures&rdquo; that strings that look like valid Python identifiers will be interned. This way, function/method/variable names will end up interned and thus lookups will be faster during bytecode execution.</p>
 <p>Single-character strings will also be reused. CPython checks if the string has a single digit before allocating a new object. If it has, it will just return a reference to an already existing object that represents that character (see <a href="https://github.com/python/cpython/blob/eb0d5c38de7f970d8cd8524f4163d831c7720f51/Objects/unicodeobject.c#L2321-L2338">unicodeobject.c</a>):</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;á&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;á&#39;</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;á&#39;</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">is</span> y
-True
+<span style="color:#66d9ef">True</span>
 </code></pre></div><p>It&rsquo;s not entirely clear to me in which cases exactly a string is interned. I&rsquo;ve read conflicting information on the subject and my experiments yielded somewhat confusing results. (if you happen to know the answer, please drop a comment)</p>
 <p>One thing I can tell is that CPython does intern code-related strings such as variable names, function name and constants, <a href="https://github.com/python/cpython/blob/3b3b83c965447a8329b34cb4befe6e9908880ee5/Objects/codeobject.c#L153-L167">when creating code objects</a>. Check this example:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">greet</span>(x):
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">greet</span>(x):
         msg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;hello&#34;</span>
         <span style="color:#66d9ef">return</span> msg <span style="color:#f92672">+</span> x
 
 <span style="color:#f92672">&gt;&gt;&gt;</span> s <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;greet&#34;</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> s <span style="color:#f92672">is</span> greet<span style="color:#f92672">.</span>__name__
-True
+<span style="color:#66d9ef">True</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> code <span style="color:#f92672">=</span> dis<span style="color:#f92672">.</span>Bytecode(greet)<span style="color:#f92672">.</span>codeobj
 <span style="color:#f92672">&gt;&gt;&gt;</span> code<span style="color:#f92672">.</span>co_consts
-(None, <span style="color:#e6db74">&#39;hello&#39;</span>)
+(<span style="color:#66d9ef">None</span>, <span style="color:#e6db74">&#39;hello&#39;</span>)
 <span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#e6db74">&#34;hello&#34;</span> <span style="color:#f92672">is</span> code<span style="color:#f92672">.</span>co_consts[<span style="color:#ae81ff">1</span>]
-True
+<span style="color:#66d9ef">True</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> code<span style="color:#f92672">.</span>co_varnames
 (<span style="color:#e6db74">&#39;x&#39;</span>, <span style="color:#e6db74">&#39;msg&#39;</span>)
 <span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#e6db74">&#34;x&#34;</span> <span style="color:#f92672">is</span> code<span style="color:#f92672">.</span>co_varnames[<span style="color:#ae81ff">0</span>]
-True
+<span style="color:#66d9ef">True</span>
 </code></pre></div><p>The snippet above demonstrates that string constants, function name and variable names have been interned when CPython creates the code object (that is, when it creates the code object that will represent the function).</p>
 <h3 id="forcing-cpython-to-intern-a-string">Forcing CPython to Intern a String</h3>
 <p>If, for some reason, you want to force CPython to intern a given string, you can call the <a href="https://docs.python.org/3/library/sys.html#sys.intern"><code>sys.intern</code></a> function passing a string as its argument. This may be helpful if you have huge strings that you&rsquo;ll need to reuse often and that would not be automatically interned by CPython. For example:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;hey!&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;hey!&#39;</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;hey!&#39;</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">is</span> y
-False
+<span style="color:#66d9ef">False</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">=</span> sys<span style="color:#f92672">.</span>intern(<span style="color:#e6db74">&#39;hey!&#39;</span>)
 <span style="color:#f92672">&gt;&gt;&gt;</span> y <span style="color:#f92672">=</span> sys<span style="color:#f92672">.</span>intern(<span style="color:#e6db74">&#39;hey!&#39;</span>)
 <span style="color:#f92672">&gt;&gt;&gt;</span> x <span style="color:#f92672">is</span> y
-True
+<span style="color:#66d9ef">True</span>
 </code></pre></div><p>Another advantage is that interned strings can be compared using pointer comparison, rather than char by char.</p>
 <h2 id="constant-folding">Constant Folding</h2>
 <p><a href="https://en.wikipedia.org/wiki/Constant_folding">Constant folding</a> is another technique often employed by compilers and interpreters. It consists of precomputing in compile time the expressions that have no runtime dependencies. For example, it is quite common to find definitions like this in Python programs:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">kilobyte <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">kilobyte <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>
 </code></pre></div><p>People usually do that so that other people reading their code can get a better grasp on how an otherwise &ldquo;magic&rdquo; value (8192 in this case) was actually defined.</p>
 <p>The CPython interpreter folds that expression into a constant while compiling the source code (<code>.py</code>) into bytecode (<code>.pyc</code>). In practical terms, it means that the resulting bytecode won&rsquo;t contain the <code>8 * 1024</code> expression, but the <code>8192</code> constant instead. We are basically trading run time for compile time. Imagine if <code>kilobyte</code> was defined in a function that is called thousands of times during a program execution. We&rsquo;d have thousands of multiplications, all happening in runtime.</p>
 <h3 id="digging-a-bit-more">Digging a Bit More</h3>
 <p>Before we start digging, let me show you how we can verify if a given expression is being folded into a constant or not. An easy way to do that is to use the <a href="https://docs.python.org/3/library/dis.html"><code>dis</code></a> module to disassemble a Python function into its bytecode representation.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">import</span> dis
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">import</span> dis
 <span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
         kilobyte <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>
 
 <span style="color:#f92672">&gt;&gt;&gt;</span> dis<span style="color:#f92672">.</span>dis(func)
   <span style="color:#ae81ff">3</span>           <span style="color:#ae81ff">0</span> LOAD_CONST               <span style="color:#ae81ff">1</span> (<span style="color:#ae81ff">8192</span>)
               <span style="color:#ae81ff">2</span> STORE_FAST               <span style="color:#ae81ff">0</span> (kilobyte)
-              <span style="color:#ae81ff">4</span> LOAD_CONST               <span style="color:#ae81ff">0</span> (None)
+              <span style="color:#ae81ff">4</span> LOAD_CONST               <span style="color:#ae81ff">0</span> (<span style="color:#66d9ef">None</span>)
               <span style="color:#ae81ff">6</span> RETURN_VALUE
 </code></pre></div><p>As you can see in the bytecode output of the <code>dis</code> call above, there&rsquo;s no multiplication instruction and we have <code>8192</code> as a constant value instead. That means that CPython precomputed that expression and created a constant for its value in compile-time, so that when the bytecode runs no multiplication has to be made.</p>
 <h3 id="strings-can-be-folded">Strings Can Be Folded</h3>
 <p>Constant folding is not used exclusively for arithmetic expressions. Expressions that compute strings are also candidates for that optimization. Check this out:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
         <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;-&#39;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">10</span>
 
 <span style="color:#f92672">&gt;&gt;&gt;</span> dis<span style="color:#f92672">.</span>dis(func)
   <span style="color:#ae81ff">2</span>           <span style="color:#ae81ff">0</span> LOAD_CONST               <span style="color:#ae81ff">1</span> (<span style="color:#e6db74">&#39;----------&#39;</span>)
               <span style="color:#ae81ff">2</span> RETURN_VALUE
 </code></pre></div><p>See how the bytecode contains the computed version of the string already. Not all string operations will be folded, though:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
         <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;-&#39;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">5000</span>
 
 <span style="color:#f92672">&gt;&gt;&gt;</span> dis<span style="color:#f92672">.</span>dis(func)
@@ -342,24 +342,24 @@ True
 <p><em><strong>Note:</strong> these experiments were done using CPython 3.7.</em></p>
 <p>My first hypothesis when I saw the output above was that it was something related to the string size. It makes a ton of sense for CPython to not expand expressions like <code>'-' * 10000000</code> into constants, as that would generate bigger <code>.pyc</code> files. But I got curious on what&rsquo;s CPython threshold for that.</p>
 <p>To find that out, I wrote a quick and dirty function to check if a given expression would be folded or not:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">folds</span>(string, size):
-    c <span style="color:#f92672">=</span> compile(f<span style="color:#e6db74">&#34;&#39;{string}&#39; * {size}&#34;</span>, <span style="color:#e6db74">&#39;dummyfile&#39;</span>, <span style="color:#e6db74">&#39;eval&#39;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">folds</span>(string, size):
+    c <span style="color:#f92672">=</span> compile(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#39;</span><span style="color:#e6db74">{</span>string<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; * </span><span style="color:#e6db74">{</span>size<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>, <span style="color:#e6db74">&#39;dummyfile&#39;</span>, <span style="color:#e6db74">&#39;eval&#39;</span>)
     <span style="color:#75715e"># in case the constant has not been folded, `co_consts` will be (string, size)</span>
     <span style="color:#75715e"># in case it was folded, it will be represented by a tuple with the resulting string</span>
     <span style="color:#66d9ef">return</span> c<span style="color:#f92672">.</span>co_consts[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> string
 </code></pre></div><p>That function allowed me to find out that <strong>CPython&gt;=3.7 won&rsquo;t fold strings bigger than 4096 characters into constants</strong>. Check this out:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> folds(<span style="color:#e6db74">&#39;-&#39;</span>, <span style="color:#ae81ff">4096</span>)
-True
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> folds(<span style="color:#e6db74">&#39;-&#39;</span>, <span style="color:#ae81ff">4096</span>)
+<span style="color:#66d9ef">True</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> folds(<span style="color:#e6db74">&#39;-&#39;</span>, <span style="color:#ae81ff">4097</span>)
-False
+<span style="color:#66d9ef">False</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> folds(<span style="color:#e6db74">&#39;--&#39;</span>, <span style="color:#ae81ff">2048</span>)
-True
+<span style="color:#66d9ef">True</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> folds(<span style="color:#e6db74">&#39;--&#39;</span>, <span style="color:#ae81ff">2049</span>)
-False
+<span style="color:#66d9ef">False</span>
 </code></pre></div><p><strong>P.S.:</strong> CPython versions prior to 3.7 have a way smaller limit set to 20 chars.</p>
 <h3 id="tuples-are-folded-as-well">Tuples Are Folded As Well</h3>
 <p>As strings and numbers, tuples are also immutable objects in Python. So, tuples will also be folded in constants, as the experiment below shows:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
         <span style="color:#66d9ef">return</span> (<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span> (<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>)
 
 <span style="color:#f92672">&gt;&gt;&gt;</span> dis<span style="color:#f92672">.</span>dis(func)
@@ -367,7 +367,7 @@ False
               <span style="color:#ae81ff">2</span> RETURN_VALUE
 </code></pre></div><h3 id="what-about-constant-propagation">What About Constant Propagation?</h3>
 <p>As far as I can tell, CPython <strong>does not do</strong> <a href="https://en.wikipedia.org/wiki/Constant_folding#Constant_propagation">Constant Propagation</a>. That is, it does not replace variables whose values are known in compile time by their actual values. Check this out:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
         kilobyte <span style="color:#f92672">=</span> <span style="color:#ae81ff">8192</span>
         megabyte <span style="color:#f92672">=</span> kilobyte <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>
 
@@ -379,25 +379,25 @@ False
               <span style="color:#ae81ff">6</span> LOAD_CONST               <span style="color:#ae81ff">2</span> (<span style="color:#ae81ff">1024</span>)
               <span style="color:#ae81ff">8</span> BINARY_MULTIPLY
              <span style="color:#ae81ff">10</span> STORE_FAST               <span style="color:#ae81ff">1</span> (megabyte)
-             <span style="color:#ae81ff">12</span> LOAD_CONST               <span style="color:#ae81ff">0</span> (None)
+             <span style="color:#ae81ff">12</span> LOAD_CONST               <span style="color:#ae81ff">0</span> (<span style="color:#66d9ef">None</span>)
              <span style="color:#ae81ff">14</span> RETURN_VALUE
 </code></pre></div><p>If CPython did it, it would propagate the <code>kilobyte</code> value into the expression that uses it and it would be able to fold the whole expression into a constant. There would be no need for a <code>BINARY_MULTIPLY</code> instruction in the resulting bytecode in that case.</p>
 <h2 id="dead-code-elimination">Dead Code Elimination</h2>
 <p>CPython also eliminates dead code, such as unreachable statements. In the example below, the first <code>print</code> will never be reached, so no bytecode is generated for that branch:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
-      <span style="color:#66d9ef">if</span> False:
-          <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;hello&#34;</span>)
-      <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;hey!&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
+      <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">False</span>:
+          print(<span style="color:#e6db74">&#34;hello&#34;</span>)
+      print(<span style="color:#e6db74">&#34;hey!&#34;</span>)
 
 <span style="color:#f92672">&gt;&gt;&gt;</span> dis<span style="color:#f92672">.</span>dis(func)
-  <span style="color:#ae81ff">4</span>           <span style="color:#ae81ff">0</span> LOAD_GLOBAL              <span style="color:#ae81ff">0</span> (<span style="color:#66d9ef">print</span>)
+  <span style="color:#ae81ff">4</span>           <span style="color:#ae81ff">0</span> LOAD_GLOBAL              <span style="color:#ae81ff">0</span> (print)
               <span style="color:#ae81ff">2</span> LOAD_CONST               <span style="color:#ae81ff">1</span> (<span style="color:#e6db74">&#39;hey!&#39;</span>)
               <span style="color:#ae81ff">4</span> CALL_FUNCTION            <span style="color:#ae81ff">1</span>
               <span style="color:#ae81ff">6</span> POP_TOP
-              <span style="color:#ae81ff">8</span> LOAD_CONST               <span style="color:#ae81ff">0</span> (None)
+              <span style="color:#ae81ff">8</span> LOAD_CONST               <span style="color:#ae81ff">0</span> (<span style="color:#66d9ef">None</span>)
              <span style="color:#ae81ff">10</span> RETURN_VALUE
 </code></pre></div><p>Any code added after a <code>return</code> statement will also be eliminated:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">func</span>():
         <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;hey&#34;</span>
         s <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;what am I doing here?&#34;</span>
 
@@ -411,7 +411,7 @@ False
 <ul>
 <li><a href="http://guilload.com/python-string-interning/">The Internals of Python String Interning</a></li>
 <li><a href="https://arpitbhayani.me/blogs/python-caches-integers">Python Caches Integers</a></li>
-<li><a href="https://stackoverflow.com/a/24245514/1084647">Martijn Pieters&rsquo; answer on Stack Overflow</a></li>
+<li><a href="https://stackoverflow.com/a/24245514/1084647">Martijn Pieters' answer on Stack Overflow</a></li>
 </ul>
 </article>
     <footer class="post-footer">

@@ -37,7 +37,7 @@ But if we start thinking about it, how in hell can the CPython interpreter multi
 
 
 
-<meta name="generator" content="Hugo 0.69.2" />
+<meta name="generator" content="Hugo 0.88.1" />
 
 
 <link rel="canonical" href="http://stummjr.github.io/post/multiplication-in-cpython/">
@@ -236,19 +236,19 @@ But if we start thinking about it, how in hell can the CPython interpreter multi
 
     <article class="post-content"><p>I am used to write code that multiplies numbers several times a week. Usually when I do that, I don&rsquo;t think much about the operation itself or how the machine will execute it.</p>
 <p>But if we start thinking about it, how in hell can the <a href="https://github.com/python/cpython">CPython</a> interpreter multiply numbers as large as the ones below? The CPU definitely does not support huge numbers like that out of the box, so how does it work?</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#ae81ff">92982374592874395723984756872342342234</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">670878370598623450872390483452435</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#ae81ff">92982374592874395723984756872342342234</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">670878370598623450872390483452435</span>
 </code></pre></div><p>The answer is both simple and complex. 😃</p>
 <p>First of all, we have to acknowledge the fact that the numbers that we can represent in Python are way larger than the numbers that a modern CPU can. For example 10^100 is huuuuge but Python can handle it:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#ae81ff">10</span> <span style="color:#f92672">**</span> <span style="color:#ae81ff">100</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#ae81ff">10</span> <span style="color:#f92672">**</span> <span style="color:#ae81ff">100</span>
 <span style="color:#ae81ff">10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000</span>
 </code></pre></div><p>To support that, CPython implements a long object (any integer number, basically) with an <a href="https://github.com/python/cpython/blob/bb3e0c240bc60fe08d332ff5955d54197f79751c/Include/longintrepr.h#L85-L88">array of digits</a>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">struct</span> _longobject {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">struct</span> _longobject {
     PyObject_VAR_HEAD
     digit ob_digit[<span style="color:#ae81ff">1</span>];
 };
 </code></pre></div><p>I don&rsquo;t know about you, but the first thing that comes to my mind when I think on how to multiply two numbers that are broken down digit by digit is to use that good old algorithm that we learn in grade school, creatively called <a href="https://en.wikipedia.org/wiki/Multiplication_algorithm#Long_multiplication">Grade-School Multiplication</a>.</p>
 <p>That is, given that I want to multiply 232 * 23, I can do something along these lines:</p>
-<pre><code>  232
+<pre tabindex="0"><code>  232
   *23
  ----
   696
@@ -259,7 +259,7 @@ But if we start thinking about it, how in hell can the CPython interpreter multi
 <h2 id="diving-into-cpython-multiplication">Diving Into CPython Multiplication</h2>
 <p>Before multiplying two numbers, CPython checks if at least one of the numbers is small enough to be handled efficiently with the grade-school algorithm.</p>
 <p>Simply put, CPython will use the grade-school algorithm (implemented in <a href="https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c#L3197"><code>x_mul</code></a>) to multiply two operands when at least one of these operands is less than 71 digits long (in <strong>base 2^30</strong>), as we can see <a href="https://github.com/python/cpython/blob/ef9e22b253253615098d22cb49141a2a1024ee3c/Objects/longobject.c#L3356-L3363">here</a>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">/* Use gradeschool math when either number is too small. */</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">/* Use gradeschool math when either number is too small. */</span>
 i <span style="color:#f92672">=</span> a <span style="color:#f92672">==</span> b <span style="color:#f92672">?</span> KARATSUBA_SQUARE_CUTOFF : KARATSUBA_CUTOFF;
 <span style="color:#66d9ef">if</span> (asize <span style="color:#f92672">&lt;=</span> i) {
     <span style="color:#66d9ef">if</span> (asize <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>)

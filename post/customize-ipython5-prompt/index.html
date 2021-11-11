@@ -39,7 +39,7 @@ Some of the things that I dislike:
 
 
 
-<meta name="generator" content="Hugo 0.69.2" />
+<meta name="generator" content="Hugo 0.88.1" />
 
 
 <link rel="canonical" href="http://stummjr.github.io/post/customize-ipython5-prompt/">
@@ -251,9 +251,9 @@ Some of the things that I dislike:
 <p>If you like it, follow me through the next steps to make your IPython shell look and behave like that.</p>
 <h1 id="customizing-the-prompt">Customizing the prompt</h1>
 <p><strong>First</strong> you have to create a default profile for your shell with this command:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ipython profile create
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ipython profile create
 </code></pre></div><p>As a result, a <code>.ipython</code> folder will be created in your home folder, with the following contents:</p>
-<pre><code>.ipython
+<pre tabindex="0"><code>.ipython
 ├── extensions
 ├── nbextensions
 └── profile_default
@@ -264,29 +264,29 @@ Some of the things that I dislike:
     └── startup
         └── README
 </code></pre><p><strong>Next</strong>, create  <code>.ipython/custom_prompt.py</code> file with the following content:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> IPython.terminal.prompts <span style="color:#f92672">import</span> Prompts, Token
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> IPython.terminal.prompts <span style="color:#f92672">import</span> Prompts, Token
  
 <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CustomPrompt</span>(Prompts):
  
-    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">in_prompt_tokens</span>(self, cli<span style="color:#f92672">=</span>None):
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">in_prompt_tokens</span>(self, cli<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>):
         <span style="color:#66d9ef">return</span> [(Token<span style="color:#f92672">.</span>Prompt, <span style="color:#e6db74">&#39;&gt;&gt;&gt; &#39;</span>), ]
  
-    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">out_prompt_tokens</span>(self, cli<span style="color:#f92672">=</span>None):
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">out_prompt_tokens</span>(self, cli<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>):
         <span style="color:#66d9ef">return</span> [(Token<span style="color:#f92672">.</span>Prompt, <span style="color:#e6db74">&#39;&#39;</span>), ]
  
-    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">continuation_prompt_tokens</span>(self, cli<span style="color:#f92672">=</span>None, width<span style="color:#f92672">=</span>None):
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">continuation_prompt_tokens</span>(self, cli<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>, width<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>):
         <span style="color:#66d9ef">return</span> [(Token<span style="color:#f92672">.</span>Prompt, <span style="color:#e6db74">&#39;&#39;</span>), ]
 </code></pre></div><p><strong>And last</strong>, you have to tell IPython to use this new class as your prompt and in addition to custom settings.</p>
 <p>You can do so by adding this code to <code>.ipython/profile_default/ipython_config.py</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> custom_prompt <span style="color:#f92672">import</span> CustomPrompt
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> custom_prompt <span style="color:#f92672">import</span> CustomPrompt
  
  
 c <span style="color:#f92672">=</span> get_config()
  
 c<span style="color:#f92672">.</span>TerminalInteractiveShell<span style="color:#f92672">.</span>prompts_class <span style="color:#f92672">=</span> CustomPrompt
 c<span style="color:#f92672">.</span>TerminalInteractiveShell<span style="color:#f92672">.</span>separate_in <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>
-c<span style="color:#f92672">.</span>TerminalInteractiveShell<span style="color:#f92672">.</span>confirm_exit <span style="color:#f92672">=</span> False
-c<span style="color:#f92672">.</span>TerminalIPythonApp<span style="color:#f92672">.</span>display_banner <span style="color:#f92672">=</span> False
+c<span style="color:#f92672">.</span>TerminalInteractiveShell<span style="color:#f92672">.</span>confirm_exit <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
+c<span style="color:#f92672">.</span>TerminalIPythonApp<span style="color:#f92672">.</span>display_banner <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
 </code></pre></div><p><strong>That’s it</strong>, now you have a prompt like the one I’ve shown earlier. I hope it improves your experience with IPython as it did for me.</p>
 <p>If you want to learn how to do further customizations, check <a href="https://ipython.readthedocs.io/en/stable/config/details.html#custom-prompts">the official documentation</a>.</p>
 <p>Ah, did I mention that <strong>I love IPython</strong>? Huge kudos and thanks for the team behind it! 👏</p>

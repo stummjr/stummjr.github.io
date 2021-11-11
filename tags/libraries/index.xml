@@ -40,7 +40,7 @@ stop until you&amp;rsquo;re clean again.&lt;/p&gt;
 to &lt;a href=&#34;https://github.com/psf/requests&#34;&gt;&lt;code&gt;requests&lt;/code&gt;&lt;/a&gt;. It basically creates a persistent cache so
 that your script does not reach out to the server every time you run it. Using it is as simple
 as importing it and installing a cache:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; requests
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; requests
 &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; requests_cache
 
 requests_cache&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;install_cache(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;temp_cache&amp;#39;&lt;/span&gt;)
@@ -50,7 +50,7 @@ file and store the responses there. The next time the script is ran, no requests
 the server.&lt;/p&gt;
 &lt;p&gt;In some cases, it may be useful to specify an expiration period. For example, we can force
 a cache invalidation after 1 hour by passing the &lt;code&gt;expire_after&lt;/code&gt; parameter:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;requests_cache&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;install_cache(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;temp_cache&amp;#39;&lt;/span&gt;, expire_after&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;3600&lt;/span&gt;)
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;requests_cache&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;install_cache(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;temp_cache&amp;#39;&lt;/span&gt;, expire_after&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;3600&lt;/span&gt;)
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This library has boosted my development speed considerably. For more options, check out
 the &lt;a href=&#34;https://requests-cache.readthedocs.io/en/latest/&#34;&gt;requests-cache documentation&lt;/a&gt;.&lt;/p&gt;
 &lt;h2 id=&#34;parsing-command-line-arguments&#34;&gt;Parsing Command Line Arguments&lt;/h2&gt;
@@ -58,20 +58,19 @@ the &lt;a href=&#34;https://requests-cache.readthedocs.io/en/latest/&#34;&gt;req
 Click is so much simpler and yet very powerful. It allows me to define the arguments for my script
 by simply decorating a function. Check out how simple it is to parse a couple command line options
 with &lt;code&gt;click&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; click
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; click
 
-&lt;span style=&#34;color:#a6e22e&#34;&gt;@click.command&lt;/span&gt;()
-&lt;span style=&#34;color:#a6e22e&#34;&gt;@click.option&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;--user&amp;#34;&lt;/span&gt;, help&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;A GitHub username.&amp;#34;&lt;/span&gt;)
-&lt;span style=&#34;color:#a6e22e&#34;&gt;@click.option&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;--days&amp;#34;&lt;/span&gt;, help&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;The number of days to look back.&amp;#34;&lt;/span&gt;, default&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@click&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;command()
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@click&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;option(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;--user&amp;#34;&lt;/span&gt;, help&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;A GitHub username.&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@click&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;option(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;--days&amp;#34;&lt;/span&gt;, help&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;The number of days to look back.&amp;#34;&lt;/span&gt;, default&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)
 &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;grab_stats&lt;/span&gt;(user, days):
-    click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;echo(click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;style(f&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Hello, {user}!&amp;#34;&lt;/span&gt;, fg&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;green&amp;#34;&lt;/span&gt;))
-    click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;echo(click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;style(f&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Fetching the PRs/issues created in the past {days} days.&amp;#34;&lt;/span&gt;, fg&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;red&amp;#34;&lt;/span&gt;))
+    click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;echo(click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;style(&lt;span style=&#34;color:#e6db74&#34;&gt;f&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Hello, &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{&lt;/span&gt;user&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;!&amp;#34;&lt;/span&gt;, fg&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;green&amp;#34;&lt;/span&gt;))
+    click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;echo(click&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;style(&lt;span style=&#34;color:#e6db74&#34;&gt;f&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Fetching the PRs/issues created in the past &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;{&lt;/span&gt;days&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; days.&amp;#34;&lt;/span&gt;, fg&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;red&amp;#34;&lt;/span&gt;))
 
 &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; __name__ &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;__main__&amp;#34;&lt;/span&gt;:
     grab_stats()
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Check out the output of the script above:&lt;/p&gt;
-&lt;figure&gt;
-    &lt;img src=&#34;http://stummjr.github.io/img/click-output.png&#34; width=&#34;800&#34;/&gt; 
+&lt;figure&gt;&lt;img src=&#34;http://stummjr.github.io/img/click-output.png&#34; width=&#34;800&#34;/&gt;
 &lt;/figure&gt;
 
 &lt;p&gt;Click allowed me to easily format the output using &lt;code&gt;click.style()&lt;/code&gt;, which is a great abstraction
@@ -79,7 +78,7 @@ around the terminal&amp;rsquo;s escape sequences.&lt;/p&gt;
 &lt;p&gt;Click&amp;rsquo;s &lt;code&gt;echo()&lt;/code&gt; function is also quite helpful as it gracefully handles multiple types of
 terminals, so that the script&amp;rsquo;s output looks the same no matter the terminal encoding.&lt;/p&gt;
 &lt;p&gt;Click also auto-generates help pages:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ python ghstats.py --help
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ python ghstats.py --help
 Usage: ghstats.py [OPTIONS]
 
 Options:
@@ -94,14 +93,13 @@ a ton of files, sometimes it&amp;rsquo;s doing a bunch of HTTP requests and some
 &lt;p&gt;There&amp;rsquo;s nothing worse than staring at the screen as the cursor blinks without telling us
 anything. Progress bars are excellent at giving the users a sense of (&lt;em&gt;uh &amp;hellip;&lt;/em&gt;) progress.
 A simple progress bar like this helps users to estimate how much time they&amp;rsquo;ll have to wait:&lt;/p&gt;
-&lt;figure&gt;
-    &lt;img src=&#34;http://stummjr.github.io/img/progress-bar-tqdm.png&#34; width=&#34;800&#34;/&gt; 
+&lt;figure&gt;&lt;img src=&#34;http://stummjr.github.io/img/progress-bar-tqdm.png&#34; width=&#34;800&#34;/&gt;
 &lt;/figure&gt;
 
 &lt;p&gt;Adding progress bars to Python scripts is super easy with &lt;a href=&#34;https://github.com/tqdm/tqdm&#34;&gt;&lt;code&gt;tqdm&lt;/code&gt;&lt;/a&gt;.
 Let&amp;rsquo;s say that we have a script that goes through a bunch of URLs making requests to fetch their
 resources. This is all we have to do to show a nice progress bar to follow through the progress:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; tqdm &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; tqdm
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; tqdm &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; tqdm
 
 &lt;span style=&#34;color:#f92672&#34;&gt;...&lt;/span&gt;
 &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; url &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; tqdm(urls):
@@ -116,7 +114,7 @@ the &lt;a href=&#34;https://github.com/tqdm/tqdm/blob/master/README.rst&#34;&gt;
 &lt;p&gt;Isn&amp;rsquo;t it better when a script outputs a nice little table on the screen instead of a confusing
 JSON object? The &lt;a href=&#34;https://github.com/astanin/python-tabulate&#34;&gt;&lt;code&gt;tabulate&lt;/code&gt;&lt;/a&gt; library is quite handy
 as it allows us to easily plot nice ASCII tables with the output of our scripts:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; tabulate &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; tabulate
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; tabulate &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; tabulate
 
 repo_pulls &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [
     (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://github.com/stummjr/flake8-scrapy/pull/13&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Drop usage of lambda as callback&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;stummjr&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;2018-10-20&amp;#34;&lt;/span&gt;),
@@ -125,9 +123,9 @@ repo_pulls &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [
 ]
 headers &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;URL&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Title&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Author&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;When&amp;#34;&lt;/span&gt;)
 table &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; tabulate(repo_pulls, headers&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;headers, tablefmt&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;fancy_grid&amp;#34;&lt;/span&gt;)
-&lt;span style=&#34;color:#66d9ef&#34;&gt;print&lt;/span&gt;(table)
+print(table)
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The script above will output a nice little table like this:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;╒══════════════════════════════════════════════════╤══════════════════════════════════╤══════════╤════════════╕
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;╒══════════════════════════════════════════════════╤══════════════════════════════════╤══════════╤════════════╕
 │ URL                                              │ Title                            │ Author   │ When       │
 ╞══════════════════════════════════════════════════╪══════════════════════════════════╪══════════╪════════════╡
 │ https://github.com/stummjr/flake8-scrapy/pull/13 │ Drop usage of lambda as callback │ stummjr  │ 2018-10-20 │

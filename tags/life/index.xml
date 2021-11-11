@@ -85,8 +85,7 @@ to see how it feels.&lt;/p&gt;
 &lt;h1 id=&#34;how-i-fixed-the-issue&#34;&gt;How I fixed the issue&lt;/h1&gt;
 &lt;p&gt;To avoid this issue, all I did was changing my whole desktop to use a light background for everything. &lt;a href=&#34;https://ethanschoonover.com/solarized/&#34;&gt;Solarized Light&lt;/a&gt; is my favorite color scheme for my editor, terminal, and many other apps. This is how my development environment looks
 like these days:&lt;/p&gt;
-&lt;figure&gt;
-    &lt;img src=&#34;http://stummjr.github.io/img/light-env.png&#34; width=&#34;500&#34;/&gt; 
+&lt;figure&gt;&lt;img src=&#34;http://stummjr.github.io/img/light-env.png&#34; width=&#34;500&#34;/&gt;
 &lt;/figure&gt;
 
 &lt;p&gt;Not as cool as my screen two decades ago, but fully functional. 😉&lt;/p&gt;
@@ -99,8 +98,7 @@ environment for too much time as they suffer from eye strain after a few hours.&
 &lt;p&gt;From a reader perspective, though, there are multiple studies showing that it&amp;rsquo;s harder to read in &lt;em&gt;light-on-dark&lt;/em&gt; than in &lt;em&gt;dark-on-light&lt;/em&gt;.&lt;/p&gt;
 &lt;h2 id=&#34;it-gets-worse-at-conferences&#34;&gt;It gets worse at conferences&lt;/h2&gt;
 &lt;p&gt;I&amp;rsquo;ve been in countless conferences where the speaker used a dark background to present snippets of code. Me during their talks:&lt;/p&gt;
-&lt;figure&gt;
-    &lt;img src=&#34;http://stummjr.github.io/img/michael-scott-i-understand-nothing.png&#34; width=&#34;500&#34;/&gt; 
+&lt;figure&gt;&lt;img src=&#34;http://stummjr.github.io/img/michael-scott-i-understand-nothing.png&#34; width=&#34;500&#34;/&gt;
 &lt;/figure&gt;
 
 &lt;p&gt;And it wasn&amp;rsquo;t just me. You could see people squeezing their eyes all around the room. Sometimes even the speaker notices and

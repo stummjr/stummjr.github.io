@@ -1,219 +1,133 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
   <url>
     <loc>http://stummjr.github.io/</loc>
     <lastmod>2021-10-04T20:21:10-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/multiplication-in-cpython/</loc>
     <lastmod>2021-10-04T20:21:10-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/internals/</loc>
     <lastmod>2021-10-04T20:21:10-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/</loc>
     <lastmod>2021-10-04T20:21:10-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/python/</loc>
     <lastmod>2021-10-04T20:21:10-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/</loc>
     <lastmod>2021-10-04T20:21:10-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/coding/</loc>
     <lastmod>2021-02-14T19:50:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/how-i-manage-virtualenvs-today/</loc>
     <lastmod>2021-02-14T19:50:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/life/</loc>
     <lastmod>2020-07-25T10:19:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/opinion/</loc>
     <lastmod>2020-07-25T10:19:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/stop-writing-for-the-audience/</loc>
     <lastmod>2020-07-25T10:19:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/writing/</loc>
     <lastmod>2020-07-25T10:19:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/best-practices/</loc>
     <lastmod>2020-07-18T10:19:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/use-a-code-formatter/</loc>
     <lastmod>2020-07-18T10:19:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/tools/</loc>
     <lastmod>2020-07-18T10:19:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/handling-headers-based-pagination/</loc>
     <lastmod>2020-07-12T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/til/</loc>
     <lastmod>2020-07-12T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/tips/</loc>
     <lastmod>2020-07-12T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/cpython-optimizations/</loc>
     <lastmod>2020-06-19T23:19:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/ipython/</loc>
     <lastmod>2020-06-06T10:19:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/ipython-tricks/</loc>
     <lastmod>2020-06-06T10:19:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/libraries/</loc>
     <lastmod>2020-05-19T23:19:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/building-scripts-in-python/</loc>
     <lastmod>2020-05-19T23:19:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/why-i-abandoned-dark-mode/</loc>
     <lastmod>2020-05-07T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/scrapy/</loc>
     <lastmod>2020-05-03T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/scrapy-in-2020/</loc>
     <lastmod>2020-05-03T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/about/</loc>
     <lastmod>2020-05-02T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/debugging/</loc>
     <lastmod>2020-05-01T15:42:35-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/debugging-python-with-pudb/</loc>
     <lastmod>2020-05-01T15:42:35-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/ast/</loc>
     <lastmod>2018-12-31T15:42:35-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/building-a-custom-flake8-plugin/</loc>
     <lastmod>2018-12-31T15:42:35-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/flake8/</loc>
     <lastmod>2018-12-31T15:42:35-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/linter/</loc>
     <lastmod>2018-12-31T15:42:35-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/loops/</loc>
     <lastmod>2018-09-05T15:42:35-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/programming/</loc>
     <lastmod>2018-09-05T15:42:35-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/else-in-python-loops/</loc>
     <lastmod>2018-09-05T15:42:35-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/customize-ipython5-prompt/</loc>
     <lastmod>2018-09-02T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/shell/</loc>
     <lastmod>2018-09-02T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/python3-round-oddities/</loc>
     <lastmod>2018-08-28T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/rounding/</loc>
     <lastmod>2018-08-28T15:55:13-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/post/drop-duplicates-in-order/</loc>
     <lastmod>2018-08-27T15:42:35-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/tags/list/</loc>
     <lastmod>2018-08-27T15:42:35-03:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>http://stummjr.github.io/categories/</loc>
   </url>
-  
 </urlset>

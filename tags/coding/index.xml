@@ -23,7 +23,8 @@ wrote down the usual steps that I follow so that next time I can remember (or fi
 &lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; this is not a comprehensive guide or tutorial on virtualenvs and pyenv. It&amp;rsquo;s just a collection of notes that I had on my note taking app that I thought that could be useful to someone else.&lt;/p&gt;
 &lt;h2 id=&#34;installing-pyenv-and-pyenv-virtualenv&#34;&gt;Installing pyenv and pyenv-virtualenv&lt;/h2&gt;
 &lt;p&gt;Here&amp;rsquo;s how I install it on my Mac + Zsh:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ brew install pyenv pyenv-virtualenv
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ brew install pyenv pyenv-virtualenv
+$ echo &#39;eval &amp;quot;$(pyenv init --path)&amp;quot;&#39; &amp;gt;&amp;gt; ~/.zprofile
 $ echo &#39;eval &amp;quot;$(pyenv init -)&amp;quot;&#39; &amp;gt;&amp;gt; ~/.zshrc
 $ echo &#39;eval &amp;quot;$(pyenv virtualenv-init -)&amp;quot;&#39; &amp;gt;&amp;gt; ~/.zshrc
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;There are other ways to install it, as you can see &lt;a href=&#34;https://github.com/pyenv/pyenv#installation&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
@@ -32,30 +33,30 @@ $ echo &#39;eval &amp;quot;$(pyenv virtualenv-init -)&amp;quot;&#39; &amp;gt;&am
 To do that, you&amp;rsquo;ll have to update the list of Python versions that are available on your
 local machine.&lt;/p&gt;
 &lt;p&gt;If pyenv was installed via homebrew as I did above, you can just run:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ brew upgrade pyenv
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ brew upgrade pyenv
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;If you manually installed pyenv by cloning the project repository, then you can run
 this command to update your local copy of the repo:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ cd `pyenv root` &amp;amp;&amp;amp; git pull
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ cd `pyenv root` &amp;amp;&amp;amp; git pull
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;installing-a-new-python-version&#34;&gt;Installing a new Python version&lt;/h2&gt;
 &lt;p&gt;First, list the versions available for installation:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ pyenv install  --list
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ pyenv install  --list
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;If the version that you&amp;rsquo;re looking for is not listed, try the commands listed in the previous topic.&lt;/p&gt;
 &lt;p&gt;Once you found the target version on the list (let&amp;rsquo;s say it&amp;rsquo;s &lt;code&gt;3.8.3&lt;/code&gt;), you can install it via:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ pyenv install 3.8.3
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ pyenv install 3.8.3
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;creating-a-virtualenv-with-a-specific-version&#34;&gt;Creating a virtualenv with a specific version&lt;/h2&gt;
 &lt;p&gt;Let&amp;rsquo;s say that you want to create a new virtualenv using the version you just installed (&lt;code&gt;3.8.3&lt;/code&gt;). You can do so via:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ pyenv virtualenv 3.8.3 my-venv-3.8.3
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ pyenv virtualenv 3.8.3 my-venv-3.8.3
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;listing-virtualenvs&#34;&gt;Listing virtualenvs&lt;/h2&gt;
-&lt;pre&gt;&lt;code&gt;$ pyenv virtualenvs
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ pyenv virtualenvs
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;activating-a-virtualenv&#34;&gt;Activating a virtualenv&lt;/h2&gt;
-&lt;pre&gt;&lt;code&gt;$ pyenv activate my-venv-3.8.3
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ pyenv activate my-venv-3.8.3
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;deactivating-a-virtualenv&#34;&gt;Deactivating a virtualenv&lt;/h2&gt;
-&lt;pre&gt;&lt;code&gt;$ pyenv deactivate
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ pyenv deactivate
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;activating-a-virtualenv-by-default-on-a-project&#34;&gt;Activating a virtualenv by default on a project&lt;/h2&gt;
 &lt;p&gt;Let&amp;rsquo;s say that you have a project on a folder in your filesystem and you always want to activate
 a given virtualenv when entering that folder. To do that, all you have to do is to place a
 &lt;code&gt;.python-version&lt;/code&gt; file in that folder with the name of your virtualenv:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;$ echo &amp;quot;my-env-3.8.3&amp;quot; &amp;gt; .python-version
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ echo &amp;quot;my-env-3.8.3&amp;quot; &amp;gt; .python-version
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;That&amp;rsquo;s it, now whenever you enter that folder, the virtualenv will be activated. This also
 works for Python versions that you have installed via &lt;code&gt;pyenv&lt;/code&gt;, not just virualenvs.&lt;/p&gt;
 </description>
@@ -87,8 +88,7 @@ to see how it feels.&lt;/p&gt;
 &lt;h1 id=&#34;how-i-fixed-the-issue&#34;&gt;How I fixed the issue&lt;/h1&gt;
 &lt;p&gt;To avoid this issue, all I did was changing my whole desktop to use a light background for everything. &lt;a href=&#34;https://ethanschoonover.com/solarized/&#34;&gt;Solarized Light&lt;/a&gt; is my favorite color scheme for my editor, terminal, and many other apps. This is how my development environment looks
 like these days:&lt;/p&gt;
-&lt;figure&gt;
-    &lt;img src=&#34;http://stummjr.github.io/img/light-env.png&#34; width=&#34;500&#34;/&gt; 
+&lt;figure&gt;&lt;img src=&#34;http://stummjr.github.io/img/light-env.png&#34; width=&#34;500&#34;/&gt;
 &lt;/figure&gt;
 
 &lt;p&gt;Not as cool as my screen two decades ago, but fully functional. 😉&lt;/p&gt;
@@ -101,8 +101,7 @@ environment for too much time as they suffer from eye strain after a few hours.&
 &lt;p&gt;From a reader perspective, though, there are multiple studies showing that it&amp;rsquo;s harder to read in &lt;em&gt;light-on-dark&lt;/em&gt; than in &lt;em&gt;dark-on-light&lt;/em&gt;.&lt;/p&gt;
 &lt;h2 id=&#34;it-gets-worse-at-conferences&#34;&gt;It gets worse at conferences&lt;/h2&gt;
 &lt;p&gt;I&amp;rsquo;ve been in countless conferences where the speaker used a dark background to present snippets of code. Me during their talks:&lt;/p&gt;
-&lt;figure&gt;
-    &lt;img src=&#34;http://stummjr.github.io/img/michael-scott-i-understand-nothing.png&#34; width=&#34;500&#34;/&gt; 
+&lt;figure&gt;&lt;img src=&#34;http://stummjr.github.io/img/michael-scott-i-understand-nothing.png&#34; width=&#34;500&#34;/&gt;
 &lt;/figure&gt;
 
 &lt;p&gt;And it wasn&amp;rsquo;t just me. You could see people squeezing their eyes all around the room. Sometimes even the speaker notices and

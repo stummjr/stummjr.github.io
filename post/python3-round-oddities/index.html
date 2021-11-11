@@ -39,7 +39,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.69.2" />
+<meta name="generator" content="Hugo 0.88.1" />
 
 
 <link rel="canonical" href="http://stummjr.github.io/post/python3-round-oddities/">
@@ -237,23 +237,23 @@
     
 
     <article class="post-content"><p>Rounding a decimal number with Python 3 is as simple as invoking the <a href="https://docs.python.org/3/library/functions.html#round"><code>round()</code></a> builtin:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.2</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.2</span>)
 <span style="color:#ae81ff">1</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.8</span>)
 <span style="color:#ae81ff">2</span>
 </code></pre></div><p>We can also pass an extra parameter called <code>ndigits</code>, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.847</span>, ndigits<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.847</span>, ndigits<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
 <span style="color:#ae81ff">1.85</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.847</span>, ndigits<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
 <span style="color:#ae81ff">1.8</span>
 </code></pre></div><p>And what happens when we want to round a number like 1.5? Will it round it up or down? Let’s check:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.5</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.5</span>)
 <span style="color:#ae81ff">2</span>
 </code></pre></div><p>It seems that it rounds up. Let’s check some other numbers to confirm:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">2.5</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">2.5</span>)
 <span style="color:#ae81ff">2</span>
 </code></pre></div><p>Uh, now it went down! Let’s check some more:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">3.5</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">3.5</span>)
 <span style="color:#ae81ff">4</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">4.5</span>)
 <span style="color:#ae81ff">4</span>
@@ -266,7 +266,7 @@
 If there’s a tie, round to the closest even number.</p>
 </blockquote>
 <p>Now it makes sense. If we check the examples above, we’ll see that the rounding was always made to the closest even number:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">3.5</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">3.5</span>)
 <span style="color:#ae81ff">4</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">4.5</span>)
 <span style="color:#ae81ff">4</span>
@@ -274,26 +274,26 @@ If there’s a tie, round to the closest even number.</p>
 <span style="color:#ae81ff">6</span>
 </code></pre></div><h1 id="what-about-python-2">What about Python 2?</h1>
 <p>Python 2 is quite different. When there’s a tie, the rounding is always made upwards in case the numbers are positive:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.5</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.5</span>)
 <span style="color:#ae81ff">2.0</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">2.5</span>)
 <span style="color:#ae81ff">3.0</span>
 </code></pre></div><p>And downwards, when the numbers are negative:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#f92672">-</span><span style="color:#ae81ff">1.5</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#f92672">-</span><span style="color:#ae81ff">1.5</span>)
 <span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#f92672">-</span><span style="color:#ae81ff">2.5</span>)
 <span style="color:#f92672">-</span><span style="color:#ae81ff">3.0</span>
 </code></pre></div><h1 id="why-the-hell-did-python-3-changed-it">Why the hell did Python 3 changed it?</h1>
 <p>The goal is to take the <strong>bias</strong> out of the rounding operations.</p>
 <p>Imagine a bank where all the roundings are done upwards. By the end of the day, the bank earning report will show a value that is higher than what the bank actually earned. That’s what happens on <strong>Python 2</strong>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#75715e"># Python 2</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#75715e"># Python 2</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> values <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1.5</span>, <span style="color:#ae81ff">2.5</span>, <span style="color:#ae81ff">3.5</span>, <span style="color:#ae81ff">4.5</span>]
 <span style="color:#f92672">&gt;&gt;&gt;</span> sum(values)
 <span style="color:#ae81ff">12.0</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> sum(round(v) <span style="color:#66d9ef">for</span> v <span style="color:#f92672">in</span> values)
 <span style="color:#ae81ff">14.0</span>
 </code></pre></div><p>Using Python 3’s <code>round()</code>, the rounded values tend to be amortized, because half of them round upwards and half of them round downwards, given that half the numbers are even and the other half are odd. Check the same code, but now running on <strong>Python 3</strong>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#75715e"># Python 3</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#75715e"># Python 3</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> values <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1.5</span>, <span style="color:#ae81ff">2.5</span>, <span style="color:#ae81ff">3.5</span>, <span style="color:#ae81ff">4.5</span>]
 <span style="color:#f92672">&gt;&gt;&gt;</span> sum(values)
 <span style="color:#ae81ff">12.0</span>

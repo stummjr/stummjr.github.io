@@ -39,7 +39,7 @@ The most common way of achieving that might be building a set from that list, gi
 
 
 
-<meta name="generator" content="Hugo 0.69.2" />
+<meta name="generator" content="Hugo 0.88.1" />
 
 
 <link rel="canonical" href="http://stummjr.github.io/post/drop-duplicates-in-order/">
@@ -238,7 +238,7 @@ The most common way of achieving that might be building a set from that list, gi
 
     <article class="post-content"><p>Let’s say you have a list containing all the URLs extracted from a web page and you want to get rid of duplicate URLs.</p>
 <p>The most common way of achieving that might be building a set from that list, given that such operation automatically drops the duplicates. Something like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> urls <span style="color:#f92672">=</span> [
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> urls <span style="color:#f92672">=</span> [
     <span style="color:#e6db74">&#39;http://api.example.com/b&#39;</span>,
     <span style="color:#e6db74">&#39;http://api.example.com/a&#39;</span>,
     <span style="color:#e6db74">&#39;http://api.example.com/c&#39;</span>,
@@ -250,7 +250,7 @@ The most common way of achieving that might be building a set from that list, gi
  <span style="color:#e6db74">&#39;http://api.example.com/c&#39;</span>}
 </code></pre></div><p>The problem is that we just lost the original order of the list.</p>
 <p>A good way to maintain the original order of the elements after removing the duplicates is by using this trick with <a href="https://docs.python.org/3/library/collections.html#collections.OrderedDict"><code>collections.OrderedDict</code></a>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">from</span> collections <span style="color:#f92672">import</span> OrderedDict
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">from</span> collections <span style="color:#f92672">import</span> OrderedDict
 <span style="color:#f92672">&gt;&gt;&gt;</span> list(OrderedDict<span style="color:#f92672">.</span>fromkeys(urls)<span style="color:#f92672">.</span>keys())
 [<span style="color:#e6db74">&#39;http://api.example.com/b&#39;</span>,
  <span style="color:#e6db74">&#39;http://api.example.com/a&#39;</span>,
@@ -258,15 +258,15 @@ The most common way of achieving that might be building a set from that list, gi
 </code></pre></div><p>Cool, huh? Now let’s dig into details to understand what the code above does.</p>
 <p><code>OrderedDict</code> is like a traditional Python <code>dict</code> with a (not so) slight difference: <code>OrderedDict</code> keeps the elements’ insertion order internally. This way, when we iterate over such an object, it will return its elements in the order in which they’ve been inserted.</p>
 <p>Now, let’s break down the operations to understand what’s going on:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> odict <span style="color:#f92672">=</span> OrderedDict<span style="color:#f92672">.</span>fromkeys(urls)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> odict <span style="color:#f92672">=</span> OrderedDict<span style="color:#f92672">.</span>fromkeys(urls)
 </code></pre></div><p>The <a href="https://docs.python.org/3/library/collections.html#collections.Counter.fromkeys"><code>fromkeys()</code></a> method creates a dictionary using the values passed as its first parameters as the keys and the second parameter as its values (or <code>None</code> if we pass nothing, as we did).</p>
 <p>As a result we get:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> odict
-OrderedDict([(<span style="color:#e6db74">&#39;http://api.example.com/b&#39;</span>, None),
-             (<span style="color:#e6db74">&#39;http://api.example.com/a&#39;</span>, None),
-             (<span style="color:#e6db74">&#39;http://api.example.com/c&#39;</span>, None)])
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> odict
+OrderedDict([(<span style="color:#e6db74">&#39;http://api.example.com/b&#39;</span>, <span style="color:#66d9ef">None</span>),
+             (<span style="color:#e6db74">&#39;http://api.example.com/a&#39;</span>, <span style="color:#66d9ef">None</span>),
+             (<span style="color:#e6db74">&#39;http://api.example.com/c&#39;</span>, <span style="color:#66d9ef">None</span>)])
 </code></pre></div><p>Now that we have a dictionary with the URLs as the keys, we can call the <code>keys()</code> method to get only a sequence containing the URLs:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> list(odict<span style="color:#f92672">.</span>keys())
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> list(odict<span style="color:#f92672">.</span>keys())
 [<span style="color:#e6db74">&#39;http://api.example.com/b&#39;</span>,
  <span style="color:#e6db74">&#39;http://api.example.com/a&#39;</span>,
  <span style="color:#e6db74">&#39;http://api.example.com/c&#39;</span>]

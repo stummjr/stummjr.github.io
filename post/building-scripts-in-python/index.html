@@ -37,7 +37,7 @@ There are several things that I find valuable in scripts like these:" />
 
 
 
-<meta name="generator" content="Hugo 0.69.2" />
+<meta name="generator" content="Hugo 0.88.1" />
 
 
 <link rel="canonical" href="http://stummjr.github.io/post/building-scripts-in-python/">
@@ -257,7 +257,7 @@ stop until you&rsquo;re clean again.</p>
 to <a href="https://github.com/psf/requests"><code>requests</code></a>. It basically creates a persistent cache so
 that your script does not reach out to the server every time you run it. Using it is as simple
 as importing it and installing a cache:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> requests
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> requests
 <span style="color:#f92672">import</span> requests_cache
 
 requests_cache<span style="color:#f92672">.</span>install_cache(<span style="color:#e6db74">&#39;temp_cache&#39;</span>)
@@ -267,7 +267,7 @@ file and store the responses there. The next time the script is ran, no requests
 the server.</p>
 <p>In some cases, it may be useful to specify an expiration period. For example, we can force
 a cache invalidation after 1 hour by passing the <code>expire_after</code> parameter:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">requests_cache<span style="color:#f92672">.</span>install_cache(<span style="color:#e6db74">&#39;temp_cache&#39;</span>, expire_after<span style="color:#f92672">=</span><span style="color:#ae81ff">3600</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">requests_cache<span style="color:#f92672">.</span>install_cache(<span style="color:#e6db74">&#39;temp_cache&#39;</span>, expire_after<span style="color:#f92672">=</span><span style="color:#ae81ff">3600</span>)
 </code></pre></div><p>This library has boosted my development speed considerably. For more options, check out
 the <a href="https://requests-cache.readthedocs.io/en/latest/">requests-cache documentation</a>.</p>
 <h2 id="parsing-command-line-arguments">Parsing Command Line Arguments</h2>
@@ -275,20 +275,19 @@ the <a href="https://requests-cache.readthedocs.io/en/latest/">requests-cache do
 Click is so much simpler and yet very powerful. It allows me to define the arguments for my script
 by simply decorating a function. Check out how simple it is to parse a couple command line options
 with <code>click</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> click
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> click
 
-<span style="color:#a6e22e">@click.command</span>()
-<span style="color:#a6e22e">@click.option</span>(<span style="color:#e6db74">&#34;--user&#34;</span>, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;A GitHub username.&#34;</span>)
-<span style="color:#a6e22e">@click.option</span>(<span style="color:#e6db74">&#34;--days&#34;</span>, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;The number of days to look back.&#34;</span>, default<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+<span style="color:#a6e22e">@click</span><span style="color:#f92672">.</span>command()
+<span style="color:#a6e22e">@click</span><span style="color:#f92672">.</span>option(<span style="color:#e6db74">&#34;--user&#34;</span>, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;A GitHub username.&#34;</span>)
+<span style="color:#a6e22e">@click</span><span style="color:#f92672">.</span>option(<span style="color:#e6db74">&#34;--days&#34;</span>, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;The number of days to look back.&#34;</span>, default<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
 <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">grab_stats</span>(user, days):
-    click<span style="color:#f92672">.</span>echo(click<span style="color:#f92672">.</span>style(f<span style="color:#e6db74">&#34;Hello, {user}!&#34;</span>, fg<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;green&#34;</span>))
-    click<span style="color:#f92672">.</span>echo(click<span style="color:#f92672">.</span>style(f<span style="color:#e6db74">&#34;Fetching the PRs/issues created in the past {days} days.&#34;</span>, fg<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;red&#34;</span>))
+    click<span style="color:#f92672">.</span>echo(click<span style="color:#f92672">.</span>style(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Hello, </span><span style="color:#e6db74">{</span>user<span style="color:#e6db74">}</span><span style="color:#e6db74">!&#34;</span>, fg<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;green&#34;</span>))
+    click<span style="color:#f92672">.</span>echo(click<span style="color:#f92672">.</span>style(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Fetching the PRs/issues created in the past </span><span style="color:#e6db74">{</span>days<span style="color:#e6db74">}</span><span style="color:#e6db74"> days.&#34;</span>, fg<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;red&#34;</span>))
 
 <span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
     grab_stats()
 </code></pre></div><p>Check out the output of the script above:</p>
-<figure>
-    <img src="/img/click-output.png" width="800"/> 
+<figure><img src="/img/click-output.png" width="800"/>
 </figure>
 
 <p>Click allowed me to easily format the output using <code>click.style()</code>, which is a great abstraction
@@ -296,7 +295,7 @@ around the terminal&rsquo;s escape sequences.</p>
 <p>Click&rsquo;s <code>echo()</code> function is also quite helpful as it gracefully handles multiple types of
 terminals, so that the script&rsquo;s output looks the same no matter the terminal encoding.</p>
 <p>Click also auto-generates help pages:</p>
-<pre><code>$ python ghstats.py --help
+<pre tabindex="0"><code>$ python ghstats.py --help
 Usage: ghstats.py [OPTIONS]
 
 Options:
@@ -311,14 +310,13 @@ a ton of files, sometimes it&rsquo;s doing a bunch of HTTP requests and sometime
 <p>There&rsquo;s nothing worse than staring at the screen as the cursor blinks without telling us
 anything. Progress bars are excellent at giving the users a sense of (<em>uh &hellip;</em>) progress.
 A simple progress bar like this helps users to estimate how much time they&rsquo;ll have to wait:</p>
-<figure>
-    <img src="/img/progress-bar-tqdm.png" width="800"/> 
+<figure><img src="/img/progress-bar-tqdm.png" width="800"/>
 </figure>
 
 <p>Adding progress bars to Python scripts is super easy with <a href="https://github.com/tqdm/tqdm"><code>tqdm</code></a>.
 Let&rsquo;s say that we have a script that goes through a bunch of URLs making requests to fetch their
 resources. This is all we have to do to show a nice progress bar to follow through the progress:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> tqdm <span style="color:#f92672">import</span> tqdm
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> tqdm <span style="color:#f92672">import</span> tqdm
 
 <span style="color:#f92672">...</span>
 <span style="color:#66d9ef">for</span> url <span style="color:#f92672">in</span> tqdm(urls):
@@ -333,7 +331,7 @@ the <a href="https://github.com/tqdm/tqdm/blob/master/README.rst">tqdm docs</a>.
 <p>Isn&rsquo;t it better when a script outputs a nice little table on the screen instead of a confusing
 JSON object? The <a href="https://github.com/astanin/python-tabulate"><code>tabulate</code></a> library is quite handy
 as it allows us to easily plot nice ASCII tables with the output of our scripts:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> tabulate <span style="color:#f92672">import</span> tabulate
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> tabulate <span style="color:#f92672">import</span> tabulate
 
 repo_pulls <span style="color:#f92672">=</span> [
     (<span style="color:#e6db74">&#34;https://github.com/stummjr/flake8-scrapy/pull/13&#34;</span>, <span style="color:#e6db74">&#34;Drop usage of lambda as callback&#34;</span>, <span style="color:#e6db74">&#34;stummjr&#34;</span>, <span style="color:#e6db74">&#34;2018-10-20&#34;</span>),
@@ -342,9 +340,9 @@ repo_pulls <span style="color:#f92672">=</span> [
 ]
 headers <span style="color:#f92672">=</span> (<span style="color:#e6db74">&#34;URL&#34;</span>, <span style="color:#e6db74">&#34;Title&#34;</span>, <span style="color:#e6db74">&#34;Author&#34;</span>, <span style="color:#e6db74">&#34;When&#34;</span>)
 table <span style="color:#f92672">=</span> tabulate(repo_pulls, headers<span style="color:#f92672">=</span>headers, tablefmt<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;fancy_grid&#34;</span>)
-<span style="color:#66d9ef">print</span>(table)
+print(table)
 </code></pre></div><p>The script above will output a nice little table like this:</p>
-<pre><code>╒══════════════════════════════════════════════════╤══════════════════════════════════╤══════════╤════════════╕
+<pre tabindex="0"><code>╒══════════════════════════════════════════════════╤══════════════════════════════════╤══════════╤════════════╕
 │ URL                                              │ Title                            │ Author   │ When       │
 ╞══════════════════════════════════════════════════╪══════════════════════════════════╪══════════╪════════════╡
 │ https://github.com/stummjr/flake8-scrapy/pull/13 │ Drop usage of lambda as callback │ stummjr  │ 2018-10-20 │

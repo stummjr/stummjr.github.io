@@ -37,7 +37,7 @@ It&amp;rsquo;s been one and a half year since I used it for the last time, but l
 
 
 
-<meta name="generator" content="Hugo 0.69.2" />
+<meta name="generator" content="Hugo 0.88.1" />
 
 
 <link rel="canonical" href="http://stummjr.github.io/post/scrapy-in-2020/">
@@ -244,32 +244,32 @@ main changes since version 1.5.2 (the last one I  had used) and 2.1.0 (the curre
 <h1 id="following-links-in-2020">Following links in 2020</h1>
 <p>Back when I used Scrapy in a daily basis, this is how I&rsquo;d make my spider follow through
 links found on the page:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">links <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;a.entry-link::attr(href)&#34;</span>)<span style="color:#f92672">.</span>extract()
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">links <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;a.entry-link::attr(href)&#34;</span>)<span style="color:#f92672">.</span>extract()
 <span style="color:#66d9ef">for</span> link <span style="color:#f92672">in</span> links:
     <span style="color:#66d9ef">yield</span> scrapy<span style="color:#f92672">.</span>Request(url<span style="color:#f92672">=</span>response<span style="color:#f92672">.</span>urljoin(link), callback<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>parse_blog_post)
 </code></pre></div><p>In 2020, I can rewrite this snippet using <a href="https://docs.scrapy.org/en/latest/topics/request-response.html#scrapy.http.Response.follow"><code>Response.follow</code></a>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">links <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;a.entry-link&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">links <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;a.entry-link&#34;</span>)
 <span style="color:#66d9ef">for</span> link <span style="color:#f92672">in</span> links:
     <span style="color:#66d9ef">yield</span> response<span style="color:#f92672">.</span>follow(link, callback<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>parse_blog_post)
 </code></pre></div><p>Notice how I didn&rsquo;t even have to extract the link as a string. That is pretty cool.</p>
 <p>But now that we&rsquo;re all using Python 3 (<em>wait, aren&rsquo;t you yet?</em>), we can just do it like
 this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">links <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;a.entry-link&#34;</span>)
-<span style="color:#66d9ef">yield</span> <span style="color:#f92672">from</span> response.follow_all(links, callback<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>parse_blog_post)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">links <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;a.entry-link&#34;</span>)
+<span style="color:#66d9ef">yield from</span> response<span style="color:#f92672">.</span>follow_all(links, callback<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>parse_blog_post)
 </code></pre></div><p><em>Neat, huh?</em></p>
 <h1 id="extracting-data-in-2020">Extracting data in 2020</h1>
 <h2 id="get-and-getall">get() and getall()</h2>
 <p>There are tons of docs on Scrapy around the web showing you how to scrape data
 using the <code>extract</code> and <code>extract_first</code> selector methods. This is how I used to write the
 data extraction side of a spider using them:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">parse_blog_post</span>(self, response):
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">parse_blog_post</span>(self, response):
     <span style="color:#66d9ef">yield</span> {
         <span style="color:#e6db74">&#34;title&#34;</span>: response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;.post-title::text&#34;</span>)<span style="color:#f92672">.</span>extract_first(),
         <span style="color:#e6db74">&#34;author&#34;</span>: response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;.entry-author::text&#34;</span>)<span style="color:#f92672">.</span>extract_first(),
         <span style="color:#e6db74">&#34;tags&#34;</span>: response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;.tag::text&#34;</span>)<span style="color:#f92672">.</span>extract(),
     }
 </code></pre></div><p>This isn&rsquo;t a big change, but now we can use <code>getall</code> and <code>get</code> instead of <code>extract</code> and <code>extract_first</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">parse_blog_post</span>(self, response):
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">parse_blog_post</span>(self, response):
     <span style="color:#66d9ef">yield</span> {
         <span style="color:#e6db74">&#34;title&#34;</span>: response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;.post-title::text&#34;</span>)<span style="color:#f92672">.</span>get(),
         <span style="color:#e6db74">&#34;author&#34;</span>: response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;.entry-author::text&#34;</span>)<span style="color:#f92672">.</span>get(),
@@ -280,9 +280,9 @@ data extraction side of a spider using them:</p>
 <p>A quite common case that I had back in the days was to have to extract multiple attributes
 from a single node. For example, let&rsquo;s say I want to extract both the <code>alt</code> and the <code>src</code>
 attributes from this <code>img</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">img</span> <span style="color:#a6e22e">alt</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Super cool&#34;</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/img/supercool.jpg&#34;</span> /&gt;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">img</span> <span style="color:#a6e22e">alt</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Super cool&#34;</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/img/supercool.jpg&#34;</span> /&gt;
 </code></pre></div><p>Back in the days, I&rsquo;d do something like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">yield</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">yield</span> {
     <span style="color:#e6db74">&#34;url&#34;</span>: response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;.header img::attr(src)&#34;</span>)<span style="color:#f92672">.</span>extract_first(),
     <span style="color:#e6db74">&#34;description&#34;</span>: response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;.header img::attr(alt)&#34;</span>)<span style="color:#f92672">.</span>extract_first(),
     <span style="color:#e6db74">&#34;size&#34;</span>: response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;.header img::attr(sizes)&#34;</span>)<span style="color:#f92672">.</span>extract_first(),
@@ -291,7 +291,7 @@ attributes from this <code>img</code>:</p>
 <p>In 2020, I can avoid such repetition by using the
 <a href="https://docs.scrapy.org/en/latest/topics/selectors.html#selecting-element-attributes"><code>attrib</code></a>
 dict available in <code>Selector</code> and <code>SelectorList</code> objects:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">img_sel <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;.header img&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">img_sel <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>css(<span style="color:#e6db74">&#34;.header img&#34;</span>)
 <span style="color:#66d9ef">yield</span> {
     <span style="color:#e6db74">&#34;url&#34;</span>: img_sel<span style="color:#f92672">.</span>attrib[<span style="color:#e6db74">&#34;src&#34;</span>],
     <span style="color:#e6db74">&#34;description&#34;</span>: img_sel<span style="color:#f92672">.</span>attrib[<span style="color:#e6db74">&#34;alt&#34;</span>],
@@ -306,7 +306,7 @@ could share some state. Back then, I&rsquo;d pass it via the <code>meta</code> p
 objects.</p>
 <p>While that worked pretty well, it wasn&rsquo;t that great for the spider readability, as you
 couldn&rsquo;t tell a callback&rsquo;s interface just by looking at its signature. Check it out:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">parse_blog_post</span>(self, response):
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">parse_blog_post</span>(self, response):
     <span style="color:#f92672">...</span>
     <span style="color:#66d9ef">for</span> link <span style="color:#f92672">in</span> links:
         <span style="color:#66d9ef">yield</span> scrapy<span style="color:#f92672">.</span>Request(
@@ -321,9 +321,9 @@ couldn&rsquo;t tell a callback&rsquo;s interface just by looking at its signatur
     <span style="color:#f92672">...</span>
 </code></pre></div><p><em>Cool, but not so cool.</em> Now we can use <code>cb_kwargs</code> and declare the parameters in the
 callback&rsquo;s signature instead:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">parse_blog_post</span>(self, response):
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">parse_blog_post</span>(self, response):
     <span style="color:#f92672">...</span>
-    <span style="color:#66d9ef">yield</span> <span style="color:#f92672">from</span> response.follow_all(
+    <span style="color:#66d9ef">yield from</span> response<span style="color:#f92672">.</span>follow_all(
         links,
         cb_kwargs<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;author&#34;</span>: author, <span style="color:#e6db74">&#34;post_date&#34;</span>: post_date},
         callback<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>parse_full_blog_post,

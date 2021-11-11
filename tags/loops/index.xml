@@ -19,12 +19,12 @@
       <guid>http://stummjr.github.io/post/else-in-python-loops/</guid>
       <description>&lt;p&gt;One of the first things to stand out when I was starting with Python was the &lt;code&gt;else&lt;/code&gt; clause. I guess everyone knows the normal usage of such clauses in any programming language, which is to define an alternate path for the &lt;code&gt;if&lt;/code&gt; condition. Oddly enough, in Python we can add &lt;code&gt;else&lt;/code&gt; clauses in loop constructions, such as &lt;code&gt;for&lt;/code&gt; and &lt;code&gt;while&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;For example, this is valid Python:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; number &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; some_sequence:
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt; number &lt;span style=&#34;color:#f92672&#34;&gt;in&lt;/span&gt; some_sequence:
     &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; is_the_magic_number(number):
-        &lt;span style=&#34;color:#66d9ef&#34;&gt;print&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;found the magic number&amp;#39;&lt;/span&gt;)
+        print(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;found the magic number&amp;#39;&lt;/span&gt;)
         &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;
 &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt;:
-    &lt;span style=&#34;color:#66d9ef&#34;&gt;print&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;magic number not found&amp;#39;&lt;/span&gt;)
+    print(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;magic number not found&amp;#39;&lt;/span&gt;)
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Notice how the &lt;code&gt;else&lt;/code&gt; is aligned with the &lt;code&gt;for&lt;/code&gt; and not with the &lt;code&gt;if&lt;/code&gt;. What this means is that commands inside the &lt;code&gt;else&lt;/code&gt; block will be executed if, and only if, the loop was not finished by a &lt;code&gt;break&lt;/code&gt;. The same is true for &lt;code&gt;while&lt;/code&gt; loops.&lt;/p&gt;
 &lt;p&gt;I must admit that I’ve always had some trouble to remember the meaning of an &lt;code&gt;else&lt;/code&gt; in loops, specially because I don’t see them very often (and I’m grateful for that). But, at some day I was watching &lt;a href=&#34;https://youtu.be/OSGv2VnC0go&#34;&gt;Raymond Hettinger’s Transforming Code into Beautiful, Idiomatic Python&lt;/a&gt; talk where he brilliantly says something like this at some point:&lt;/p&gt;
 &lt;blockquote&gt;

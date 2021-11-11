@@ -37,7 +37,7 @@ The reason I like it so much is that IPython makes it very easy for me to increm
 
 
 
-<meta name="generator" content="Hugo 0.69.2" />
+<meta name="generator" content="Hugo 0.88.1" />
 
 
 <link rel="canonical" href="http://stummjr.github.io/post/ipython-tricks/">
@@ -241,29 +241,29 @@ The reason I like it so much is that IPython makes it very easy for me to increm
 <h2 id="docstrings-and-source-code-at-your-fingertips">Docstrings and source code at your fingertips</h2>
 <p>REPLs like IPython are the perfect environment for experimentation. One of the things that I need the most when trying stuff in IPython is to understand the functions/modules that I am willing to employ, and there&rsquo;s nothing better than docstrings to help me with that.</p>
 <p>IPython brings a handy shortcut to view the docstrings from any object. All I have to do is to append <code>?</code> to the object&rsquo;s name and hit enter. Check this out:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> os<span style="color:#f92672">.</span>getenv<span style="color:#960050;background-color:#1e0010">?</span>
-Signature: os<span style="color:#f92672">.</span>getenv(key, default<span style="color:#f92672">=</span>None)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> os<span style="color:#f92672">.</span>getenv<span style="color:#960050;background-color:#1e0010">?</span>
+Signature: os<span style="color:#f92672">.</span>getenv(key, default<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>)
 Docstring:
-Get an environment variable, <span style="color:#66d9ef">return</span> None <span style="color:#66d9ef">if</span> it doesn<span style="color:#e6db74">&#39;t exist.</span>
+Get an environment variable, <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">None</span> <span style="color:#66d9ef">if</span> it doesn<span style="color:#e6db74">&#39;t exist.</span>
 The optional second argument can specify an alternate default<span style="color:#f92672">.</span>
 key, default <span style="color:#f92672">and</span> the result are str<span style="color:#f92672">.</span>
-File:      <span style="color:#f92672">~/.</span>virtualenvs<span style="color:#f92672">/</span>python3<span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>python3<span style="color:#f92672">.</span><span style="color:#ae81ff">7</span><span style="color:#f92672">/</span>os<span style="color:#f92672">.</span>py
+File:      <span style="color:#f92672">~/.</span>virtualenvs<span style="color:#f92672">/</span>python3<span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>python3<span style="color:#ae81ff">.7</span><span style="color:#f92672">/</span>os<span style="color:#f92672">.</span>py
 Type:      function
 </code></pre></div><p>However, sometimes I need to dig a bit further because the doctstrings are not clear enough or because I want to make sure that a corner-case is covered. Reading the source code is usually the best approach for that and IPython makes it pretty easy for pure-Python functions/classes/modules. It’s just a matter of appending <code>??</code> and hitting enter:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> os<span style="color:#f92672">.</span>getenv<span style="color:#960050;background-color:#1e0010">??</span>
-Signature: os<span style="color:#f92672">.</span>getenv(key, default<span style="color:#f92672">=</span>None)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> os<span style="color:#f92672">.</span>getenv<span style="color:#960050;background-color:#1e0010">??</span>
+Signature: os<span style="color:#f92672">.</span>getenv(key, default<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>)
 Source:
-<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">getenv</span>(key, default<span style="color:#f92672">=</span>None):
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">getenv</span>(key, default<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>):
     <span style="color:#e6db74">&#34;&#34;&#34;Get an environment variable, return None if it doesn&#39;t exist.
 </span><span style="color:#e6db74">    The optional second argument can specify an alternate default.
 </span><span style="color:#e6db74">    key, default and the result are str.&#34;&#34;&#34;</span>
     <span style="color:#66d9ef">return</span> environ<span style="color:#f92672">.</span>get(key, default)
-File:      <span style="color:#f92672">~/.</span>virtualenvs<span style="color:#f92672">/</span>python3<span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>python3<span style="color:#f92672">.</span><span style="color:#ae81ff">7</span><span style="color:#f92672">/</span>os<span style="color:#f92672">.</span>py
+File:      <span style="color:#f92672">~/.</span>virtualenvs<span style="color:#f92672">/</span>python3<span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>python3<span style="color:#ae81ff">.7</span><span style="color:#f92672">/</span>os<span style="color:#f92672">.</span>py
 Type:      function
 </code></pre></div><h2 id="saved-results-for-faster-experiments">Saved results for faster experiments</h2>
 <p>I find myself very often in a situation like this: I just executed a statement, saw the result and then I want to reuse that value in a follow-up statement. You&rsquo;ve probably been there already too. The first instinct is to just re-execute that expression, now assigning a name to it so that you can reuse it in the next statement.</p>
 <p>The good news is that we don&rsquo;t need to do that. IPython saves the results of the 3 latest statements in these 3 names: <code>_</code>, <code>__</code> and <code>___</code> (most to least recent).</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#ae81ff">1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#ae81ff">1</span>
 <span style="color:#ae81ff">1</span>
 <span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#ae81ff">2</span>
 <span style="color:#ae81ff">2</span>
@@ -274,7 +274,7 @@ Type:      function
 <span style="color:#f92672">&gt;&gt;&gt;</span> _ <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>
 <span style="color:#ae81ff">12</span>
 </code></pre></div><p>IPython also allows you to refer to the result of any statement previously executed in the current session via their numbers using the <code>_n</code> syntax. Check this out:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">In [<span style="color:#ae81ff">18</span>]: <span style="color:#ae81ff">5</span> <span style="color:#f92672">**</span> <span style="color:#ae81ff">2</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">In [<span style="color:#ae81ff">18</span>]: <span style="color:#ae81ff">5</span> <span style="color:#f92672">**</span> <span style="color:#ae81ff">2</span>
 Out[<span style="color:#ae81ff">18</span>]: <span style="color:#ae81ff">25</span>
 
 In [<span style="color:#ae81ff">19</span>]: _ <span style="color:#f92672">*</span> <span style="color:#ae81ff">4</span>
@@ -283,24 +283,24 @@ Out[<span style="color:#ae81ff">19</span>]: <span style="color:#ae81ff">100</spa
 In [<span style="color:#ae81ff">20</span>]: _19 <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>
 Out[<span style="color:#ae81ff">20</span>]: <span style="color:#ae81ff">102</span>
 </code></pre></div><p>I actually customized my prompt to not show these numbers, so this is not useful for me. Also, a long session with large output objects may bloat your computer&rsquo;s RAM. To avoid that, you can always disable caching by addding this to your IPython configuration:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">c<span style="color:#f92672">.</span>TerminalInteractiveShell<span style="color:#f92672">.</span>cache_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">c<span style="color:#f92672">.</span>TerminalInteractiveShell<span style="color:#f92672">.</span>cache_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
 </code></pre></div><p>This won&rsquo;t disable the handy <code>_</code>, <code>__</code> and <code>___</code> shortcuts, though.</p>
 <h2 id="magic-commands">Magic commands</h2>
 <p>IPython supports a variety of builtin commands that are so handy that they’re called <strong>magic commands</strong>. They all start with the <code>%</code> prefix and serve the most varied purposes. I am not a magic commands power user, but there are a few that I see myself using every now and then.</p>
 <h3 id="timeit-timing-your-python-code">%timeit: timing your python code</h3>
 <p>One of the goals of experimentation is figuring out what’d be the best solution to a particular problem, and often deciding what’s best involves performance evaluation. The <a href="https://docs.python.org/3.8/library/timeit.html"><code>timeit</code></a> standard library module is great for that as it allows for measuring the time taken by a statement.</p>
 <p>With IPython it&rsquo;s even easier, as you can use the <code>%timeit</code> magic function:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">%</span>timeit [x <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1000</span>)]
-<span style="color:#ae81ff">33.4</span> <span style="color:#960050;background-color:#1e0010">µ</span>s <span style="color:#960050;background-color:#1e0010">±</span> <span style="color:#ae81ff">238</span> ns per loop (mean <span style="color:#960050;background-color:#1e0010">±</span> std<span style="color:#f92672">.</span> dev<span style="color:#f92672">.</span> of <span style="color:#ae81ff">7</span> runs, <span style="color:#ae81ff">10000</span> loops each)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">%</span>timeit [x <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1000</span>)]
+<span style="color:#ae81ff">33.4</span> µs <span style="color:#960050;background-color:#1e0010">±</span> <span style="color:#ae81ff">238</span> ns per loop (mean <span style="color:#960050;background-color:#1e0010">±</span> std<span style="color:#f92672">.</span> dev<span style="color:#f92672">.</span> of <span style="color:#ae81ff">7</span> runs, <span style="color:#ae81ff">10000</span> loops each)
 </code></pre></div><h3 id="prun-profiling-your-python-code">%prun: profiling your python code</h3>
 <p>When timing the execution of a given statement is not enough for the experiments, profiling it is the next step. IPython provides the <code>%prun</code> magic command to allow for that. Check it out:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">%</span>prun get_players_with_most_championships(players)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">%</span>prun get_players_with_most_championships(players)
          <span style="color:#ae81ff">11</span> function calls <span style="color:#f92672">in</span> <span style="color:#ae81ff">0.000</span> seconds
 
    Ordered by: internal time
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        <span style="color:#ae81ff">1</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span> {built<span style="color:#f92672">-</span><span style="color:#f92672">in</span> method builtins<span style="color:#f92672">.</span><span style="color:#66d9ef">exec</span>}
+        <span style="color:#ae81ff">1</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span> {built<span style="color:#f92672">-</span><span style="color:#f92672">in</span> method builtins<span style="color:#f92672">.</span>exec}
         <span style="color:#ae81ff">1</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span> ipython_edit_s94fadw6<span style="color:#f92672">.</span>py:<span style="color:#ae81ff">1</span>(players_with_most_rings)
         <span style="color:#ae81ff">1</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span> {built<span style="color:#f92672">-</span><span style="color:#f92672">in</span> method builtins<span style="color:#f92672">.</span>max}
         <span style="color:#ae81ff">1</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span>    <span style="color:#ae81ff">0.000</span> <span style="color:#f92672">&lt;</span>string<span style="color:#f92672">&gt;</span>:<span style="color:#ae81ff">1</span>(<span style="color:#f92672">&lt;</span>module<span style="color:#f92672">&gt;</span>)
@@ -312,8 +312,7 @@ Out[<span style="color:#ae81ff">20</span>]: <span style="color:#ae81ff">102</spa
 <h3 id="edit-editing-snippets-in-my-editor">%edit: editing snippets in my editor</h3>
 <p>It’s a pain to write an entire function directly in the shell input. Fortunately, the <code>%edit</code> magic function allows me to do that in my favorite editor. Once I close the editor, IPython will execute whatever I have typed in there.</p>
 <p>Check this out:</p>
-<figure>
-    <img src="/img/edit-ipython.gif" width="650"/> 
+<figure><img src="/img/edit-ipython.gif" width="650"/>
 </figure>
 
 <p>And if I want to reopen the same snippet for editing, I can just execute <code>%edit -p</code> and that very same code snippet will be back in my editor.</p>
@@ -321,13 +320,12 @@ Out[<span style="color:#ae81ff">20</span>]: <span style="color:#ae81ff">102</spa
 <h3 id="hist-listing-the-commands-history">%hist: listing the commands history</h3>
 <p>When I am writing a function for an app and I am not really sure which operations are needed to transform the input from one format into another, I just open IPython and start experimenting. After a few experiments, I usually figure out what the function must implement. The next step is to copy the relevant lines to my editor and build the function from there.</p>
 <p>Copying them one by one is cumbersome and copying them all at once will include the shell preffix and the outputs, so I&rsquo;d need to clean that up after pasting into my editor. In cases like this, I use the magic <code>%hist</code> command:</p>
-<figure>
-    <img src="/img/hist-ipython.png"/> 
+<figure><img src="/img/hist-ipython.png"/>
 </figure>
 
 <p>It ouputs only the expressions I typed in (no prefix and no outputs), so now I can just copy those into my editor, cut out the irrelevant parts of the experiments and finally polish the implementation.</p>
 <p>This commmand also allows to save the history directly into a file by running:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">%</span>hist <span style="color:#f92672">-</span>f myscript<span style="color:#f92672">.</span>py <span style="color:#ae81ff">5</span><span style="color:#f92672">-</span><span style="color:#ae81ff">25</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">%</span>hist <span style="color:#f92672">-</span>f myscript<span style="color:#f92672">.</span>py <span style="color:#ae81ff">5</span><span style="color:#f92672">-</span><span style="color:#ae81ff">25</span>
 </code></pre></div><p>The command above will save all the statements from the input lines 5 to 25 into the <code>myscript.py</code> file.</p>
 <p>Some people refer to this process as <em>REPL driven development</em>. I find it particularly useful when I am writing a function to transform data from a known format to another.</p>
 <h3 id="what-else">What else?</h3>
@@ -339,10 +337,10 @@ Out[<span style="color:#ae81ff">20</span>]: <span style="color:#ae81ff">102</spa
 </ul>
 <h2 id="running-system-commands-from-inside-the-shell">Running system commands from inside the shell</h2>
 <p>It’s quite common to need to run an external command when you’re into an IPython session. Let’s say you want to quickly list the files from the current directory and you don’t want to leave your IPython session for that. All you have to do is this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#960050;background-color:#1e0010">!</span>ls
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#960050;background-color:#1e0010">!</span>ls
 main<span style="color:#f92672">.</span>py main<span style="color:#f92672">.</span>pyc output<span style="color:#f92672">.</span>txt
 </code></pre></div><p>What’s even cooler is that you can assign a name to the output of the system command:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> files <span style="color:#f92672">=</span> <span style="color:#960050;background-color:#1e0010">!</span>ls
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> files <span style="color:#f92672">=</span> <span style="color:#960050;background-color:#1e0010">!</span>ls
 <span style="color:#f92672">&gt;&gt;&gt;</span> files
 [<span style="color:#e6db74">&#39;main.py&#39;</span>, <span style="color:#e6db74">&#39;main.pyc&#39;</span>, <span style="color:#e6db74">&#39;output.txt&#39;</span>]
 <span style="color:#f92672">&gt;&gt;&gt;</span> files<span style="color:#f92672">.</span>s
@@ -354,7 +352,7 @@ main<span style="color:#f92672">.</span>py main<span style="color:#f92672">.</sp
 </code></pre></div><p>Of course this is not valid Python code, so you can&rsquo;t just use <code>!ls</code> in your regular python scripts, but it can be pretty helpful during experiments.</p>
 <h2 id="inspecting-code-with-ipython">Inspecting code with IPython</h2>
 <p>Sometimes I need to stop the execution of my app at a certain point to inspect what’s going on. Even though debuggers serve this exact purpose very well, IPython also allows to drop the line below into any Python script and it will stop its execution for you to inspect the context and run experiments:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> IPython <span style="color:#f92672">import</span> embed; embed()
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> IPython <span style="color:#f92672">import</span> embed; embed()
 </code></pre></div><p>Does this replace a full-fledged debugger? Not at all, but it can be pretty handy. If you want a debugger, check out <a href="/post/debugging-python-with-pudb/">this blog post that I wrote on pudb</a>.</p>
 <h2 id="wrapping-up">Wrapping up</h2>
 <p>IPython is super powerful and I am sure that there are tons of goodies that I am not even aware of, specially when it comes to notebooks and scientific computing.</p>
