@@ -6,10 +6,144 @@
     <description>Recent content on Dunder Doc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 04 Oct 2021 20:21:10 -0300</lastBuildDate>
+    <lastBuildDate>Wed, 16 Mar 2022 15:55:13 -0300</lastBuildDate>
     
       <atom:link href="http://stummjr.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Translation Tables In Python</title>
+      <link>http://stummjr.github.io/post/translation-tables-in-python/</link>
+      <pubDate>Wed, 16 Mar 2022 15:55:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/translation-tables-in-python/</guid>
+      <description>&lt;p&gt;Back when I was a teacher, I used to ask my students to implement a
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Caesar_cipher&#34;&gt;Caeser Cipher&lt;/a&gt; encoder/decoder.
+If you&amp;rsquo;re not familiar with it, it is a simple substitution cipher that replaces
+characters on a string by the corresponding characters from a shifted alphabet.&lt;/p&gt;
+&lt;p&gt;The algorithm takes a numerical cipher &lt;code&gt;n&lt;/code&gt; as its input (the key) and then rotates the letters
+in the alphabet by &lt;code&gt;n&lt;/code&gt; characters. Then, a translation table is created by lining up the original
+and the rotated alphabets. For example, if we use &lt;code&gt;2&lt;/code&gt; as the key, we get this translation table:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;a b c d e f g h i j k l m n o p q r s t u v w x y z
+c d e f g h i j k l m n o p q r s t u v w x y z a b
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;So, if we were to encode the message &lt;code&gt;hello&lt;/code&gt; using the key &lt;code&gt;2&lt;/code&gt;, we&amp;rsquo;d get &lt;code&gt;jgnnq&lt;/code&gt; as a result.
+To decode &lt;code&gt;jgnnq&lt;/code&gt; back, we&amp;rsquo;ll use a reverse table:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;c d e f g h i j k l m n o p q r s t u v w x y z a b
+a b c d e f g h i j k l m n o p q r s t u v w x y z
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The algorithm is simple and there are many possible ways to implement it. But as a Pythonista,
+my gut tells me that there must be something in the standard library to help me here.&lt;/p&gt;
+&lt;h2 id=&#34;maketrans-to-the-rescue&#34;&gt;&lt;code&gt;maketrans&lt;/code&gt; to the rescue&lt;/h2&gt;
+&lt;p&gt;The Python standard library allows to create a &lt;strong&gt;translation table&lt;/strong&gt; that we can later use when
+translating strings. That&amp;rsquo;s what the &lt;a href=&#34;https://docs.python.org/3/library/stdtypes.html#str.maketrans&#34;&gt;&lt;code&gt;str.maketrans&lt;/code&gt;&lt;/a&gt;
+is for.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s say we want to quickly create a translation table to encode strings using the Caesar Cipher,
+having &lt;code&gt;2&lt;/code&gt; as the key.&lt;/p&gt;
+&lt;p&gt;First of all, we&amp;rsquo;ll create a translation table using &lt;code&gt;str.maketrans&lt;/code&gt;,
+passing in the original alphabet and the rotated one:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; encoding_table &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; str&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;maketrans(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;abcdefghijklmnopqrstuvwxyz&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;cdefghijklmnopqrstuvwxyzab&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; encoding_table
+{&lt;span style=&#34;color:#ae81ff&#34;&gt;97&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;99&lt;/span&gt;,
+ &lt;span style=&#34;color:#ae81ff&#34;&gt;98&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;,
+ &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;
+ &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;
+ &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;
+ &lt;span style=&#34;color:#ae81ff&#34;&gt;120&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;122&lt;/span&gt;,
+ &lt;span style=&#34;color:#ae81ff&#34;&gt;121&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;97&lt;/span&gt;,
+ &lt;span style=&#34;color:#ae81ff&#34;&gt;122&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;98&lt;/span&gt;}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;As you can see above, all it does is to create a mapping between the ASCII value of each character
+from the source to the target alphabet (remember that &lt;code&gt;ord(&amp;quot;a&amp;quot;) == 97&lt;/code&gt;, and so on).&lt;/p&gt;
+&lt;p&gt;Once we have the translation table in hand, we can encode our text via the
+&lt;a href=&#34;https://docs.python.org/3/library/stdtypes.html#str.translate&#34;&gt;&lt;code&gt;translate&lt;/code&gt;&lt;/a&gt; method of
+Python string objects:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;translate(encoding_table)
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;jgnnq&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;And if we want to decode the text back to its original value, we can use a reverse table:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; decoding_table &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; str&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;maketrans(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;cdefghijklmnopqrstuvwxyzab&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;abcdefghijklmnopqrstuvwxyz&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;jgnnq&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;translate(decoding_table)
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hello&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;generalizing-it&#34;&gt;Generalizing it&lt;/h2&gt;
+&lt;p&gt;We can dynamically create these tables using another great Python builtin feature: &lt;strong&gt;slicing&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s say that we want to rotate the alphabet &lt;code&gt;2&lt;/code&gt; letters to the right. All we need is to break
+the alphabet in two parts and join them. For example, &lt;code&gt;abcdefghijklmnopqrstuvwxyz&lt;/code&gt; becomes
+&lt;code&gt;cdefghijklmnopqrstuvwxyz + ab&lt;/code&gt;. In Python, we can do this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; string &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; ascii_lowercase &lt;span style=&#34;color:#66d9ef&#34;&gt;as&lt;/span&gt; alphabet
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; alphabet
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;abcdefghijklmnopqrstuvwxyz&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; alphabet[&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;:]
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;cdefghijklmnopqrstuvwxyz&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; alphabet[:&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;]
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;ab&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; alphabet[&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;:] &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; alphabet[:&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;]
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;cdefghijklmnopqrstuvwxyzab&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;As you can see above, we are taking two slices of the alphabet:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;one starting from the third letter of the alphabet: &lt;code&gt;alphabet[2:]&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;the other with just the first two letters: &lt;code&gt;alphabet[:2]&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Now we can write utilities to build the encoding/decoding tables for us, given a key:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; string &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; ascii_lowercase &lt;span style=&#34;color:#66d9ef&#34;&gt;as&lt;/span&gt; alphabet
+
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;build_encoding_table&lt;/span&gt;(key):
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; str&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;maketrans(alphabet, alphabet[key:] &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; alphabet[:key])
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;build_decoding_table&lt;/span&gt;(key):
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; str&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;maketrans(alphabet[key:] &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; alphabet[:key], alphabet)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;And then we can encode/decode strings using the &lt;code&gt;.translate&lt;/code&gt; method and the proper
+translation tables.&lt;/p&gt;
+&lt;h2 id=&#34;building-an-abstraction&#34;&gt;Building an abstraction&lt;/h2&gt;
+&lt;p&gt;Given what we&amp;rsquo;ve seen above, we can now create a class to encode/decode strings using
+Caesar Cipher. Something like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; string &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; ascii_lowercase &lt;span style=&#34;color:#66d9ef&#34;&gt;as&lt;/span&gt; alphabet
+
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;CaesarCipher&lt;/span&gt;:
+
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; __init__(self, key):
+        key &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; key &lt;span style=&#34;color:#f92672&#34;&gt;%&lt;/span&gt; len(alphabet)
+        rotated_alphabet &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; alphabet[key:] &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; alphabet[:key]
+        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;encoding_table &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; str&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;maketrans(alphabet, rotated_alphabet)
+        self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;decoding_table &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; str&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;maketrans(rotated_alphabet, alphabet)
+
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;encode&lt;/span&gt;(self, text):
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; text&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;translate(self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;encoding_table)
+
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;decode&lt;/span&gt;(self, text):
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; text&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;translate(self&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;decoding_table)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The code above is just a simplification to show how we can take advantage of the standard library to simplify
+solutions. It does not handle uppercase/numbers/special characters and possibly other scenarios.&lt;/p&gt;
+&lt;h2 id=&#34;testing-it-all&#34;&gt;Testing it all&lt;/h2&gt;
+&lt;p&gt;We want to make sure it all works as expected and for that we can add some unit tests:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; pytest
+&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; caesar &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; CaesarCipher
+
+
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@pytest&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;mark&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;parametrize(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;key, input_text, output_text&amp;#34;&lt;/span&gt;, [
+    (&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;),
+    (&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;khoor&amp;#34;&lt;/span&gt;),
+    (&lt;span style=&#34;color:#ae81ff&#34;&gt;29&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;khoor&amp;#34;&lt;/span&gt;),
+    (&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ebiil&amp;#34;&lt;/span&gt;),
+    (&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;29&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ebiil&amp;#34;&lt;/span&gt;),
+])
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;test_encode&lt;/span&gt;(key, input_text, output_text):
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;assert&lt;/span&gt; CaesarCipher(key&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;key)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;encode(input_text) &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; output_text
+
+
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@pytest&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;mark&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;parametrize(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;key, input_text, output_text&amp;#34;&lt;/span&gt;, [
+    (&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;),
+    (&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;khoor&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;),
+    (&lt;span style=&#34;color:#ae81ff&#34;&gt;29&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;khoor&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;),
+    (&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ebiil&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;),
+    (&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;29&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ebiil&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello&amp;#34;&lt;/span&gt;),
+])
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;test_decode&lt;/span&gt;(key, input_text, output_text):
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;assert&lt;/span&gt; CaesarCipher(key&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;key)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;decode(input_text) &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; output_text
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;If you&amp;rsquo;re not familiar with Pytest parametrization, check this out: &lt;a href=&#34;https://docs.pytest.org/en/latest/parametrize.html&#34;&gt;https://docs.pytest.org/en/latest/parametrize.html&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;thats-all-for-today&#34;&gt;That&amp;rsquo;s all for today&lt;/h2&gt;
+&lt;p&gt;I am pretty sure that there are a lot of corners in the standard library that are not used very often,
+but that can be very helpful. What&amp;rsquo;s your favorite?&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>How Does CPython Multiply Big Numbers?</title>

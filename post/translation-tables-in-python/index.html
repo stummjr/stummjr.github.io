@@ -11,28 +11,28 @@
     
 
     
-    <title>
-  Tag → ipython
+    <title>Translation Tables In Python</title>
+
+    
+    
+
+
+
   
-   | Dunder Doc
-</title>
-
-    
-    
-
-
-
-
   
   <meta name="author" content="Valdir Stumm Jr" />
-  <meta name="description" content="Random thoughts and tips on programming." />
+  <meta name="description" content="Back when I was a teacher, I used to ask my students to implement a Caeser Cipher encoder/decoder. If you&amp;rsquo;re not familiar with it, it is a simple substitution cipher that replaces characters on a string by the corresponding characters from a shifted alphabet.
+The algorithm takes a numerical cipher n as its input (the key) and then rotates the letters in the alphabet by n characters. Then, a translation table is created by lining up the original and the rotated alphabets.">
 
   
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="@stummjr" />
-  <meta name="twitter:title" content="Dunder Doc" />
-  <meta name="twitter:description" content="Random thoughts and tips on programming." />
-  <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
+  
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@stummjr" />
+    <meta name="twitter:title" content="Translation Tables In Python" />
+    <meta name="twitter:description" content="Back when I was a teacher, I used to ask my students to implement a Caeser Cipher encoder/decoder. If you&amp;rsquo;re not familiar with it, it is a simple substitution cipher that replaces characters on a string by the corresponding characters from a shifted alphabet.
+The algorithm takes a numerical cipher n as its input (the key) and then rotates the letters in the alphabet by n characters. Then, a translation table is created by lining up the original and the rotated alphabets." />
+    <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
+  
 
 
 
@@ -40,7 +40,7 @@
 <meta name="generator" content="Hugo 0.92.1" />
 
 
-<link rel="canonical" href="http://stummjr.github.io/tags/ipython/">
+<link rel="canonical" href="http://stummjr.github.io/post/translation-tables-in-python/">
 <link rel="alternative" href="/index.xml" title="Dunder Doc" type="application/atom+xml">
 
 
@@ -223,65 +223,177 @@
 </amp-sidebar>
 
     
-  <section class="main entry-list">
-    <header class="list-header">
-      
-      
-        
-      
-        
-      
+  <section class="main post-detail">
+    <header class="post-header">
+      <h1 class="post-title">Translation Tables In Python</h1>
+      <p class="entry-meta">
+        <span class="entry-time">Mar 16, 2022</span>
+        <span class="entry-author">Valdir Stumm Jr</span>
+        4 min read
+      </p>
     </header>
     
-    
-      
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/ipython-tricks/" title="My Favorite IPython Tricks" class="entry-link">My Favorite IPython Tricks</a></h3>
-  </header>
 
-  <p class="entry-summary">It’s no secret that IPython is my favorite Python shell. I am the guy who is always asking everyone “did you try IPython already?” as soon as I see they opening the regular Python shell. Yes, I know, you’d probably hate me.
-The reason I like it so much is that IPython makes it very easy for me to incrementally experiment when coding. I consider experimentation to be a crucial step when writing software, as it helps to reduce the unkowns in a problem or technology.</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Jun 6, 2020</span> 8 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=My%20Favorite%20IPython%20Tricks&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fipython-tricks%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fipython-tricks%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
+    <article class="post-content"><p>Back when I was a teacher, I used to ask my students to implement a
+<a href="https://en.wikipedia.org/wiki/Caesar_cipher">Caeser Cipher</a> encoder/decoder.
+If you&rsquo;re not familiar with it, it is a simple substitution cipher that replaces
+characters on a string by the corresponding characters from a shifted alphabet.</p>
+<p>The algorithm takes a numerical cipher <code>n</code> as its input (the key) and then rotates the letters
+in the alphabet by <code>n</code> characters. Then, a translation table is created by lining up the original
+and the rotated alphabets. For example, if we use <code>2</code> as the key, we get this translation table:</p>
+<pre tabindex="0"><code>a b c d e f g h i j k l m n o p q r s t u v w x y z
+c d e f g h i j k l m n o p q r s t u v w x y z a b
+</code></pre><p>So, if we were to encode the message <code>hello</code> using the key <code>2</code>, we&rsquo;d get <code>jgnnq</code> as a result.
+To decode <code>jgnnq</code> back, we&rsquo;ll use a reverse table:</p>
+<pre tabindex="0"><code>c d e f g h i j k l m n o p q r s t u v w x y z a b
+a b c d e f g h i j k l m n o p q r s t u v w x y z
+</code></pre><p>The algorithm is simple and there are many possible ways to implement it. But as a Pythonista,
+my gut tells me that there must be something in the standard library to help me here.</p>
+<h2 id="maketrans-to-the-rescue"><code>maketrans</code> to the rescue</h2>
+<p>The Python standard library allows to create a <strong>translation table</strong> that we can later use when
+translating strings. That&rsquo;s what the <a href="https://docs.python.org/3/library/stdtypes.html#str.maketrans"><code>str.maketrans</code></a>
+is for.</p>
+<p>Let&rsquo;s say we want to quickly create a translation table to encode strings using the Caesar Cipher,
+having <code>2</code> as the key.</p>
+<p>First of all, we&rsquo;ll create a translation table using <code>str.maketrans</code>,
+passing in the original alphabet and the rotated one:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> encoding_table <span style="color:#f92672">=</span> str<span style="color:#f92672">.</span>maketrans(<span style="color:#e6db74">&#34;abcdefghijklmnopqrstuvwxyz&#34;</span>, <span style="color:#e6db74">&#34;cdefghijklmnopqrstuvwxyzab&#34;</span>)
+<span style="color:#f92672">&gt;&gt;&gt;</span> encoding_table
+{<span style="color:#ae81ff">97</span>: <span style="color:#ae81ff">99</span>,
+ <span style="color:#ae81ff">98</span>: <span style="color:#ae81ff">100</span>,
+ <span style="color:#f92672">.</span>
+ <span style="color:#f92672">.</span>
+ <span style="color:#f92672">.</span>
+ <span style="color:#ae81ff">120</span>: <span style="color:#ae81ff">122</span>,
+ <span style="color:#ae81ff">121</span>: <span style="color:#ae81ff">97</span>,
+ <span style="color:#ae81ff">122</span>: <span style="color:#ae81ff">98</span>}
+</code></pre></div><p>As you can see above, all it does is to create a mapping between the ASCII value of each character
+from the source to the target alphabet (remember that <code>ord(&quot;a&quot;) == 97</code>, and so on).</p>
+<p>Once we have the translation table in hand, we can encode our text via the
+<a href="https://docs.python.org/3/library/stdtypes.html#str.translate"><code>translate</code></a> method of
+Python string objects:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#e6db74">&#34;hello&#34;</span><span style="color:#f92672">.</span>translate(encoding_table)
+<span style="color:#e6db74">&#39;jgnnq&#39;</span>
+</code></pre></div><p>And if we want to decode the text back to its original value, we can use a reverse table:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> decoding_table <span style="color:#f92672">=</span> str<span style="color:#f92672">.</span>maketrans(<span style="color:#e6db74">&#34;cdefghijklmnopqrstuvwxyzab&#34;</span>, <span style="color:#e6db74">&#34;abcdefghijklmnopqrstuvwxyz&#34;</span>)
+<span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#e6db74">&#34;jgnnq&#34;</span><span style="color:#f92672">.</span>translate(decoding_table)
+<span style="color:#e6db74">&#39;hello&#39;</span>
+</code></pre></div><h2 id="generalizing-it">Generalizing it</h2>
+<p>We can dynamically create these tables using another great Python builtin feature: <strong>slicing</strong>.</p>
+<p>Let&rsquo;s say that we want to rotate the alphabet <code>2</code> letters to the right. All we need is to break
+the alphabet in two parts and join them. For example, <code>abcdefghijklmnopqrstuvwxyz</code> becomes
+<code>cdefghijklmnopqrstuvwxyz + ab</code>. In Python, we can do this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">from</span> string <span style="color:#f92672">import</span> ascii_lowercase <span style="color:#66d9ef">as</span> alphabet
+<span style="color:#f92672">&gt;&gt;&gt;</span> alphabet
+<span style="color:#e6db74">&#39;abcdefghijklmnopqrstuvwxyz&#39;</span>
+<span style="color:#f92672">&gt;&gt;&gt;</span> alphabet[<span style="color:#ae81ff">2</span>:]
+<span style="color:#e6db74">&#39;cdefghijklmnopqrstuvwxyz&#39;</span>
+<span style="color:#f92672">&gt;&gt;&gt;</span> alphabet[:<span style="color:#ae81ff">2</span>]
+<span style="color:#e6db74">&#39;ab&#39;</span>
+<span style="color:#f92672">&gt;&gt;&gt;</span> alphabet[<span style="color:#ae81ff">2</span>:] <span style="color:#f92672">+</span> alphabet[:<span style="color:#ae81ff">2</span>]
+<span style="color:#e6db74">&#39;cdefghijklmnopqrstuvwxyzab&#39;</span>
+</code></pre></div><p>As you can see above, we are taking two slices of the alphabet:</p>
+<ul>
+<li>one starting from the third letter of the alphabet: <code>alphabet[2:]</code>.</li>
+<li>the other with just the first two letters: <code>alphabet[:2]</code>.</li>
+</ul>
+<p>Now we can write utilities to build the encoding/decoding tables for us, given a key:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> string <span style="color:#f92672">import</span> ascii_lowercase <span style="color:#66d9ef">as</span> alphabet
+
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">build_encoding_table</span>(key):
+    <span style="color:#66d9ef">return</span> str<span style="color:#f92672">.</span>maketrans(alphabet, alphabet[key:] <span style="color:#f92672">+</span> alphabet[:key])
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">build_decoding_table</span>(key):
+    <span style="color:#66d9ef">return</span> str<span style="color:#f92672">.</span>maketrans(alphabet[key:] <span style="color:#f92672">+</span> alphabet[:key], alphabet)
+</code></pre></div><p>And then we can encode/decode strings using the <code>.translate</code> method and the proper
+translation tables.</p>
+<h2 id="building-an-abstraction">Building an abstraction</h2>
+<p>Given what we&rsquo;ve seen above, we can now create a class to encode/decode strings using
+Caesar Cipher. Something like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> string <span style="color:#f92672">import</span> ascii_lowercase <span style="color:#66d9ef">as</span> alphabet
+
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CaesarCipher</span>:
+
+    <span style="color:#66d9ef">def</span> __init__(self, key):
+        key <span style="color:#f92672">=</span> key <span style="color:#f92672">%</span> len(alphabet)
+        rotated_alphabet <span style="color:#f92672">=</span> alphabet[key:] <span style="color:#f92672">+</span> alphabet[:key]
+        self<span style="color:#f92672">.</span>encoding_table <span style="color:#f92672">=</span> str<span style="color:#f92672">.</span>maketrans(alphabet, rotated_alphabet)
+        self<span style="color:#f92672">.</span>decoding_table <span style="color:#f92672">=</span> str<span style="color:#f92672">.</span>maketrans(rotated_alphabet, alphabet)
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">encode</span>(self, text):
+        <span style="color:#66d9ef">return</span> text<span style="color:#f92672">.</span>translate(self<span style="color:#f92672">.</span>encoding_table)
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decode</span>(self, text):
+        <span style="color:#66d9ef">return</span> text<span style="color:#f92672">.</span>translate(self<span style="color:#f92672">.</span>decoding_table)
+</code></pre></div><p>The code above is just a simplification to show how we can take advantage of the standard library to simplify
+solutions. It does not handle uppercase/numbers/special characters and possibly other scenarios.</p>
+<h2 id="testing-it-all">Testing it all</h2>
+<p>We want to make sure it all works as expected and for that we can add some unit tests:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> pytest
+<span style="color:#f92672">from</span> caesar <span style="color:#f92672">import</span> CaesarCipher
+
+
+<span style="color:#a6e22e">@pytest</span><span style="color:#f92672">.</span>mark<span style="color:#f92672">.</span>parametrize(<span style="color:#e6db74">&#34;key, input_text, output_text&#34;</span>, [
+    (<span style="color:#ae81ff">0</span>, <span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;hello&#34;</span>),
+    (<span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;khoor&#34;</span>),
+    (<span style="color:#ae81ff">29</span>, <span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;khoor&#34;</span>),
+    (<span style="color:#f92672">-</span><span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;ebiil&#34;</span>),
+    (<span style="color:#f92672">-</span><span style="color:#ae81ff">29</span>, <span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;ebiil&#34;</span>),
+])
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_encode</span>(key, input_text, output_text):
+    <span style="color:#66d9ef">assert</span> CaesarCipher(key<span style="color:#f92672">=</span>key)<span style="color:#f92672">.</span>encode(input_text) <span style="color:#f92672">==</span> output_text
+
+
+<span style="color:#a6e22e">@pytest</span><span style="color:#f92672">.</span>mark<span style="color:#f92672">.</span>parametrize(<span style="color:#e6db74">&#34;key, input_text, output_text&#34;</span>, [
+    (<span style="color:#ae81ff">0</span>, <span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;hello&#34;</span>),
+    (<span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#34;khoor&#34;</span>, <span style="color:#e6db74">&#34;hello&#34;</span>),
+    (<span style="color:#ae81ff">29</span>, <span style="color:#e6db74">&#34;khoor&#34;</span>, <span style="color:#e6db74">&#34;hello&#34;</span>),
+    (<span style="color:#f92672">-</span><span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#34;ebiil&#34;</span>, <span style="color:#e6db74">&#34;hello&#34;</span>),
+    (<span style="color:#f92672">-</span><span style="color:#ae81ff">29</span>, <span style="color:#e6db74">&#34;ebiil&#34;</span>, <span style="color:#e6db74">&#34;hello&#34;</span>),
+])
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_decode</span>(key, input_text, output_text):
+    <span style="color:#66d9ef">assert</span> CaesarCipher(key<span style="color:#f92672">=</span>key)<span style="color:#f92672">.</span>decode(input_text) <span style="color:#f92672">==</span> output_text
+</code></pre></div><p>If you&rsquo;re not familiar with Pytest parametrization, check this out: <a href="https://docs.pytest.org/en/latest/parametrize.html">https://docs.pytest.org/en/latest/parametrize.html</a></p>
+<h2 id="thats-all-for-today">That&rsquo;s all for today</h2>
+<p>I am pretty sure that there are a lot of corners in the standard library that are not used very often,
+but that can be very helpful. What&rsquo;s your favorite?</p>
 </article>
+    <footer class="post-footer">
+      
+      <ul class="post-tags">
+        
+          <li class="post-tag"><a href="/tags/python"><span class="tag">Python</span></a></li>
+        
+          <li class="post-tag"><a href="/tags/string"><span class="tag">String</span></a></li>
+        
+      </ul>
+      
+      <div class="sharing">
+        <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Translation%20Tables%20In%20Python&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2ftranslation-tables-in-python%2f" title="Share on Twitter">
+          <svg class="icon icon-twitter" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
+        </a>
+        <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2ftranslation-tables-in-python%2f" title="Share on Facebook">
+          <svg class="icon icon-facebook" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
+        </a>
+      </div>
+
+      <div id="disqus_thread"></div>
+      <script>
+      
 
       
-        <article class="entry-single">
-  
-  <header class="entry-header">
-    <h3 class="entry-title"><a href="http://stummjr.github.io/post/customize-ipython5-prompt/" title="How to customize your IPython 5&#43; prompt" class="entry-link">How to customize your IPython 5&#43; prompt</a></h3>
-  </header>
 
-  <p class="entry-summary">IPython is wonderful and I ❤️ it. I can’t see myself using the default Python shell in a daily basis. However, its default prompt kind of annoys me:
-Some of the things that I dislike:
- the banner displayed when we start it; the In[x] and Out[x] displayed for inputs and outputs; the newline in between commands; and last, but far from least, the uber-annoying “do you really want to exit?</p>
-  <footer class="entry-footer">
-    <p class="entry-meta"><span class="entry-time">Sep 2, 2018</span> 2 min read</p>
-    <div class="sharing">
-      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=How%20to%20customize%20your%20IPython%205%2b%20prompt&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Twitter">
-        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-      </a>
-      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fcustomize-ipython5-prompt%2f" title="Share on Facebook">
-        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-      </a>
-    </div>
-  </footer>
-</article>
-
-      
-    
-    
+      (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://dunderdoc.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+      })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                       
+    </footer>
   </section>
 
     <footer class="footer">
