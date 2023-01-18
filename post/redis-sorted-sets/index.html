@@ -11,7 +11,7 @@
     
 
     
-    <title>Python 3 rounding oddities</title>
+    <title>Counting With Redis Sorted Sets</title>
 
     
     
@@ -21,18 +21,16 @@
   
   
   <meta name="author" content="Valdir Stumm Jr" />
-  <meta name="description" content="Rounding a decimal number with Python 3 is as simple as invoking the round() builtin:
-&amp;gt;&amp;gt;&amp;gt; round(1.2) 1 &amp;gt;&amp;gt;&amp;gt; round(1.8) 2 We can also pass an extra parameter called ndigits, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:
-&amp;gt;&amp;gt;&amp;gt; round(1.847, ndigits=2) 1.85 &amp;gt;&amp;gt;&amp;gt; round(1.847, ndigits=1) 1.8 And what happens when we want to round a number like 1.5? Will it round it up or down?">
+  <meta name="description" content="I&amp;rsquo;ve used Redis as a cache layer multiple times in my career. Most of the times, all I needed was a fast storage where I could store pre-computed JSON data and retrieve it by key. Redis was just perfect for that. Lightweight, easy to use, good docs, widely available in Cloud providers, etc.
+A couple weeks ago, though, I was faced with a different problem that helped me learn Redis a little more in depth.">
 
   
   
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@stummjr" />
-    <meta name="twitter:title" content="Python 3 rounding oddities" />
-    <meta name="twitter:description" content="Rounding a decimal number with Python 3 is as simple as invoking the round() builtin:
-&amp;gt;&amp;gt;&amp;gt; round(1.2) 1 &amp;gt;&amp;gt;&amp;gt; round(1.8) 2 We can also pass an extra parameter called ndigits, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:
-&amp;gt;&amp;gt;&amp;gt; round(1.847, ndigits=2) 1.85 &amp;gt;&amp;gt;&amp;gt; round(1.847, ndigits=1) 1.8 And what happens when we want to round a number like 1.5? Will it round it up or down?" />
+    <meta name="twitter:title" content="Counting With Redis Sorted Sets" />
+    <meta name="twitter:description" content="I&amp;rsquo;ve used Redis as a cache layer multiple times in my career. Most of the times, all I needed was a fast storage where I could store pre-computed JSON data and retrieve it by key. Redis was just perfect for that. Lightweight, easy to use, good docs, widely available in Cloud providers, etc.
+A couple weeks ago, though, I was faced with a different problem that helped me learn Redis a little more in depth." />
     <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
   
 
@@ -42,7 +40,7 @@
 <meta name="generator" content="Hugo 0.92.1" />
 
 
-<link rel="canonical" href="http://stummjr.github.io/post/python3-round-oddities/">
+<link rel="canonical" href="http://stummjr.github.io/post/redis-sorted-sets/">
 <link rel="alternative" href="/index.xml" title="Dunder Doc" type="application/atom+xml">
 
 
@@ -227,79 +225,74 @@
     
   <section class="main post-detail">
     <header class="post-header">
-      <h1 class="post-title">Python 3 rounding oddities</h1>
+      <h1 class="post-title">Counting With Redis Sorted Sets</h1>
       <p class="entry-meta">
-        <span class="entry-time">Aug 28, 2018</span>
+        <span class="entry-time">Jan 18, 2023</span>
         <span class="entry-author">Valdir Stumm Jr</span>
-        2 min read
+        4 min read
       </p>
     </header>
     
 
-    <article class="post-content"><p>Rounding a decimal number with Python 3 is as simple as invoking the <a href="https://docs.python.org/3/library/functions.html#round"><code>round()</code></a> builtin:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.2</span>)
+    <article class="post-content"><p>I&rsquo;ve used Redis as a cache layer multiple times in my career.
+Most of the times, all I needed was a fast storage where I could store pre-computed JSON data and retrieve it by key.
+Redis was just perfect for that. Lightweight, easy to use, good docs, widely available in Cloud providers, etc.</p>
+<p>A couple weeks ago, though, I was faced with a different problem that helped me learn Redis a little more in depth.</p>
+<p>The general problem is a quite common one: keeping track of the number of hits to a given resource and listing the top resources,
+in an efficient way. A problem like this may take many forms: top songs in a music streaming service, a leaderboard in a video game, etc.</p>
+<h2 id="my-first-idea">My first idea</h2>
+<p>There are many ways to do that, and I was initially inclined to use a simple counter in Redis, using the resource name
+as the key. So, every time there was a hit to a resource, I could just increment a counter:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> redis_client <span style="color:#f92672">=</span> redis<span style="color:#f92672">.</span>Redis(host<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;localhost&#34;</span>, port<span style="color:#f92672">=</span><span style="color:#ae81ff">6379</span>, encoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;utf-8&#34;</span>, decode_responses<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+<span style="color:#f92672">&gt;&gt;&gt;</span> redis_client<span style="color:#f92672">.</span>incr(<span style="color:#e6db74">&#34;/foo/bar.png&#34;</span>)
 <span style="color:#ae81ff">1</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.8</span>)
+<span style="color:#f92672">&gt;&gt;&gt;</span> redis_client<span style="color:#f92672">.</span>incr(<span style="color:#e6db74">&#34;/foo/bar.png&#34;</span>)
 <span style="color:#ae81ff">2</span>
-</code></pre></div><p>We can also pass an extra parameter called <code>ndigits</code>, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.847</span>, ndigits<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
-<span style="color:#ae81ff">1.85</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.847</span>, ndigits<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
-<span style="color:#ae81ff">1.8</span>
-</code></pre></div><p>And what happens when we want to round a number like 1.5? Will it round it up or down? Let’s check:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.5</span>)
-<span style="color:#ae81ff">2</span>
-</code></pre></div><p>It seems that it rounds up. Let’s check some other numbers to confirm:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">2.5</span>)
-<span style="color:#ae81ff">2</span>
-</code></pre></div><p>Uh, now it went down! Let’s check some more:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">3.5</span>)
-<span style="color:#ae81ff">4</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">4.5</span>)
-<span style="color:#ae81ff">4</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">5.5</span>)
-<span style="color:#ae81ff">6</span>
-</code></pre></div><p><img src="/img/posts/michael-scott-eli5.png" alt=""></p>
-<p>Calm down, there’s an explanation for this. In Python 3, <code>round()</code> works like this:</p>
+<span style="color:#f92672">&gt;&gt;&gt;</span> redis_client<span style="color:#f92672">.</span>incr(<span style="color:#e6db74">&#34;/api/foo/&#34;</span>)
+<span style="color:#ae81ff">1</span>
+<span style="color:#f92672">&gt;&gt;&gt;</span> redis_client<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;/foo/bar.png&#34;</span>)
+<span style="color:#e6db74">&#39;2&#39;</span>
+</code></pre></div><p>While that works well for keeping track of the hits on each resource, it would not be very efficient for retrieving
+the most-accessed resources. Redis would not give me the results sorted by counter and I&rsquo;d have to do so in the
+application level, which would be problematic given that there could be many thousands of resources to keep track of.</p>
+<h2 id="a-better-approach">A better approach</h2>
+<p><strong><em>&ldquo;Redis must have a way to do that natively&hellip;&rdquo; (scratching my head)</em></strong></p>
+<p>So I started looking into Redis (excellent) documentation on its data types and found a page describing
+<a href="https://redis.io/docs/data-types/sorted-sets/">Sorted Sets</a>. Here&rsquo;s how they are described:</p>
 <blockquote>
-<p>Round to the closest number.
-If there’s a tie, round to the closest even number.</p>
+<p>A Redis sorted set is a collection of unique strings (members) ordered by an associated score.</p>
 </blockquote>
-<p>Now it makes sense. If we check the examples above, we’ll see that the rounding was always made to the closest even number:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">3.5</span>)
-<span style="color:#ae81ff">4</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">4.5</span>)
-<span style="color:#ae81ff">4</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">5.5</span>)
-<span style="color:#ae81ff">6</span>
-</code></pre></div><h1 id="what-about-python-2">What about Python 2?</h1>
-<p>Python 2 is quite different. When there’s a tie, the rounding is always made upwards in case the numbers are positive:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.5</span>)
+<p><strong>Bingo!</strong> I can use the resource names as keys inside the set and increment the associated score every
+time the resource is hit. While that sounds similar to what I was doing with my first approach, in this
+case I can use sorted sets' builtin <a href="https://redis.io/commands/zrange/"><code>ZRANGE</code></a> function to
+retrieve the elements in a range <em>sorted by score</em>. Neat, huh?</p>
+<p>This is how we can increment the counter for the resources:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> redis_client<span style="color:#f92672">.</span>zadd(<span style="color:#e6db74">&#34;myapp:hits&#34;</span>, {<span style="color:#e6db74">&#34;/foo/bar.png&#34;</span>: <span style="color:#ae81ff">1</span>}, incr<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+<span style="color:#ae81ff">1.0</span>
+<span style="color:#f92672">&gt;&gt;&gt;</span> redis_client<span style="color:#f92672">.</span>zadd(<span style="color:#e6db74">&#34;myapp:hits&#34;</span>, {<span style="color:#e6db74">&#34;/foo/bar.png&#34;</span>: <span style="color:#ae81ff">1</span>}, incr<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
 <span style="color:#ae81ff">2.0</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">2.5</span>)
-<span style="color:#ae81ff">3.0</span>
-</code></pre></div><p>And downwards, when the numbers are negative:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#f92672">-</span><span style="color:#ae81ff">1.5</span>)
-<span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#f92672">-</span><span style="color:#ae81ff">2.5</span>)
-<span style="color:#f92672">-</span><span style="color:#ae81ff">3.0</span>
-</code></pre></div><h1 id="why-the-hell-did-python-3-changed-it">Why the hell did Python 3 changed it?</h1>
-<p>The goal is to take the <strong>bias</strong> out of the rounding operations.</p>
-<p>Imagine a bank where all the roundings are done upwards. By the end of the day, the bank earning report will show a value that is higher than what the bank actually earned. That’s what happens on <strong>Python 2</strong>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#75715e"># Python 2</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> values <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1.5</span>, <span style="color:#ae81ff">2.5</span>, <span style="color:#ae81ff">3.5</span>, <span style="color:#ae81ff">4.5</span>]
-<span style="color:#f92672">&gt;&gt;&gt;</span> sum(values)
-<span style="color:#ae81ff">12.0</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> sum(round(v) <span style="color:#66d9ef">for</span> v <span style="color:#f92672">in</span> values)
-<span style="color:#ae81ff">14.0</span>
-</code></pre></div><p>Using Python 3’s <code>round()</code>, the rounded values tend to be amortized, because half of them round upwards and half of them round downwards, given that half the numbers are even and the other half are odd. Check the same code, but now running on <strong>Python 3</strong>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#75715e"># Python 3</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> values <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1.5</span>, <span style="color:#ae81ff">2.5</span>, <span style="color:#ae81ff">3.5</span>, <span style="color:#ae81ff">4.5</span>]
-<span style="color:#f92672">&gt;&gt;&gt;</span> sum(values)
-<span style="color:#ae81ff">12.0</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> sum(round(v) <span style="color:#66d9ef">for</span> v <span style="color:#f92672">in</span> values)
-<span style="color:#ae81ff">12</span>
-</code></pre></div><p>This is no Python 3’s inovation. In fact, this kind of rounding is quite old and even has a proper name: <a href="http://wiki.c2.com/?BankersRounding">Bankers Rounding</a>.</p>
+<span style="color:#f92672">&gt;&gt;&gt;</span> redis_client<span style="color:#f92672">.</span>zadd(<span style="color:#e6db74">&#34;myapp:hits&#34;</span>, {<span style="color:#e6db74">&#34;/api/foo/&#34;</span>: <span style="color:#ae81ff">1</span>}, incr<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+<span style="color:#ae81ff">1.0</span>
+</code></pre></div><p>That is, in order to increment the counter for a given resource in the sorted set, we provided the key
+to access the whole set in Redis (<code>myapp:hits</code> in this case), a mapping with the resource name mapped to
+the amount that we want to increment its score by (<code>1</code>), and finally the <code>incr</code> flag as <code>True</code>.</p>
+<p>Now that we know how to store the resources and their number of hits in a set, the next thing is to find a way
+to retrieve the top <code>n</code> resources. For that we&rsquo;ll use the aforementioned <code>ZRANGE</code> function, like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> n <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>
+<span style="color:#f92672">&gt;&gt;&gt;</span> redis_client<span style="color:#f92672">.</span>zrange(<span style="color:#e6db74">&#34;myapp:hits&#34;</span>, <span style="color:#ae81ff">0</span>, n<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, withscores<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, desc<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, score_cast_func<span style="color:#f92672">=</span>int)
+[(<span style="color:#e6db74">&#39;/foo/bar.png&#39;</span>, <span style="color:#ae81ff">2</span>), (<span style="color:#e6db74">&#39;/api/foo/&#39;</span>, <span style="color:#ae81ff">1</span>)]
+</code></pre></div><p>Here we&rsquo;re basically telling <code>zrange</code> to retrieve the top <code>n</code> elements in the set (0&hellip;n-1), including their scores,
+in descending order, and finally casting the scores from floats to ints.</p>
+<p>Once I figured that out, all I had to to was to setup a <em>before-request</em> hook in my web app to increment the counter
+when the resources are hit and create a simple endpoint to return the top resources.</p>
+<p>As you can see, Redis handled most of the complexity for me and I ended up with a very simple solution in the application side.
+All I had to do was to spend some time reading Redis documentation.</p>
+<p>I&rsquo;m sure there are better ways to do that, but this seemed like a pretty good first implementation and a good exercise on
+diving a little more into Redis.</p>
+<h2 id="wrapping-up">Wrapping up</h2>
+<p>If you&rsquo;re interested in learning more about Redis, I suggest you to read the docs on its data types: <a href="https://redis.io/docs/data-types/">https://redis.io/docs/data-types/</a>.
+It&rsquo;s very concise and it perhaps will add some resources to your toolbelt that can be useful the next time you&rsquo;re facing a problem that
+can be solved via Redis.</p>
 </article>
     <footer class="post-footer">
       
@@ -307,15 +300,17 @@ If there’s a tie, round to the closest even number.</p>
         
           <li class="post-tag"><a href="/tags/python"><span class="tag">Python</span></a></li>
         
-          <li class="post-tag"><a href="/tags/rounding"><span class="tag">Rounding</span></a></li>
+          <li class="post-tag"><a href="/tags/redis"><span class="tag">Redis</span></a></li>
+        
+          <li class="post-tag"><a href="/tags/data-structures"><span class="tag">Data Structures</span></a></li>
         
       </ul>
       
       <div class="sharing">
-        <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Python%203%20rounding%20oddities&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fpython3-round-oddities%2f" title="Share on Twitter">
+        <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Counting%20With%20Redis%20Sorted%20Sets&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fredis-sorted-sets%2f" title="Share on Twitter">
           <svg class="icon icon-twitter" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
         </a>
-        <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fpython3-round-oddities%2f" title="Share on Facebook">
+        <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fredis-sorted-sets%2f" title="Share on Facebook">
           <svg class="icon icon-facebook" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
         </a>
       </div>

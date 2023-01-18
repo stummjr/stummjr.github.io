@@ -6,17 +6,35 @@
     <description>Recent content in Tags on Dunder Doc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 16 Mar 2022 15:55:13 -0300</lastBuildDate>
+    <lastBuildDate>Wed, 18 Jan 2023 13:55:13 -0300</lastBuildDate>
     
       <atom:link href="http://stummjr.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>data structures</title>
+      <link>http://stummjr.github.io/tags/data-structures/</link>
+      <pubDate>Wed, 18 Jan 2023 13:55:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/data-structures/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>python</title>
       <link>http://stummjr.github.io/tags/python/</link>
-      <pubDate>Wed, 16 Mar 2022 15:55:13 -0300</pubDate>
+      <pubDate>Wed, 18 Jan 2023 13:55:13 -0300</pubDate>
       
       <guid>http://stummjr.github.io/tags/python/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>redis</title>
+      <link>http://stummjr.github.io/tags/redis/</link>
+      <pubDate>Wed, 18 Jan 2023 13:55:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/tags/redis/</guid>
       <description></description>
     </item>
     

@@ -6,10 +6,78 @@
     <description>Recent content in Posts on Dunder Doc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 16 Mar 2022 15:55:13 -0300</lastBuildDate>
+    <lastBuildDate>Wed, 18 Jan 2023 13:55:13 -0300</lastBuildDate>
     
       <atom:link href="http://stummjr.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Counting With Redis Sorted Sets</title>
+      <link>http://stummjr.github.io/post/redis-sorted-sets/</link>
+      <pubDate>Wed, 18 Jan 2023 13:55:13 -0300</pubDate>
+      
+      <guid>http://stummjr.github.io/post/redis-sorted-sets/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;ve used Redis as a cache layer multiple times in my career.
+Most of the times, all I needed was a fast storage where I could store pre-computed JSON data and retrieve it by key.
+Redis was just perfect for that. Lightweight, easy to use, good docs, widely available in Cloud providers, etc.&lt;/p&gt;
+&lt;p&gt;A couple weeks ago, though, I was faced with a different problem that helped me learn Redis a little more in depth.&lt;/p&gt;
+&lt;p&gt;The general problem is a quite common one: keeping track of the number of hits to a given resource and listing the top resources,
+in an efficient way. A problem like this may take many forms: top songs in a music streaming service, a leaderboard in a video game, etc.&lt;/p&gt;
+&lt;h2 id=&#34;my-first-idea&#34;&gt;My first idea&lt;/h2&gt;
+&lt;p&gt;There are many ways to do that, and I was initially inclined to use a simple counter in Redis, using the resource name
+as the key. So, every time there was a hit to a resource, I could just increment a counter:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; redis_client &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; redis&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;Redis(host&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;localhost&amp;#34;&lt;/span&gt;, port&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;6379&lt;/span&gt;, encoding&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;utf-8&amp;#34;&lt;/span&gt;, decode_responses&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;True&lt;/span&gt;)
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; redis_client&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;incr(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/foo/bar.png&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; redis_client&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;incr(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/foo/bar.png&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; redis_client&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;incr(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/api/foo/&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; redis_client&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;get(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/foo/bar.png&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;2&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;While that works well for keeping track of the hits on each resource, it would not be very efficient for retrieving
+the most-accessed resources. Redis would not give me the results sorted by counter and I&amp;rsquo;d have to do so in the
+application level, which would be problematic given that there could be many thousands of resources to keep track of.&lt;/p&gt;
+&lt;h2 id=&#34;a-better-approach&#34;&gt;A better approach&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;&amp;ldquo;Redis must have a way to do that natively&amp;hellip;&amp;rdquo; (scratching my head)&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;So I started looking into Redis (excellent) documentation on its data types and found a page describing
+&lt;a href=&#34;https://redis.io/docs/data-types/sorted-sets/&#34;&gt;Sorted Sets&lt;/a&gt;. Here&amp;rsquo;s how they are described:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A Redis sorted set is a collection of unique strings (members) ordered by an associated score.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Bingo!&lt;/strong&gt; I can use the resource names as keys inside the set and increment the associated score every
+time the resource is hit. While that sounds similar to what I was doing with my first approach, in this
+case I can use sorted sets&#39; builtin &lt;a href=&#34;https://redis.io/commands/zrange/&#34;&gt;&lt;code&gt;ZRANGE&lt;/code&gt;&lt;/a&gt; function to
+retrieve the elements in a range &lt;em&gt;sorted by score&lt;/em&gt;. Neat, huh?&lt;/p&gt;
+&lt;p&gt;This is how we can increment the counter for the resources:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; redis_client&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;zadd(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;myapp:hits&amp;#34;&lt;/span&gt;, {&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/foo/bar.png&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;}, incr&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;True&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;1.0&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; redis_client&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;zadd(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;myapp:hits&amp;#34;&lt;/span&gt;, {&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/foo/bar.png&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;}, incr&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;True&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;2.0&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; redis_client&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;zadd(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;myapp:hits&amp;#34;&lt;/span&gt;, {&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/api/foo/&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;}, incr&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;True&lt;/span&gt;)
+&lt;span style=&#34;color:#ae81ff&#34;&gt;1.0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;That is, in order to increment the counter for a given resource in the sorted set, we provided the key
+to access the whole set in Redis (&lt;code&gt;myapp:hits&lt;/code&gt; in this case), a mapping with the resource name mapped to
+the amount that we want to increment its score by (&lt;code&gt;1&lt;/code&gt;), and finally the &lt;code&gt;incr&lt;/code&gt; flag as &lt;code&gt;True&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Now that we know how to store the resources and their number of hits in a set, the next thing is to find a way
+to retrieve the top &lt;code&gt;n&lt;/code&gt; resources. For that we&amp;rsquo;ll use the aforementioned &lt;code&gt;ZRANGE&lt;/code&gt; function, like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; n &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; redis_client&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;zrange(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;myapp:hits&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;, n&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, withscores&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;True&lt;/span&gt;, desc&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;True&lt;/span&gt;, score_cast_func&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;int)
+[(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/foo/bar.png&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;), (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/api/foo/&amp;#39;&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Here we&amp;rsquo;re basically telling &lt;code&gt;zrange&lt;/code&gt; to retrieve the top &lt;code&gt;n&lt;/code&gt; elements in the set (0&amp;hellip;n-1), including their scores,
+in descending order, and finally casting the scores from floats to ints.&lt;/p&gt;
+&lt;p&gt;Once I figured that out, all I had to to was to setup a &lt;em&gt;before-request&lt;/em&gt; hook in my web app to increment the counter
+when the resources are hit and create a simple endpoint to return the top resources.&lt;/p&gt;
+&lt;p&gt;As you can see, Redis handled most of the complexity for me and I ended up with a very simple solution in the application side.
+All I had to do was to spend some time reading Redis documentation.&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;m sure there are better ways to do that, but this seemed like a pretty good first implementation and a good exercise on
+diving a little more into Redis.&lt;/p&gt;
+&lt;h2 id=&#34;wrapping-up&#34;&gt;Wrapping up&lt;/h2&gt;
+&lt;p&gt;If you&amp;rsquo;re interested in learning more about Redis, I suggest you to read the docs on its data types: &lt;a href=&#34;https://redis.io/docs/data-types/&#34;&gt;https://redis.io/docs/data-types/&lt;/a&gt;.
+It&amp;rsquo;s very concise and it perhaps will add some resources to your toolbelt that can be useful the next time you&amp;rsquo;re facing a problem that
+can be solved via Redis.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Translation Tables In Python</title>

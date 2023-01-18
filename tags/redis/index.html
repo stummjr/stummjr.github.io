@@ -11,30 +11,28 @@
     
 
     
-    <title>Python 3 rounding oddities</title>
-
-    
-    
-
-
-
+    <title>
+  Tag → redis
   
+   | Dunder Doc
+</title>
+
+    
+    
+
+
+
+
   
   <meta name="author" content="Valdir Stumm Jr" />
-  <meta name="description" content="Rounding a decimal number with Python 3 is as simple as invoking the round() builtin:
-&amp;gt;&amp;gt;&amp;gt; round(1.2) 1 &amp;gt;&amp;gt;&amp;gt; round(1.8) 2 We can also pass an extra parameter called ndigits, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:
-&amp;gt;&amp;gt;&amp;gt; round(1.847, ndigits=2) 1.85 &amp;gt;&amp;gt;&amp;gt; round(1.847, ndigits=1) 1.8 And what happens when we want to round a number like 1.5? Will it round it up or down?">
+  <meta name="description" content="Random thoughts and tips on programming." />
 
   
-  
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@stummjr" />
-    <meta name="twitter:title" content="Python 3 rounding oddities" />
-    <meta name="twitter:description" content="Rounding a decimal number with Python 3 is as simple as invoking the round() builtin:
-&amp;gt;&amp;gt;&amp;gt; round(1.2) 1 &amp;gt;&amp;gt;&amp;gt; round(1.8) 2 We can also pass an extra parameter called ndigits, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:
-&amp;gt;&amp;gt;&amp;gt; round(1.847, ndigits=2) 1.85 &amp;gt;&amp;gt;&amp;gt; round(1.847, ndigits=1) 1.8 And what happens when we want to round a number like 1.5? Will it round it up or down?" />
-    <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
-  
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@stummjr" />
+  <meta name="twitter:title" content="Dunder Doc" />
+  <meta name="twitter:description" content="Random thoughts and tips on programming." />
+  <meta name="twitter:image" content="http://stummjr.github.io/img/avatar.jpg" />
 
 
 
@@ -42,7 +40,7 @@
 <meta name="generator" content="Hugo 0.92.1" />
 
 
-<link rel="canonical" href="http://stummjr.github.io/post/python3-round-oddities/">
+<link rel="canonical" href="http://stummjr.github.io/tags/redis/">
 <link rel="alternative" href="/index.xml" title="Dunder Doc" type="application/atom+xml">
 
 
@@ -225,116 +223,42 @@
 </amp-sidebar>
 
     
-  <section class="main post-detail">
-    <header class="post-header">
-      <h1 class="post-title">Python 3 rounding oddities</h1>
-      <p class="entry-meta">
-        <span class="entry-time">Aug 28, 2018</span>
-        <span class="entry-author">Valdir Stumm Jr</span>
-        2 min read
-      </p>
+  <section class="main entry-list">
+    <header class="list-header">
+      
+      
+        
+      
+        
+      
     </header>
     
+    
+      
+        <article class="entry-single">
+  
+  <header class="entry-header">
+    <h3 class="entry-title"><a href="http://stummjr.github.io/post/redis-sorted-sets/" title="Counting With Redis Sorted Sets" class="entry-link">Counting With Redis Sorted Sets</a></h3>
+  </header>
 
-    <article class="post-content"><p>Rounding a decimal number with Python 3 is as simple as invoking the <a href="https://docs.python.org/3/library/functions.html#round"><code>round()</code></a> builtin:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.2</span>)
-<span style="color:#ae81ff">1</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.8</span>)
-<span style="color:#ae81ff">2</span>
-</code></pre></div><p>We can also pass an extra parameter called <code>ndigits</code>, which defines the precision we want in the result. Such parameter defaults to 0, but we can pass anything:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.847</span>, ndigits<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
-<span style="color:#ae81ff">1.85</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.847</span>, ndigits<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
-<span style="color:#ae81ff">1.8</span>
-</code></pre></div><p>And what happens when we want to round a number like 1.5? Will it round it up or down? Let’s check:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.5</span>)
-<span style="color:#ae81ff">2</span>
-</code></pre></div><p>It seems that it rounds up. Let’s check some other numbers to confirm:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">2.5</span>)
-<span style="color:#ae81ff">2</span>
-</code></pre></div><p>Uh, now it went down! Let’s check some more:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">3.5</span>)
-<span style="color:#ae81ff">4</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">4.5</span>)
-<span style="color:#ae81ff">4</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">5.5</span>)
-<span style="color:#ae81ff">6</span>
-</code></pre></div><p><img src="/img/posts/michael-scott-eli5.png" alt=""></p>
-<p>Calm down, there’s an explanation for this. In Python 3, <code>round()</code> works like this:</p>
-<blockquote>
-<p>Round to the closest number.
-If there’s a tie, round to the closest even number.</p>
-</blockquote>
-<p>Now it makes sense. If we check the examples above, we’ll see that the rounding was always made to the closest even number:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">3.5</span>)
-<span style="color:#ae81ff">4</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">4.5</span>)
-<span style="color:#ae81ff">4</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">5.5</span>)
-<span style="color:#ae81ff">6</span>
-</code></pre></div><h1 id="what-about-python-2">What about Python 2?</h1>
-<p>Python 2 is quite different. When there’s a tie, the rounding is always made upwards in case the numbers are positive:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">1.5</span>)
-<span style="color:#ae81ff">2.0</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#ae81ff">2.5</span>)
-<span style="color:#ae81ff">3.0</span>
-</code></pre></div><p>And downwards, when the numbers are negative:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#f92672">-</span><span style="color:#ae81ff">1.5</span>)
-<span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> round(<span style="color:#f92672">-</span><span style="color:#ae81ff">2.5</span>)
-<span style="color:#f92672">-</span><span style="color:#ae81ff">3.0</span>
-</code></pre></div><h1 id="why-the-hell-did-python-3-changed-it">Why the hell did Python 3 changed it?</h1>
-<p>The goal is to take the <strong>bias</strong> out of the rounding operations.</p>
-<p>Imagine a bank where all the roundings are done upwards. By the end of the day, the bank earning report will show a value that is higher than what the bank actually earned. That’s what happens on <strong>Python 2</strong>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#75715e"># Python 2</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> values <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1.5</span>, <span style="color:#ae81ff">2.5</span>, <span style="color:#ae81ff">3.5</span>, <span style="color:#ae81ff">4.5</span>]
-<span style="color:#f92672">&gt;&gt;&gt;</span> sum(values)
-<span style="color:#ae81ff">12.0</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> sum(round(v) <span style="color:#66d9ef">for</span> v <span style="color:#f92672">in</span> values)
-<span style="color:#ae81ff">14.0</span>
-</code></pre></div><p>Using Python 3’s <code>round()</code>, the rounded values tend to be amortized, because half of them round upwards and half of them round downwards, given that half the numbers are even and the other half are odd. Check the same code, but now running on <strong>Python 3</strong>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#75715e"># Python 3</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> values <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1.5</span>, <span style="color:#ae81ff">2.5</span>, <span style="color:#ae81ff">3.5</span>, <span style="color:#ae81ff">4.5</span>]
-<span style="color:#f92672">&gt;&gt;&gt;</span> sum(values)
-<span style="color:#ae81ff">12.0</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> sum(round(v) <span style="color:#66d9ef">for</span> v <span style="color:#f92672">in</span> values)
-<span style="color:#ae81ff">12</span>
-</code></pre></div><p>This is no Python 3’s inovation. In fact, this kind of rounding is quite old and even has a proper name: <a href="http://wiki.c2.com/?BankersRounding">Bankers Rounding</a>.</p>
+  <p class="entry-summary">I’ve used Redis as a cache layer multiple times in my career. Most of the times, all I needed was a fast storage where I could store pre-computed JSON data and retrieve it by key. Redis was just perfect for that. Lightweight, easy to use, good docs, widely available in Cloud providers, etc.
+A couple weeks ago, though, I was faced with a different problem that helped me learn Redis a little more in depth.</p>
+  <footer class="entry-footer">
+    <p class="entry-meta"><span class="entry-time">Jan 18, 2023</span> 4 min read</p>
+    <div class="sharing">
+      <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Counting%20With%20Redis%20Sorted%20Sets&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fredis-sorted-sets%2f" title="Share on Twitter">
+        <svg class="icon share-twitter-icon" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
+      </a>
+      <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fredis-sorted-sets%2f" title="Share on Facebook">
+        <svg class="icon" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
+      </a>
+    </div>
+  </footer>
 </article>
-    <footer class="post-footer">
-      
-      <ul class="post-tags">
-        
-          <li class="post-tag"><a href="/tags/python"><span class="tag">Python</span></a></li>
-        
-          <li class="post-tag"><a href="/tags/rounding"><span class="tag">Rounding</span></a></li>
-        
-      </ul>
-      
-      <div class="sharing">
-        <a class="share share-twitter" target="_blank" href="https://twitter.com/intent/tweet/?text=Python%203%20rounding%20oddities&amp;url=http%3a%2f%2fstummjr.github.io%2fpost%2fpython3-round-oddities%2f" title="Share on Twitter">
-          <svg class="icon icon-twitter" fill="currentColor"><use xlink:href="#icon-twitter" /></svg>
-        </a>
-        <a class="share share-facebook" target="_blank" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fstummjr.github.io%2fpost%2fpython3-round-oddities%2f" title="Share on Facebook">
-          <svg class="icon icon-facebook" fill="currentColor"><use xlink:href="#icon-facebook" /></svg>
-        </a>
-      </div>
-
-      <div id="disqus_thread"></div>
-      <script>
-      
 
       
-
-      (function() { 
-      var d = document, s = d.createElement('script');
-      s.src = 'https://dunderdoc.disqus.com/embed.js';
-      s.setAttribute('data-timestamp', +new Date());
-      (d.head || d.body).appendChild(s);
-      })();
-      </script>
-      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>                       
-    </footer>
+    
+    
   </section>
 
     <footer class="footer">
